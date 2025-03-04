@@ -1,5 +1,5 @@
 import React, { JSX } from 'react';
-import FeatureDescription from '../components/FeatureDescription';
+import FeatureDescription from '../components/home/FeatureDescription';
 
 export default function Home(): JSX.Element {
     return (
@@ -10,12 +10,12 @@ export default function Home(): JSX.Element {
                 for cities and countries around the world.
             </p>
 
-            {/* City Explorer Feature */}
+            {/* Globe Scout Feature */}
             <FeatureDescription
-                title="City Explorer"
-                description="City Explorer lets you search for a city or country and discover the top 10 attractions in that area. You can also view the current weather and navigate to the Weather Page for a detailed 5-day forecast."
-                buttonText="Explore Cities"
-                buttonLink="/cityexplorer"
+                title="Globe Scout"
+                description="Globe Scout lets you search for a city or country and discover the top 10 attractions in that area. You can also view the current weather and navigate to the Weather Page for a detailed 5-day forecast."
+                buttonText="Discover the Globe"
+                buttonLink="/globe-scout"
             />
 
             {/* Weather Page Feature */}
@@ -23,7 +23,15 @@ export default function Home(): JSX.Element {
                 title="Weather Forecast"
                 description="Weather Forecast shows a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities."
                 buttonText="View Weather Forecast"
-                buttonLink="/weather"
+                buttonLink="/weather-forecast"
+            />
+
+            {/* Users Page */}
+            <FeatureDescription
+                title="Users"
+                description="A list of users who have registered on CityZen"
+                buttonText=" View Users"
+                buttonLink="/users"
             />
         </>
     );
