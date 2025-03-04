@@ -3,5 +3,10 @@
         "prettier --write",
         "eslint --fix",
         "eslint"
+    ],
+    "client/**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "eslint --fix",
+      "eslint"
     ]
 }

@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-    ...compat.extends('prettier'),
+    ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
     {
         rules: {
             'no-console': [

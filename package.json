@@ -1,39 +1,43 @@
 {
-    "name": "cityzen",
+    "name": "cityzen-server",
     "version": "0.1.0",
-    "private": true,
+    "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+    "main": "server.js",
     "scripts": {
         "dev": "nodemon --exec ts-node server.ts",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint",
-        "lint:fix": "next lint --fix",
-        "prettier": "prettier --write .",
+        "dev:client": "cd client && npm run dev",
+        "build": "cd client && next build",
+        "start": "cd client && next start",
+        "lint": "echo 'Server lint' && eslint --config eslint.config.mjs && echo 'Client lint' && cd client && npm run lint",
+        "lint:fix": "echo 'Server lint fix' && eslint --fix --config eslint.config.mjs && echo 'Client lint fix' && cd client && npm run lint:fix",
+        "prettier": "echo 'Server Prettier' && prettier --config .prettierrc --write . && echo 'Client Prettier' && cd client && npm run prettier",
         "prepare": "husky"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nicnolen/CityZen.git"
+    },
+    "author": "Nicholas Nolen",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/nicnolen/CityZen/issues"
+    },
+    "homepage": "https://github.com/nicnolen/CityZen#readme",
     "dependencies": {
+        "@types/express": "^5.0.0",
         "dotenv": "^16.4.7",
-        "next": "15.2.0",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "express": "^4.21.2",
+        "next": "^15.2.1"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "^3",
-        "@tailwindcss/postcss": "^4",
-        "@types/express": "^5.0.0",
-        "@types/node": "^20",
-        "@types/react": "^19",
-        "@types/react-dom": "^19",
-        "eslint": "^9",
-        "eslint-config-next": "15.2.0",
+        "@types/cors": "^2.8.17",
+        "eslint": "^9.21.0",
         "eslint-config-prettier": "^10.0.2",
-        "express": "^4.21.2",
+        "eslint-plugin-node": "^11.1.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.4.3",
         "nodemon": "^3.1.9",
-        "prettier": "^3.5.2",
-        "tailwindcss": "^4",
-        "ts-node": "^10.9.2",
-        "typescript": "^5"
+        "prettier": "^3.5.3",
+        "ts-node": "^10.9.2"
     }
 }
