@@ -27,7 +27,6 @@ async function startServer(): Promise<void> {
         // Wait for Next.js to be ready;
         await app.prepare();
 
-        //TODO: TYPE THIS CORRECTLY AND THEN MAKE SURE ALL QUERIES AND RESOLVERS
         const server: Express = express();
 
         await apolloServer.start();
