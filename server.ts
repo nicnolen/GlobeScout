@@ -1,11 +1,11 @@
 import express, { Express, Request, Response, RequestHandler } from 'express';
 import next from 'next';
 import path from 'path';
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import { typeDefs } from './client/src/graphQL/queries/index';
-import { resolvers } from './client/src/graphQL/resolvers/index';
 import dotenv from 'dotenv';
+import connectToMongoDB from './config/mongoDB/db';
+import { startApolloServer } from './config/graphQL/db';
+import { expressMiddleware } from '@apollo/server/express4';
+import { errorHandler } from './utils/errorHandler';
 
 // Load environmental variables
 dotenv.config();
@@ -16,11 +16,8 @@ const app = next({ dev, dir: './client' });
 // Tell Express how to handle incoming requests to server Next.js pages
 const handle = app.getRequestHandler();
 
-// Initialize Apollo Server with typeDefs and resolvers
-const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
-});
+// Connect to MongoDB
+connectToMongoDB();
 
 async function startServer(): Promise<void> {
     try {
@@ -29,7 +26,7 @@ async function startServer(): Promise<void> {
 
         const server: Express = express();
 
-        await apolloServer.start();
+        const apolloServer = await startApolloServer();
 
         // Middleware to parse JSON requests before Apollo Server
         server.use(express.json());
@@ -53,11 +50,8 @@ async function startServer(): Promise<void> {
             console.info(`GraphQL endpoint available at http://localhost:${PORT}/graphql`);
         });
     } catch (err: unknown) {
-        if (err instanceof Error) {
-            console.error(`Error starting server: ${err.message}`);
-        } else {
-            console.error(`Error starting server: ${err}`);
-        }
+        const customMessage = 'Error starting server';
+        errorHandler(err, customMessage);
     }
 }
 
