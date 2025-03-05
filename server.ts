@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Express, Request, Response, RequestHandler } from 'express';
 import next from 'next';
 import path from 'path';
 import { ApolloServer } from '@apollo/server';
@@ -27,7 +27,8 @@ async function startServer(): Promise<void> {
         // Wait for Next.js to be ready;
         await app.prepare();
 
-        const server: any = express();
+        //TODO: TYPE THIS CORRECTLY AND THEN MAKE SURE ALL QUERIES AND RESOLVERS
+        const server: Express = express();
 
         await apolloServer.start();
 
@@ -35,8 +36,10 @@ async function startServer(): Promise<void> {
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
 
+        // Explicitly cast Apollo's middleware as an Express RequestHandler
+        const graphqlMiddleware = expressMiddleware(apolloServer) as unknown as RequestHandler;
         // Apply Apollo Server middleware to the Express app
-        server.use('/graphql', expressMiddleware(apolloServer));
+        server.use('/graphql', graphqlMiddleware);
 
         // Serve static files from the `client/public` folder
         server.use(express.static(path.join(__dirname, 'client', 'public')));
