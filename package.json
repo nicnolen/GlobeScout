@@ -11,7 +11,9 @@
         "lint": "echo 'Server lint' && eslint --config eslint.config.mjs && echo 'Client lint' && cd client && npm run lint",
         "lint:fix": "echo 'Server lint fix' && eslint --fix --config eslint.config.mjs && echo 'Client lint fix' && cd client && npm run lint:fix",
         "prettier": "echo 'Server Prettier' && prettier --config .prettierrc --write . && echo 'Client Prettier' && cd client && npm run prettier",
-        "prepare": "husky"
+        "prepare": "husky",
+        "update-deps": "echo 'Server' && ncu -i --format group && echo 'Client' && ncu -i --format group && echo 'Global' && ncu -g",
+        "unused-deps": "depcheck"
     },
     "repository": {
         "type": "git",
@@ -32,13 +34,9 @@
         "next": "^15.2.1"
     },
     "devDependencies": {
-        "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
-        "@types/graphql": "^14.2.3",
-        "@types/mongoose": "^5.11.96",
         "eslint": "^9.21.0",
         "eslint-config-prettier": "^10.0.2",
-        "eslint-plugin-node": "^11.1.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.4.3",
         "nodemon": "^3.1.9",
