@@ -1,6 +1,6 @@
 import { ApolloServer } from '@apollo/server';
-import { typeDefs } from '../../client/src/graphQL/queries/index';
-import { resolvers } from '../../client/src/graphQL/resolvers/index';
+import { typeDefs } from '../../graphQL/queries/index';
+import { resolvers } from '../../graphQL/resolvers/index';
 import { errorHandler } from '../../utils/errorHandler';
 
 // Initialize Apollo Server with typeDefs and resolvers

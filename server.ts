@@ -3,7 +3,7 @@ import next from 'next';
 import path from 'path';
 import dotenv from 'dotenv';
 import connectToMongoDB from './config/mongoDB/db';
-import { startApolloServer } from './config/graphQL/db';
+import { startApolloServer } from './config/graphQL/apolloServer';
 import { expressMiddleware } from '@apollo/server/express4';
 import { errorHandler } from './utils/errorHandler';
 
