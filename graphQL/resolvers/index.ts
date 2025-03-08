@@ -1,3 +1,3 @@
-import { greetingResolver } from './userResolver';
+import { weatherResolvers } from './weatherResolvers';
 
-export const resolvers = [greetingResolver];
+export const resolvers = [weatherResolvers];
