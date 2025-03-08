@@ -16,25 +16,27 @@ export default function GlobeScout(): JSX.Element {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        getCurrentWeather({ variables: { city, units } }); // Trigger the query when the form is submitted
+        getCurrentWeather({ variables: { city, units } });
     };
 
     const isError = error instanceof ApolloError;
 
     return (
         <div>
-            <WeatherTitle city={city} loading={loading} error={error} />
+            {city && <WeatherTitle city={city} loading={loading} error={error} />}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
                 <WeatherInput city={city} setCity={setCity} />
 
-                <WeatherForecastButton
-                    currentWeatherData={currentWeatherData}
-                    units={units}
-                    setUnits={setUnits}
-                    loading={loading}
-                    isError={isError}
-                />
+                {currentWeatherData && (
+                    <WeatherForecastButton
+                        currentWeatherData={currentWeatherData}
+                        units={units}
+                        setUnits={setUnits}
+                        loading={loading}
+                        isError={isError}
+                    />
+                )}
             </form>
         </div>
     );

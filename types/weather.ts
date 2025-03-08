@@ -4,10 +4,11 @@ export enum Units {
 }
 
 export interface WeatherForecastButtonProps {
-    handleWeatherForecastButtonClick: () => void;
+    currentWeatherData: any;
+    units: Units;
+    setUnits: React.Dispatch<React.SetStateAction<Units>>;
     loading: boolean;
     isError: boolean;
-    currentWeatherData: any;
 }
 
 // GraphQL query structure
@@ -24,6 +25,12 @@ export interface Weather {
     windDirection: number;
     sunrise: number;
     sunset: number;
+}
+
+// GraphQL resolvers
+export interface GetCurrentWeatherArgs {
+    city: string;
+    units: Units;
 }
 
 // Interface for the OpenWeatherMap API response for current weather by city name

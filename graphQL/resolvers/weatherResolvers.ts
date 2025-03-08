@@ -1,11 +1,6 @@
 import axios from 'axios';
-import { Units, Weather, CurrentWeatherResponse } from '../../types/weather';
+import { Weather, CurrentWeatherResponse, GetCurrentWeatherArgs } from '../../types/weather';
 import { errorHandler } from '../../utils/errorHandler';
-
-interface GetCurrentWeatherArgs {
-    city: string;
-    units: Units;
-}
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
 
