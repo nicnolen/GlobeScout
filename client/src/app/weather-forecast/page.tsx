@@ -1,6 +1,6 @@
 import React, { JSX } from 'react';
-import Weather from '../../components/weather-forecast/Weather';
 
 export default function WeatherForecast(): JSX.Element {
-    return <Weather />;
+    //TODO IMPORT WEATHER FORECAST PAGE AND ADD A BACK BUTTON
+    return <p>Weather Forecast Page</p>;
 }

@@ -1,3 +1,3 @@
-import { GET_GREETING } from './userQuery';
+import { GET_WEATHER } from './weatherQueries';
 
-export const typeDefs = [GET_GREETING];
+export const typeDefs = [GET_WEATHER];
