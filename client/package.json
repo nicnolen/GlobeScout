@@ -12,10 +12,12 @@
     },
     "dependencies": {
         "@apollo/client": "^3.13.3",
+        "@reduxjs/toolkit": "^2.6.1",
         "dotenv": "^16.4.7",
         "next": "15.2.0",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "react-redux": "^9.2.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",

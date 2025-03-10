@@ -1,7 +1,6 @@
 export interface GlobeScoutTitleProps {
     city: string;
-    loading: boolean;
-    error: Error | undefined;
+    message: string;
 }
 
 export interface GlobeScoutSearchbarProps {

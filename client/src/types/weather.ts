@@ -1,14 +1,8 @@
+import { ApolloError } from '@apollo/client';
+
 export enum Units {
     Metric = 'metric',
     Imperial = 'imperial',
-}
-
-export interface WeatherForecastButtonProps {
-    currentWeatherData: any;
-    units: Units;
-    setUnits: React.Dispatch<React.SetStateAction<Units>>;
-    loading: boolean;
-    isError: boolean;
 }
 
 // GraphQL query structure
@@ -26,6 +20,9 @@ export interface Weather {
     sunrise: number;
     sunset: number;
 }
+
+// Alias
+export type CurrentWeather = Weather;
 
 // GraphQL resolvers
 export interface GetCurrentWeatherArgs {
@@ -75,4 +72,22 @@ export interface CurrentWeatherResponse {
     id: number;
     name: string;
     cod: number;
+}
+
+// Redux
+export interface WeatherState {
+    units: Units;
+}
+
+// Custom Interfaces
+export interface WeatherForecastButtonProps {
+    currentWeatherData: CurrentWeather;
+    isLoading: boolean;
+    isError: ApolloError | null;
+}
+
+export interface UseWeatherMessageParams {
+    currentWeatherLoading: boolean;
+    currentWeatherError: Error | undefined;
+    setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
