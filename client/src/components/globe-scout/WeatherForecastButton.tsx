@@ -4,7 +4,7 @@ import React, { JSX } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Units } from '../../types/weather';
+import { Units } from '../../../../types/weather';
 import { WeatherForecastButtonProps } from '../../types/weather';
 import { selectUnits } from '../../redux/selectors/weatherSelectors';
 import { setUnits } from '../../redux/slices/weatherSlice';

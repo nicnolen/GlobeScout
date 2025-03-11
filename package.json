@@ -32,10 +32,12 @@
         "express": "^4.21.2",
         "graphql": "^16.10.0",
         "mongoose": "^8.12.1",
-        "next": "^15.2.1"
+        "next": "^15.2.1",
+        "node-cron": "^3.0.3"
     },
     "devDependencies": {
         "@types/express": "^5.0.0",
+        "@types/node-cron": "^3.0.11",
         "eslint": "^9.21.0",
         "eslint-config-prettier": "^10.0.2",
         "husky": "^9.1.7",

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Units, WeatherState } from '../../types/weather';
+import { WeatherState } from '../../types/weather';
+import { Units } from '../../../../types/weather';
 import * as weatherReducers from '../reducers/weatherReducers';
 
 const initialState: WeatherState = {
