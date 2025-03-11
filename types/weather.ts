@@ -19,9 +19,35 @@ export interface Weather {
     sunset: number;
 }
 
+export interface DailyForecastAccumulator {
+    description: string;
+    icon: string;
+    temperatures: number[];
+    humidity: number[];
+    pressure: number[];
+    visibility: number[];
+    windSpeed: number[];
+    minTemperature: number;
+    maxTemperature: number;
+}
+
+// A daily forecast, with the data aggregated and averaged
+export interface DailyWeather {
+    date: string; // e.g., '2022-03-15'
+    description: string;
+    icon: string;
+    temperature: number; // Average of 3-hour temperatures
+    minTemperature: number; // Minimum temperature for the day
+    maxTemperature: number; // Maximum temperature for the day
+    humidity: number; // Average humidity for the day
+    pressure: number; // Average pressure for the day
+    visibility: number; // Average visibility for the day
+    windSpeed: number; // Average wind speed for the day
+}
+
 // Alias
 export type CurrentWeather = Weather;
-export type FiveDayForecast = Weather[];
+export type FiveDayForecast = DailyWeather[];
 
 // GraphQL resolvers
 export interface GetWeatherArgs {

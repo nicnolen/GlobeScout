@@ -2,6 +2,8 @@ import axios from 'axios';
 import {
     CurrentWeather,
     FiveDayForecast,
+    DailyForecastAccumulator,
+    DailyWeather,
     CurrentWeatherResponse,
     FiveDayForecastResponse,
     Units,
@@ -88,26 +90,64 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
         );
 
         const { list } = response.data;
-
         const country = response.data.city.country;
 
-        // Map through the response list and transform it into an array of Weather objects
-        const formattedForecastEntries: FiveDayForecast = list.map((entry) => ({
-            description: entry.weather[0].description,
-            icon: entry.weather[0].icon,
-            temperature: entry.main.temp,
-            minTemperature: entry.main.temp_min,
-            maxTemperature: entry.main.temp_max,
-            humidity: entry.main.humidity,
-            pressure: entry.main.pressure,
-            visibility: entry.visibility,
-            windSpeed: entry.wind.speed,
-            windDirection: entry.wind.deg,
-            timestamp: entry.dt,
-            dateTime: entry.dt_txt,
-            sunrise: entry.sunrise,
-            sunset: entry.sunset,
-        }));
+        // Helper function to calculate average
+        function average(arr: number[]): number {
+            if (arr.length === 0) return 0; // Prevent division by zero
+            return arr.reduce((acc, val) => acc + val, 0) / arr.length;
+        }
+
+        // Define an intermediate accumulator type to temporarily hold forecast data
+
+        // Group the 3-hour forecast data into daily averages
+        const dailyForecast = list.reduce<Record<string, DailyForecastAccumulator>>(
+            (acc, entry) => {
+                const date = new Date(entry.dt_txt).toISOString().split('T')[0]; // Extract the date
+
+                // Initialize the day if it doesn't exist
+                if (!acc[date]) {
+                    acc[date] = {
+                        description: entry.weather[0].description,
+                        icon: entry.weather[0].icon,
+                        temperatures: [],
+                        humidity: [],
+                        pressure: [],
+                        visibility: [],
+                        windSpeed: [],
+                        minTemperature: entry.main.temp_min,
+                        maxTemperature: entry.main.temp_max,
+                    };
+                }
+
+                // Aggregate data
+                acc[date].temperatures.push(entry.main.temp);
+                acc[date].humidity.push(entry.main.humidity);
+                acc[date].pressure.push(entry.main.pressure);
+                acc[date].visibility.push(entry.visibility);
+                acc[date].windSpeed.push(entry.wind.speed);
+
+                return acc;
+            },
+            {} as Record<string, DailyForecastAccumulator>, // Use the new accumulator type
+        );
+
+        // Convert daily data into an array with averages
+        const formattedForecastEntries: DailyWeather[] = Object.keys(dailyForecast).map((date) => {
+            const dayData = dailyForecast[date];
+            return {
+                date,
+                description: dayData.description,
+                icon: dayData.icon,
+                temperature: Math.round(average(dayData.temperatures)),
+                minTemperature: dayData.minTemperature,
+                maxTemperature: dayData.maxTemperature,
+                humidity: Math.round(average(dayData.humidity)),
+                pressure: Math.round(average(dayData.pressure)),
+                visibility: Math.round(average(dayData.visibility)),
+                windSpeed: Math.round(average(dayData.windSpeed)),
+            };
+        });
 
         await FiveDayForecastModel.insertOne({
             city,
