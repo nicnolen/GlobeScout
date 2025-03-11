@@ -21,5 +21,6 @@ export const GET_WEATHER = `
 
   type Query {
     getCurrentWeather(city: String!, units: Units!): Weather
+    getFiveDayForecast(city: String!, units: Units!): [Weather]
   }
 `;
