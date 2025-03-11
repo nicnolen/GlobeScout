@@ -2,10 +2,11 @@ import express, { Express, Request, Response, RequestHandler } from 'express';
 import next from 'next';
 import path from 'path';
 import dotenv from 'dotenv';
+import { expressMiddleware } from '@apollo/server/express4';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
-import { expressMiddleware } from '@apollo/server/express4';
-import { errorHandler } from './utils/errorHandler';
+import { scheduleClearCurrentWeatherJob } from './utils/cron/weatherCrons';
+import { catchErrorHandler } from './utils/errorHandlers';
 
 // Load environmental variables
 dotenv.config();
@@ -45,13 +46,16 @@ async function startServer(): Promise<void> {
             return handle(req, res);
         });
 
+        // cron jobs
+        scheduleClearCurrentWeatherJob();
+
         server.listen(PORT, () => {
             console.info(`Server is running on http://localhost:${PORT}`);
             console.info(`GraphQL endpoint available at http://localhost:${PORT}/graphql`);
         });
     } catch (err: unknown) {
         const customMessage = 'Error starting server';
-        errorHandler(err, customMessage);
+        catchErrorHandler(err, customMessage);
     }
 }
 

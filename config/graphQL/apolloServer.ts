@@ -1,7 +1,7 @@
 import { ApolloServer } from '@apollo/server';
 import { typeDefs } from '../../graphQL/queries/index';
 import { resolvers } from '../../graphQL/resolvers/index';
-import { errorHandler } from '../../utils/errorHandler';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 // Initialize Apollo Server with typeDefs and resolvers
 const apolloServer = new ApolloServer({
@@ -16,7 +16,7 @@ export async function startApolloServer(): Promise<ApolloServer> {
         return apolloServer;
     } catch (err: unknown) {
         const customMessage = 'Error starting Apollo Server';
-        errorHandler(err, customMessage);
+        catchErrorHandler(err, customMessage);
         throw err;
     }
 }

@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { Weather, CurrentWeatherResponse, GetCurrentWeatherArgs } from '../../client/src/types/weather';
-import { errorHandler } from '../../utils/errorHandler';
+import { CurrentWeather, GetCurrentWeatherArgs } from '../../types/weather';
+import { getCurrentWeather } from '../../library/weather';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
 
@@ -12,30 +12,12 @@ if (!API_KEY) {
 
 export const weatherResolvers = {
     Query: {
-        getCurrentWeather: async (parent: any, { city, units }: GetCurrentWeatherArgs): Promise<Weather> => {
+        getCurrentWeather: async (parent: any, { city, units }: GetCurrentWeatherArgs): Promise<CurrentWeather> => {
             try {
-                const response = await axios.get<CurrentWeatherResponse>(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=${units}`,
-                );
-                const weatherData = response.data;
-
-                return {
-                    description: weatherData.weather[0].description,
-                    icon: weatherData.weather[0].icon,
-                    temperature: weatherData.main.temp,
-                    minTemperature: weatherData.main.temp_min,
-                    maxTemperature: weatherData.main.temp_max,
-                    humidity: weatherData.main.humidity,
-                    pressure: weatherData.main.pressure,
-                    visibility: weatherData.visibility,
-                    windSpeed: weatherData.wind.speed,
-                    windDirection: weatherData.wind.deg,
-                    sunrise: weatherData.sys.sunrise,
-                    sunset: weatherData.sys.sunset,
-                };
+                return await getCurrentWeather(city, units);
             } catch (err: unknown) {
                 const customMessage = 'Error fetching weather data from OpenWeatherMap';
-                errorHandler(err, customMessage);
+                catchErrorHandler(err, customMessage);
                 throw err;
             }
         },
