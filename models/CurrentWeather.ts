@@ -5,7 +5,7 @@ interface CurrentWeatherDocument extends Document {
     city: string;
     country: string;
     units: Units;
-    data: CurrentWeatherResponse;
+    currentWeather: CurrentWeatherResponse;
 }
 
 const CurrentWeatherSchema = new Schema<CurrentWeatherDocument>(
@@ -13,7 +13,7 @@ const CurrentWeatherSchema = new Schema<CurrentWeatherDocument>(
         city: { type: String, required: true },
         country: { type: String, required: true },
         units: { type: String, required: true },
-        data: { type: Schema.Types.Mixed, required: true },
+        currentWeather: { type: Schema.Types.Mixed, required: true },
     },
     { timestamps: true },
 );

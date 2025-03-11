@@ -20,21 +20,18 @@ export const GET_CURRENT_WEATHER = gql`
 `;
 
 export const GET_FIVE_DAY_FORECAST = gql`
-    query GetFiveDayForecast($lat: Float!, $lon: Float!, $units: Units!) {
-        getFiveDayForecast(lat: $lat, lon: $lon, units: $units) {
+    query GetFiveDayForecast($city: String!, $units: Units!) {
+        getFiveDayForecast(city: $city, units: $units) {
             description
             icon
             temperature
             minTemperature
             maxTemperature
-            feelsLike
-            rain
             humidity
             pressure
             visibility
             windSpeed
             windDirection
-            windGust
             sunrise
             sunset
         }

@@ -5,5 +5,4 @@ export interface GlobeScoutTitleProps {
 
 export interface GlobeScoutSearchbarProps {
     city: string;
-    setCity: React.Dispatch<React.SetStateAction<string>>;
 }

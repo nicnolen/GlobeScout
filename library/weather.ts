@@ -7,6 +7,7 @@ import {
     Units,
 } from '../types/weather';
 import CurrentWeatherModel from '../models/CurrentWeather';
+import FiveDayForecastModel from '../models/FiveDayForecast';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
@@ -27,7 +28,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
-            return cachedCurrentWeather.data;
+            return cachedCurrentWeather.currentWeather;
         }
 
         const response = await axios.get<CurrentWeatherResponse>(
@@ -57,7 +58,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
             city,
             country,
             units,
-            data: fortmattedCurrentWeather,
+            currentWeather: fortmattedCurrentWeather,
         });
 
         return fortmattedCurrentWeather;
@@ -70,6 +71,17 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
 
 export async function getFiveDayForecast(city: string, units: Units): Promise<FiveDayForecast> {
     try {
+        // Check the cache first (MongoDB)
+        const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
+            city,
+            units,
+        });
+
+        if (cachedFiveDayForecast) {
+            console.info('Cached five day forecast data was found');
+            return cachedFiveDayForecast.fiveDayForecast;
+        }
+
         // Fetch the 5-day forecast from OpenWeather API
         const response = await axios.get<FiveDayForecastResponse>(
             `${BASE_URL}/forecast?q=${city}&appid=${API_KEY}&units=${units}`,
@@ -77,8 +89,10 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
 
         const { list } = response.data;
 
+        const country = response.data.city.country;
+
         // Map through the response list and transform it into an array of Weather objects
-        const forecastEntries: FiveDayForecast = list.map((entry) => ({
+        const formattedForecastEntries: FiveDayForecast = list.map((entry) => ({
             description: entry.weather[0].description,
             icon: entry.weather[0].icon,
             temperature: entry.main.temp,
@@ -95,8 +109,15 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
             sunset: entry.sunset,
         }));
 
+        await FiveDayForecastModel.insertOne({
+            city,
+            country,
+            units,
+            fiveDayForecast: formattedForecastEntries,
+        });
+
         // Return the forecast entries (Weather[])
-        return forecastEntries;
+        return formattedForecastEntries;
     } catch (error) {
         console.error(`Error fetching forecast for ${city}:`, error);
         throw new Error('Failed to fetch 5-day forecast.');

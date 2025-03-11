@@ -5,14 +5,14 @@ import { useLazyQuery } from '@apollo/client';
 import { CurrentWeather } from '../../../../types/weather';
 import { useCurrentWeatherMessage } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
-import { selectUnits } from '../../redux/selectors/weatherSelectors';
+import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
 
 export default function GlobeScout(): JSX.Element {
-    const [city, setCity] = useState<string>('');
     const [message, setMessage] = useState<string>('');
+    const city = useSelector(selectCity);
     const units = useSelector(selectUnits);
 
     const [
@@ -42,7 +42,7 @@ export default function GlobeScout(): JSX.Element {
             {city && <WeatherTitle city={city} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <WeatherInput city={city} setCity={setCity} />
+                <WeatherInput city={city} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton

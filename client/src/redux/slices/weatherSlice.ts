@@ -4,6 +4,7 @@ import { Units } from '../../../../types/weather';
 import * as weatherReducers from '../reducers/weatherReducers';
 
 const initialState: WeatherState = {
+    city: '',
     units: Units.Imperial,
 };
 
@@ -14,6 +15,6 @@ const weatherSlice = createSlice({
 });
 
 // define actions
-export const { setUnits } = weatherSlice.actions;
+export const { setCity, setUnits } = weatherSlice.actions;
 
 export default weatherSlice.reducer;

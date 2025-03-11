@@ -3,6 +3,7 @@ import { CurrentWeather, Units } from '../../../types/weather';
 
 // Redux
 export interface WeatherState {
+    city: string;
     units: Units;
 }
 
@@ -17,4 +18,9 @@ export interface UseWeatherMessageParams {
     currentWeatherLoading: boolean;
     currentWeatherError: Error | undefined;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export interface FiveDayForecastProps {
+    city: string;
+    units: Units;
 }
