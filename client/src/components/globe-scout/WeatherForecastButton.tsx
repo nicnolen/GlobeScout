@@ -1,19 +1,22 @@
 'use client';
 
 import React, { JSX } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Units } from '../../../../types/weather';
-import { WeatherForecastButtonProps } from '../../../../types/weather';
+import { Units } from '../../types/weather';
+import { WeatherForecastButtonProps } from '../../types/weather';
+import { selectUnits } from '../../redux/selectors/weatherSelectors';
+import { setUnits } from '../../redux/slices/weatherSlice';
 
 export default function WeatherForecastButton({
     currentWeatherData,
-    units,
-    setUnits,
-    loading,
+    isLoading,
     isError,
 }: WeatherForecastButtonProps): JSX.Element {
     const router = useRouter();
+    const units = useSelector(selectUnits);
+    const dispatch = useDispatch();
 
     const handleWeatherButtonClick = () => {
         if (currentWeatherData) {
@@ -23,12 +26,11 @@ export default function WeatherForecastButton({
 
     const isUnitsCelcius = units === Units.Metric;
     const degreeDisplay = isUnitsCelcius ? '°C' : '°F';
-
     return (
         <>
             {/* Units buttons */}
             <button
-                onClick={() => setUnits(Units.Metric)}
+                onClick={() => dispatch(setUnits(Units.Metric))}
                 className={`p-2 px-4 mr-2 rounded-md cursor-pointer border-none ${
                     units === Units.Metric ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'
                 }`}
@@ -36,7 +38,7 @@ export default function WeatherForecastButton({
                 Metric
             </button>
             <button
-                onClick={() => setUnits(Units.Imperial)}
+                onClick={() => dispatch(setUnits(Units.Imperial))}
                 className={`p-2 px-4 mr-2 rounded-md cursor-pointer border-none ${
                     units === Units.Imperial ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'
                 }`}
@@ -48,20 +50,20 @@ export default function WeatherForecastButton({
             <button
                 type="button"
                 onClick={handleWeatherButtonClick}
-                disabled={loading || isError || !currentWeatherData}
+                disabled={isLoading || !!isError || !currentWeatherData} // !!error will convert ApolloError to true and null to false
                 className="flex items-center ml-2.5 p-2 px-4 rounded-md bg-blue-600 text-white cursor-pointer border-none"
             >
-                {currentWeatherData?.getCurrentWeather.icon && (
+                {currentWeatherData.icon && (
                     <Image
-                        src={`https://openweathermap.org/img/wn/${currentWeatherData.getCurrentWeather.icon}@2x.png`}
+                        src={`https://openweathermap.org/img/wn/${currentWeatherData.icon}@2x.png`}
                         alt="weather-icon"
                         width={30}
                         height={30}
                         className="mr-2.5"
                     />
                 )}
-                {currentWeatherData?.getCurrentWeather.maxTemperature}
-                {degreeDisplay} / {currentWeatherData?.getCurrentWeather.minTemperature}
+                {currentWeatherData.maxTemperature}
+                {degreeDisplay} / {currentWeatherData.minTemperature}
                 {degreeDisplay}
             </button>
         </>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Weather, CurrentWeatherResponse, GetCurrentWeatherArgs } from '../../types/weather';
+import { Weather, CurrentWeatherResponse, GetCurrentWeatherArgs } from '../../client/src/types/weather';
 import { errorHandler } from '../../utils/errorHandler';
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
@@ -18,7 +18,6 @@ export const weatherResolvers = {
                     `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=${units}`,
                 );
                 const weatherData = response.data;
-                console.log(weatherData, 'weatherData');
 
                 return {
                     description: weatherData.weather[0].description,

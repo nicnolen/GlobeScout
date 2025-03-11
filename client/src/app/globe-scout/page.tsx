@@ -1,39 +1,53 @@
 'use client';
-
 import React, { JSX, useState } from 'react';
-import { useLazyQuery, ApolloError } from '@apollo/client';
+import { useSelector } from 'react-redux';
+import { useLazyQuery } from '@apollo/client';
+import { Weather } from '../../types/weather';
+import { useCurrentWeatherMessage } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
-import { Units } from '../../../../types/weather';
+import { selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
 
 export default function GlobeScout(): JSX.Element {
-    const [city, setCity] = useState('');
-    const [units, setUnits] = useState<Units>(Units.Imperial); // Default to Imperial units
+    const [city, setCity] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
+    const units = useSelector(selectUnits);
 
-    const [getCurrentWeather, { data: currentWeatherData, loading, error }] = useLazyQuery(GET_CURRENT_WEATHER);
+    const [
+        getCurrentWeather,
+        { data: currentWeatherData, loading: currentWeatherLoading, error: currentWeatherError },
+    ] = useLazyQuery<{
+        getCurrentWeather: Weather;
+    }>(GET_CURRENT_WEATHER);
+
+    useCurrentWeatherMessage({
+        currentWeatherLoading,
+        currentWeatherError,
+        setMessage,
+    });
+
+    const isLoading = currentWeatherLoading;
+    const isError = currentWeatherError;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         getCurrentWeather({ variables: { city, units } });
     };
 
-    const isError = error instanceof ApolloError;
-
     return (
         <div>
-            {city && <WeatherTitle city={city} loading={loading} error={error} />}
+            {city && <WeatherTitle city={city} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
                 <WeatherInput city={city} setCity={setCity} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton
-                        currentWeatherData={currentWeatherData}
-                        units={units}
-                        setUnits={setUnits}
-                        loading={loading}
+                        currentWeatherData={currentWeatherData.getCurrentWeather}
+                        isLoading={isLoading}
                         isError={isError}
                     />
                 )}

@@ -1,5 +1,5 @@
 import React, { JSX } from 'react';
-import { GlobeScoutSearchbarProps } from '../../../../types/globeScout';
+import { GlobeScoutSearchbarProps } from '../../types/globeScout';
 
 export default function GlobeScoutSearchbar({ city, setCity }: GlobeScoutSearchbarProps): JSX.Element {
     return (

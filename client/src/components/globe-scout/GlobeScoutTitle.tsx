@@ -1,12 +1,11 @@
 import React, { JSX } from 'react';
-import { GlobeScoutTitleProps } from '../../../../types/globeScout';
+import { GlobeScoutTitleProps } from '../../types/globeScout';
 
-export default function GlobeScoutTitle({ city, loading, error }: GlobeScoutTitleProps): JSX.Element {
+export default function GlobeScoutTitle({ city, message }: GlobeScoutTitleProps): JSX.Element {
     return (
         <div>
-            {city && !loading && !error && <h1>{city}</h1>}
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error.message}</p>}
+            {city && !message && <h1>{city}</h1>}
+            {message && <p>{message}</p>}
         </div>
     );
 }

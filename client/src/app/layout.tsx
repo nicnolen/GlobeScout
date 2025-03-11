@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
 import ApolloProviderWrapper from '../config/graphQL/apolloProviderWrapper';
 import NavBar from '../components/common/NavBar';
 import './globals.css';
@@ -36,10 +37,12 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <div className="container mx-auto px-4 py-8 min-h-screen">
-                    <ApolloProviderWrapper>
-                        <NavBar />
-                        {children}
-                    </ApolloProviderWrapper>
+                    <ReduxProviderWrapper>
+                        <ApolloProviderWrapper>
+                            <NavBar />
+                            {children}
+                        </ApolloProviderWrapper>
+                    </ReduxProviderWrapper>
                 </div>
             </body>
         </html>
