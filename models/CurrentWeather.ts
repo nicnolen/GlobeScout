@@ -19,7 +19,7 @@ const CurrentWeatherSchema = new Schema<CurrentWeatherDocument>(
 );
 
 // Use the model name from environment variable, defaulting to 'CurrentWeather'
-const modelName = process.env.CURRENT_WEATHER_MODEL_NAME;
+const modelName = process.env.CURRENT_WEATHER_CACHE_MODEL_NAME;
 
 if (!modelName) {
     throw new Error('CURRENT_WEATHER_MODEL_NAME environment variable is not defined');

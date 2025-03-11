@@ -1,5 +1,5 @@
-import { CurrentWeather, GetCurrentWeatherArgs } from '../../types/weather';
-import { getCurrentWeather } from '../../library/weather';
+import { CurrentWeather, FiveDayForecast, GetCurrentWeatherArgs, GetFiveDayForecastArgs } from '../../types/weather';
+import { getCurrentWeather, getFiveDayForecast } from '../../library/weather';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
@@ -16,7 +16,16 @@ export const weatherResolvers = {
             try {
                 return await getCurrentWeather(city, units);
             } catch (err: unknown) {
-                const customMessage = 'Error fetching weather data from OpenWeatherMap';
+                const customMessage = 'Error fetching current weather data from OpenWeatherMap';
+                catchErrorHandler(err, customMessage);
+                throw err;
+            }
+        },
+        getFiveDayForecast: async (parent: any, { city, units }: GetFiveDayForecastArgs): Promise<FiveDayForecast> => {
+            try {
+                return await getFiveDayForecast(city, units);
+            } catch (err: unknown) {
+                const customMessage = 'Error fetching five day forecast data from OpenWeatherMap';
                 catchErrorHandler(err, customMessage);
                 throw err;
             }

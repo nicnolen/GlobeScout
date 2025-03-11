@@ -21,12 +21,17 @@ export interface Weather {
 
 // Alias
 export type CurrentWeather = Weather;
+export type FiveDayForecast = Weather[];
 
 // GraphQL resolvers
-export interface GetCurrentWeatherArgs {
+export interface GetWeatherArgs {
     city: string;
     units: Units;
 }
+
+// Resolver Alias
+export type GetCurrentWeatherArgs = GetWeatherArgs;
+export type GetFiveDayForecastArgs = GetWeatherArgs;
 
 // Interface for the OpenWeatherMap API response for current weather by city name
 export interface CurrentWeatherResponse {
@@ -70,4 +75,59 @@ export interface CurrentWeatherResponse {
     id: number;
     name: string;
     cod: number;
+}
+
+export interface FiveDayForecastResponse {
+    cod: string;
+    message: number;
+    cnt: number;
+    list: Array<{
+        sunset: any;
+        sunrise: any;
+        dt: number;
+        main: {
+            temp: number;
+            feels_like: number;
+            temp_min: number;
+            temp_max: number;
+            pressure: number;
+            sea_level: number;
+            grnd_level: number;
+            humidity: number;
+            temp_kf: number;
+        };
+        weather: Array<{
+            id: number;
+            main: string;
+            description: string;
+            icon: string;
+        }>;
+        clouds: {
+            all: number;
+        };
+        wind: {
+            speed: number;
+            deg: number;
+            gust: number;
+        };
+        visibility: number;
+        pop: number;
+        sys: {
+            pod: string;
+        };
+        dt_txt: string;
+    }>;
+    city: {
+        id: number;
+        name: string;
+        coord: {
+            lat: number;
+            lon: number;
+        };
+        country: string;
+        population: number;
+        timezone: number;
+        sunrise: number;
+        sunset: number;
+    };
 }
