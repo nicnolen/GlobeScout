@@ -44,9 +44,9 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
         const fortmattedCurrentWeather = {
             description: weatherData.weather[0].description,
             icon: weatherData.weather[0].icon,
-            temperature: weatherData.main.temp,
-            minTemperature: weatherData.main.temp_min,
-            maxTemperature: weatherData.main.temp_max,
+            temperature: Math.round(weatherData.main.temp),
+            minTemperature: Math.round(weatherData.main.temp_min),
+            maxTemperature: Math.round(weatherData.main.temp_max),
             humidity: weatherData.main.humidity,
             pressure: weatherData.main.pressure,
             visibility: weatherData.visibility,
@@ -121,11 +121,11 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 }
 
                 // Aggregate data
-                acc[date].temperatures.push(entry.main.temp);
-                acc[date].humidity.push(entry.main.humidity);
-                acc[date].pressure.push(entry.main.pressure);
-                acc[date].visibility.push(entry.visibility);
-                acc[date].windSpeed.push(entry.wind.speed);
+                acc[date].temperatures.push(entry.main.temp ?? 0);
+                acc[date].humidity.push(entry.main.humidity ?? 0);
+                acc[date].pressure.push(entry.main.pressure ?? 0);
+                acc[date].visibility.push(entry.visibility ?? 0);
+                acc[date].windSpeed.push(entry.wind.speed ?? 0);
 
                 return acc;
             },
@@ -140,8 +140,8 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 description: dayData.description,
                 icon: dayData.icon,
                 temperature: Math.round(average(dayData.temperatures)),
-                minTemperature: dayData.minTemperature,
-                maxTemperature: dayData.maxTemperature,
+                minTemperature: Math.round(dayData.minTemperature),
+                maxTemperature: Math.round(dayData.maxTemperature),
                 humidity: Math.round(average(dayData.humidity)),
                 pressure: Math.round(average(dayData.pressure)),
                 visibility: Math.round(average(dayData.visibility)),
