@@ -2,29 +2,30 @@
 import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
-import { CurrentWeather } from '../../../../types/weather';
-import { useCurrentWeatherMessage } from '../../hooks/weatherHooks';
+import { Weather } from '../../../../types/weather';
+import { useCurrentWeatherData } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
-import { selectUnits } from '../../redux/selectors/weatherSelectors';
+import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
 
 export default function GlobeScout(): JSX.Element {
-    const [city, setCity] = useState<string>('');
     const [message, setMessage] = useState<string>('');
+    const city = useSelector(selectCity);
     const units = useSelector(selectUnits);
 
     const [
         getCurrentWeather,
         { data: currentWeatherData, loading: currentWeatherLoading, error: currentWeatherError },
     ] = useLazyQuery<{
-        getCurrentWeather: CurrentWeather;
+        getCurrentWeather: Weather;
     }>(GET_CURRENT_WEATHER);
 
-    useCurrentWeatherMessage({
+    useCurrentWeatherData({
         currentWeatherLoading,
         currentWeatherError,
+        currentWeatherData: currentWeatherData ? currentWeatherData.getCurrentWeather : null,
         setMessage,
     });
 
@@ -42,7 +43,7 @@ export default function GlobeScout(): JSX.Element {
             {city && <WeatherTitle city={city} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <WeatherInput city={city} setCity={setCity} />
+                <WeatherInput city={city} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton

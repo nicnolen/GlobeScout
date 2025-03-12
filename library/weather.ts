@@ -1,13 +1,19 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import {
-    CurrentWeather,
+    Weather,
     FiveDayForecast,
+    DailyWeather,
     CurrentWeatherResponse,
     FiveDayForecastResponse,
     Units,
 } from '../types/weather';
 import CurrentWeatherModel from '../models/CurrentWeather';
+import FiveDayForecastModel from '../models/FiveDayForecast';
 import { catchErrorHandler } from '../utils/errorHandlers';
+
+dayjs.extend(utc);
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
 const BASE_URL: string | undefined = process.env.OPENWEATHER_BASE_URL;
@@ -20,14 +26,26 @@ if (!BASE_URL) {
     throw new Error('OpenWeatherMap Error: Base URL is missing.');
 }
 
-export async function getCurrentWeather(city: string, units: Units): Promise<CurrentWeather> {
+interface DailyForecastAccumulator {
+    description: string;
+    icon: string;
+    temperatures: number[];
+    humidity: number[];
+    pressure: number[];
+    visibility: number[];
+    windSpeed: number[];
+    minTemperature: number;
+    maxTemperature: number;
+}
+
+export async function getCurrentWeather(city: string, units: Units): Promise<Weather> {
     try {
         // Check if the data is cached in MongoDB
         const cachedCurrentWeather = await CurrentWeatherModel.findOne({ city, units });
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
-            return cachedCurrentWeather.data;
+            return cachedCurrentWeather.currentWeather;
         }
 
         const response = await axios.get<CurrentWeatherResponse>(
@@ -38,15 +56,19 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
 
         const country = weatherData.sys.country;
 
+        const metersToMiles = 0.000621371;
+        const visibilityConversion =
+            units === 'imperial' ? weatherData.visibility * metersToMiles : weatherData.visibility;
+
         const fortmattedCurrentWeather = {
             description: weatherData.weather[0].description,
             icon: weatherData.weather[0].icon,
-            temperature: weatherData.main.temp,
-            minTemperature: weatherData.main.temp_min,
-            maxTemperature: weatherData.main.temp_max,
+            temperature: Math.round(weatherData.main.temp),
+            minTemperature: Math.round(weatherData.main.temp_min),
+            maxTemperature: Math.round(weatherData.main.temp_max),
             humidity: weatherData.main.humidity,
             pressure: weatherData.main.pressure,
-            visibility: weatherData.visibility,
+            visibility: visibilityConversion,
             windSpeed: weatherData.wind.speed,
             windDirection: weatherData.wind.deg,
             sunrise: weatherData.sys.sunrise,
@@ -57,7 +79,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
             city,
             country,
             units,
-            data: fortmattedCurrentWeather,
+            currentWeather: fortmattedCurrentWeather,
         });
 
         return fortmattedCurrentWeather;
@@ -70,33 +92,99 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Cur
 
 export async function getFiveDayForecast(city: string, units: Units): Promise<FiveDayForecast> {
     try {
+        // Check the cache first (MongoDB)
+        const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
+            city,
+            units,
+        });
+
+        if (cachedFiveDayForecast) {
+            console.info('Cached five day forecast data was found');
+            return cachedFiveDayForecast.fiveDayForecast;
+        }
+
         // Fetch the 5-day forecast from OpenWeather API
         const response = await axios.get<FiveDayForecastResponse>(
             `${BASE_URL}/forecast?q=${city}&appid=${API_KEY}&units=${units}`,
         );
 
         const { list } = response.data;
+        const country = response.data.city.country;
 
-        // Map through the response list and transform it into an array of Weather objects
-        const forecastEntries: FiveDayForecast = list.map((entry) => ({
-            description: entry.weather[0].description,
-            icon: entry.weather[0].icon,
-            temperature: entry.main.temp,
-            minTemperature: entry.main.temp_min,
-            maxTemperature: entry.main.temp_max,
-            humidity: entry.main.humidity,
-            pressure: entry.main.pressure,
-            visibility: entry.visibility,
-            windSpeed: entry.wind.speed,
-            windDirection: entry.wind.deg,
-            timestamp: entry.dt,
-            dateTime: entry.dt_txt,
-            sunrise: entry.sunrise,
-            sunset: entry.sunset,
-        }));
+        // Determine today's date
+        const today = dayjs().format('dddd MM/DD/YYYY');
+
+        // Filter out the current day's forecast data (skip all entries for today)
+        const filteredList = list.filter((entry) => {
+            const formattedDate = dayjs(entry.dt_txt).format('dddd MM/DD/YYYY');
+            return formattedDate !== today;
+        });
+
+        // Helper function to calculate average
+        function average(arr: number[]): number {
+            if (arr.length === 0) return 0; // Prevent division by zero
+            return arr.reduce((acc, val) => acc + val, 0) / arr.length;
+        }
+
+        // Group the 3-hour forecast data into daily averages
+        const dailyForecast = filteredList.reduce<Record<string, DailyForecastAccumulator>>(
+            (acc, entry) => {
+                const date = new Date(entry.dt_txt);
+                const formattedDate = dayjs(date).format('dddd MM/DD/YYYY');
+
+                // Initialize the day if it doesn't exist
+                if (!acc[formattedDate]) {
+                    acc[formattedDate] = {
+                        description: entry.weather[0].description,
+                        icon: entry.weather[0].icon,
+                        temperatures: [],
+                        humidity: [],
+                        pressure: [],
+                        visibility: [],
+                        windSpeed: [],
+                        minTemperature: entry.main.temp_min,
+                        maxTemperature: entry.main.temp_max,
+                    };
+                }
+
+                // Aggregate data
+                acc[formattedDate].temperatures.push(entry.main.temp ?? 0);
+                acc[formattedDate].humidity.push(entry.main.humidity ?? 0);
+                acc[formattedDate].pressure.push(entry.main.pressure ?? 0);
+                acc[formattedDate].visibility.push(entry.visibility ?? 0);
+                acc[formattedDate].windSpeed.push(entry.wind.speed ?? 0);
+
+                return acc;
+            },
+            {} as Record<string, DailyForecastAccumulator>, // Use the new accumulator type
+        );
+
+        // Convert daily data into an array with averages
+        const formattedForecastEntries: DailyWeather[] = Object.keys(dailyForecast).map((date) => {
+            const dayData = dailyForecast[date];
+            return {
+                date,
+                description: dayData.description,
+                icon: dayData.icon,
+                temperature: Math.round(average(dayData.temperatures)),
+                minTemperature: Math.round(dayData.minTemperature),
+                maxTemperature: Math.round(dayData.maxTemperature),
+                humidity: Math.round(average(dayData.humidity)),
+                pressure: Math.round(average(dayData.pressure)),
+                visibility: Math.round(average(dayData.visibility)),
+                windSpeed: Math.round(average(dayData.windSpeed)),
+            };
+        });
+
+        await FiveDayForecastModel.insertOne({
+            city,
+            country,
+            units,
+            fiveDayForecast: formattedForecastEntries,
+        });
 
         // Return the forecast entries (Weather[])
-        return forecastEntries;
+        return formattedForecastEntries;
     } catch (error) {
         console.error(`Error fetching forecast for ${city}:`, error);
         throw new Error('Failed to fetch 5-day forecast.');

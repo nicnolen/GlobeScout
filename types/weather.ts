@@ -5,6 +5,7 @@ export enum Units {
 
 // GraphQL query structure
 export interface Weather {
+    date?: string;
     description: string;
     icon: string;
     temperature: number;
@@ -19,19 +20,22 @@ export interface Weather {
     sunset: number;
 }
 
-// Alias
-export type CurrentWeather = Weather;
-export type FiveDayForecast = Weather[];
-
-// GraphQL resolvers
-export interface GetWeatherArgs {
-    city: string;
-    units: Units;
+// A daily forecast, with the data aggregated and averaged
+export interface DailyWeather {
+    date: string;
+    description: string;
+    icon: string;
+    temperature: number; // Average of 3-hour temperatures
+    minTemperature: number; // Minimum temperature for the day
+    maxTemperature: number; // Maximum temperature for the day
+    humidity: number; // Average humidity for the day
+    pressure: number; // Average pressure for the day
+    visibility: number; // Average visibility for the day
+    windSpeed: number; // Average wind speed for the day
 }
 
-// Resolver Alias
-export type GetCurrentWeatherArgs = GetWeatherArgs;
-export type GetFiveDayForecastArgs = GetWeatherArgs;
+// Alias
+export type FiveDayForecast = DailyWeather[];
 
 // Interface for the OpenWeatherMap API response for current weather by city name
 export interface CurrentWeatherResponse {

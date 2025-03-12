@@ -5,11 +5,12 @@ export const GET_WEATHER = `
     }
 
     type Weather {
+      date: String
       description: String
       icon: String!
-      temperature: Float!
-      minTemperature: Float!
-      maxTemperature: Float!
+      temperature: Int!
+      minTemperature: Int!
+      maxTemperature: Int!
       humidity: Int
       pressure: Int
       visibility: Int
