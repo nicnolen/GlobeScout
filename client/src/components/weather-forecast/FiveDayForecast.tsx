@@ -33,8 +33,8 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                 <p>Error fetching forecast: {forecastError.message}</p>
             ) : (
                 forecastData && (
-                    <div className="rounded-lg shadow-lg border-2 border-black p-4">
-                        <h3 className="text-xl font-bold mb-4 mt-2 ms-3">5-Day Weather Forecast</h3>
+                    <div className="rounded-lg shadow-lg border-2 border-gray-300 p-6 mb-6">
+                        <h3 className="text-xl font-semibold mb-6 text-gray-800">5-Day Weather Forecast</h3>
 
                         {/* Forecast Cards */}
                         <div className="flex flex-wrap justify-center gap-4 overflow-x-auto mb-6">
@@ -57,7 +57,7 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                                 return (
                                     <div
                                         key={index}
-                                        className="flex flex-col items-center justify-between w-64 p-4 rounded-lg shadow-lg border-2 border-black mt-6"
+                                        className="flex flex-col items-center justify-between w-64 p-4 rounded-lg shadow-lg border-2 border-gray-300 mt-6"
                                     >
                                         {/* Date above the card */}
                                         <h4 className="text-lg font-semibold mb-2">{date}</h4>
@@ -79,18 +79,25 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                                             </p>
                                         </div>
 
-                                        <p className="text-sm text-gray-500">
-                                            Min: {minTemperature}
-                                            {degreeDisplay}, Max: {maxTemperature}
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-semibold">Min:</span> {minTemperature}
+                                            {degreeDisplay} / <span className="font-semibold">Max:</span>{' '}
+                                            {maxTemperature}
                                             {degreeDisplay}
                                         </p>
-                                        <p className="text-sm text-gray-500">Humidity: {humidity}%</p>
-                                        <p className="text-sm text-gray-500">Pressure: {pressure} hPa</p>
-                                        <p className="text-sm text-gray-500">
-                                            Visibility: {visibility} {visibilityDisplay}
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-semibold">Humidity:</span> {humidity}%
                                         </p>
-                                        <p className="text-sm text-gray-500">
-                                            Wind Speed: {windSpeed} {windSpeedDisplay}
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-semibold">Pressure:</span> {pressure} hPa
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-semibold">Visibility:</span> {visibility}{' '}
+                                            {visibilityDisplay}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-semibold">Wind Speed:</span> {windSpeed}{' '}
+                                            {windSpeedDisplay}
                                         </p>
                                     </div>
                                 );
