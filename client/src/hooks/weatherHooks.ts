@@ -27,5 +27,5 @@ export const useCurrentWeatherData = ({
             dispatch(setCurrentWeatherData(currentWeatherData));
             setMessage('');
         }
-    }, [currentWeatherLoading, currentWeatherError]); // eslint-disable-line  react-hooks/exhaustive-deps
+    }, [currentWeatherLoading, currentWeatherError, currentWeatherData]); // eslint-disable-line  react-hooks/exhaustive-deps
 };

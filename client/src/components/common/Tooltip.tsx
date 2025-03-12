@@ -13,7 +13,7 @@ export default function Tooltip({ message, children, showTooltip = true }: Toolt
             {children}
 
             {showTooltip && (
-                <span className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-max rounded bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-max rounded bg-gray-800 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-50">
                     {message}
                 </span>
             )}

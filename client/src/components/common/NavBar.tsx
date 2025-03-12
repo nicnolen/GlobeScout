@@ -16,6 +16,7 @@ export default function NavBar(): JSX.Element {
     }
 
     const isDisabled = !currentWeatherData;
+    const disabledForecastTooltipMessage = 'Must search a city or country first';
 
     return (
         <nav className="bg-teal-500 text-white p-4 mb-4 shadow-md">
@@ -32,7 +33,7 @@ export default function NavBar(): JSX.Element {
                         </Link>
                     </li>
                     <li>
-                        <Tooltip message="Must search a city or country first" showTooltip={isDisabled}>
+                        <Tooltip message={disabledForecastTooltipMessage} showTooltip={isDisabled}>
                             <Link
                                 href="/weather-forecast"
                                 className={`${!currentWeatherData ? 'disabledLink' : ''}`}

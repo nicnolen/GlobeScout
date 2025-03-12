@@ -56,6 +56,10 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
 
         const country = weatherData.sys.country;
 
+        const metersToMiles = 0.000621371;
+        const visibilityConversion =
+            units === 'imperial' ? weatherData.visibility * metersToMiles : weatherData.visibility;
+
         const fortmattedCurrentWeather = {
             description: weatherData.weather[0].description,
             icon: weatherData.weather[0].icon,
@@ -64,7 +68,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
             maxTemperature: Math.round(weatherData.main.temp_max),
             humidity: weatherData.main.humidity,
             pressure: weatherData.main.pressure,
-            visibility: weatherData.visibility,
+            visibility: visibilityConversion,
             windSpeed: weatherData.wind.speed,
             windDirection: weatherData.wind.deg,
             sunrise: weatherData.sys.sunrise,

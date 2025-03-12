@@ -3,6 +3,7 @@ import { GET_FIVE_DAY_FORECAST } from '../../graphQL/queries';
 import { useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { Weather, Units } from '../../../../types/weather';
+import Tooltip from '../common/Tooltip';
 
 interface FiveDayForecastProps {
     city: string;
@@ -20,6 +21,8 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
 
     const isUnitsCelcius = units === Units.Metric;
     const degreeDisplay = isUnitsCelcius ? '°C' : '°F';
+    const visibilityDisplay = isUnitsCelcius ? 'm' : 'mi';
+    const windSpeedDisplay = isUnitsCelcius ? 'm/s' : 'mph';
 
     return (
         <>
@@ -36,7 +39,20 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                         {/* Forecast Cards */}
                         <div className="flex flex-wrap justify-center gap-4 overflow-x-auto mb-6">
                             {forecastData.getFiveDayForecast.map((day: Weather, index: number) => {
-                                const { date, icon, description, temperature, minTemperature, maxTemperature } = day;
+                                const {
+                                    date,
+                                    icon,
+                                    description,
+                                    temperature,
+                                    minTemperature,
+                                    maxTemperature,
+                                    humidity,
+                                    pressure,
+                                    visibility,
+                                    windSpeed,
+                                } = day;
+
+                                const weatherIconTooltipMessage = description;
 
                                 return (
                                     <div
@@ -48,13 +64,15 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
 
                                         {/* Weather Card */}
                                         <div className="flex flex-col items-center justify-center mb-2">
-                                            <Image
-                                                src={`http://openweathermap.org/img/wn/${icon}.png`}
-                                                alt={description}
-                                                width={40}
-                                                height={40}
-                                                className="mx-2"
-                                            />
+                                            <Tooltip message={weatherIconTooltipMessage}>
+                                                <Image
+                                                    src={`http://openweathermap.org/img/wn/${icon}.png`}
+                                                    alt={description}
+                                                    width={40}
+                                                    height={40}
+                                                    className="mx-2"
+                                                />
+                                            </Tooltip>
                                             <p className="text-xl font-bold">
                                                 {temperature}
                                                 {degreeDisplay}
@@ -65,6 +83,14 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                                             Min: {minTemperature}
                                             {degreeDisplay}, Max: {maxTemperature}
                                             {degreeDisplay}
+                                        </p>
+                                        <p className="text-sm text-gray-500">Humidity: {humidity}%</p>
+                                        <p className="text-sm text-gray-500">Pressure: {pressure} hPa</p>
+                                        <p className="text-sm text-gray-500">
+                                            Visibility: {visibility} {visibilityDisplay}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            Wind Speed: {windSpeed} {windSpeedDisplay}
                                         </p>
                                     </div>
                                 );
