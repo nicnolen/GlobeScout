@@ -1,4 +1,6 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import {
     Weather,
     FiveDayForecast,
@@ -10,6 +12,8 @@ import {
 import CurrentWeatherModel from '../models/CurrentWeather';
 import FiveDayForecastModel from '../models/FiveDayForecast';
 import { catchErrorHandler } from '../utils/errorHandlers';
+
+dayjs.extend(utc);
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
 const BASE_URL: string | undefined = process.env.OPENWEATHER_BASE_URL;
@@ -103,22 +107,30 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
         const { list } = response.data;
         const country = response.data.city.country;
 
+        // Determine today's date
+        const today = dayjs().format('dddd MM/DD/YYYY');
+
+        // Filter out the current day's forecast data (skip all entries for today)
+        const filteredList = list.filter((entry) => {
+            const formattedDate = dayjs(entry.dt_txt).format('dddd MM/DD/YYYY');
+            return formattedDate !== today;
+        });
+
         // Helper function to calculate average
         function average(arr: number[]): number {
             if (arr.length === 0) return 0; // Prevent division by zero
             return arr.reduce((acc, val) => acc + val, 0) / arr.length;
         }
 
-        // Define an intermediate accumulator type to temporarily hold forecast data
-
         // Group the 3-hour forecast data into daily averages
-        const dailyForecast = list.reduce<Record<string, DailyForecastAccumulator>>(
+        const dailyForecast = filteredList.reduce<Record<string, DailyForecastAccumulator>>(
             (acc, entry) => {
-                const date = new Date(entry.dt_txt).toISOString().split('T')[0]; // Extract the date
+                const date = new Date(entry.dt_txt);
+                const formattedDate = dayjs(date).format('dddd MM/DD/YYYY');
 
                 // Initialize the day if it doesn't exist
-                if (!acc[date]) {
-                    acc[date] = {
+                if (!acc[formattedDate]) {
+                    acc[formattedDate] = {
                         description: entry.weather[0].description,
                         icon: entry.weather[0].icon,
                         temperatures: [],
@@ -132,11 +144,11 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 }
 
                 // Aggregate data
-                acc[date].temperatures.push(entry.main.temp ?? 0);
-                acc[date].humidity.push(entry.main.humidity ?? 0);
-                acc[date].pressure.push(entry.main.pressure ?? 0);
-                acc[date].visibility.push(entry.visibility ?? 0);
-                acc[date].windSpeed.push(entry.wind.speed ?? 0);
+                acc[formattedDate].temperatures.push(entry.main.temp ?? 0);
+                acc[formattedDate].humidity.push(entry.main.humidity ?? 0);
+                acc[formattedDate].pressure.push(entry.main.pressure ?? 0);
+                acc[formattedDate].visibility.push(entry.visibility ?? 0);
+                acc[formattedDate].windSpeed.push(entry.wind.speed ?? 0);
 
                 return acc;
             },

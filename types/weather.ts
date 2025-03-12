@@ -5,6 +5,7 @@ export enum Units {
 
 // GraphQL query structure
 export interface Weather {
+    date?: string;
     description: string;
     icon: string;
     temperature: number;

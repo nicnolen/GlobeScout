@@ -22,6 +22,7 @@ export const GET_CURRENT_WEATHER = gql`
 export const GET_FIVE_DAY_FORECAST = gql`
     query GetFiveDayForecast($city: String!, $units: Units!) {
         getFiveDayForecast(city: $city, units: $units) {
+            date
             description
             icon
             temperature
