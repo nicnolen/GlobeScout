@@ -2,8 +2,12 @@ import React, { JSX } from 'react';
 import { GET_FIVE_DAY_FORECAST } from '../../graphQL/queries';
 import { useQuery } from '@apollo/client';
 import Image from 'next/image';
-import { FiveDayForecastProps } from '../../types/weather';
-import { Weather } from '../../../../types/weather';
+import { Weather, Units } from '../../../../types/weather';
+
+interface FiveDayForecastProps {
+    city: string;
+    units: Units;
+}
 
 export default function FiveDayForecast({ city, units }: FiveDayForecastProps): JSX.Element {
     const {

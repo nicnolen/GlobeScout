@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
-import { UseWeatherMessageParams } from '../types/weather';
+
+interface UseWeatherMessageParams {
+    currentWeatherLoading: boolean;
+    currentWeatherError: Error | undefined;
+    setMessage: React.Dispatch<React.SetStateAction<string>>;
+}
 
 export const useCurrentWeatherMessage = ({
     currentWeatherLoading,

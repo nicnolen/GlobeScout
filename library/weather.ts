@@ -1,8 +1,7 @@
 import axios from 'axios';
 import {
-    CurrentWeather,
+    Weather,
     FiveDayForecast,
-    DailyForecastAccumulator,
     DailyWeather,
     CurrentWeatherResponse,
     FiveDayForecastResponse,
@@ -23,7 +22,19 @@ if (!BASE_URL) {
     throw new Error('OpenWeatherMap Error: Base URL is missing.');
 }
 
-export async function getCurrentWeather(city: string, units: Units): Promise<CurrentWeather> {
+interface DailyForecastAccumulator {
+    description: string;
+    icon: string;
+    temperatures: number[];
+    humidity: number[];
+    pressure: number[];
+    visibility: number[];
+    windSpeed: number[];
+    minTemperature: number;
+    maxTemperature: number;
+}
+
+export async function getCurrentWeather(city: string, units: Units): Promise<Weather> {
     try {
         // Check if the data is cached in MongoDB
         const cachedCurrentWeather = await CurrentWeatherModel.findOne({ city, units });

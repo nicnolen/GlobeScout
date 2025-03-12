@@ -1,5 +1,9 @@
 import React, { JSX } from 'react';
-import { GlobeScoutTitleProps } from '../../types/globeScout';
+
+interface GlobeScoutTitleProps {
+    city: string;
+    message: string;
+}
 
 export default function GlobeScoutTitle({ city, message }: GlobeScoutTitleProps): JSX.Element {
     return (

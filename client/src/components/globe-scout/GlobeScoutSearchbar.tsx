@@ -1,7 +1,10 @@
 import React, { JSX } from 'react';
 import { useDispatch } from 'react-redux';
-import { GlobeScoutSearchbarProps } from '../../types/globeScout';
 import { setCity } from '../../redux/slices/weatherSlice';
+
+export interface GlobeScoutSearchbarProps {
+    city: string;
+}
 
 export default function GlobeScoutSearchbar({ city }: GlobeScoutSearchbarProps): JSX.Element {
     const dispatch = useDispatch();

@@ -19,21 +19,9 @@ export interface Weather {
     sunset: number;
 }
 
-export interface DailyForecastAccumulator {
-    description: string;
-    icon: string;
-    temperatures: number[];
-    humidity: number[];
-    pressure: number[];
-    visibility: number[];
-    windSpeed: number[];
-    minTemperature: number;
-    maxTemperature: number;
-}
-
 // A daily forecast, with the data aggregated and averaged
 export interface DailyWeather {
-    date: string; // e.g., '2022-03-15'
+    date: string;
     description: string;
     icon: string;
     temperature: number; // Average of 3-hour temperatures
@@ -46,18 +34,7 @@ export interface DailyWeather {
 }
 
 // Alias
-export type CurrentWeather = Weather;
 export type FiveDayForecast = DailyWeather[];
-
-// GraphQL resolvers
-export interface GetWeatherArgs {
-    city: string;
-    units: Units;
-}
-
-// Resolver Alias
-export type GetCurrentWeatherArgs = GetWeatherArgs;
-export type GetFiveDayForecastArgs = GetWeatherArgs;
 
 // Interface for the OpenWeatherMap API response for current weather by city name
 export interface CurrentWeatherResponse {

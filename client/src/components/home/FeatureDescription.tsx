@@ -1,6 +1,12 @@
 import React, { JSX } from 'react';
 import Link from 'next/link';
-import { FeatureDescriptionProps } from '../../types/featureDescription';
+
+interface FeatureDescriptionProps {
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+}
 
 export default function FeatureDescription({
     title,

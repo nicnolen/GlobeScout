@@ -1,4 +1,5 @@
-import { CurrentWeather, FiveDayForecast, GetCurrentWeatherArgs, GetFiveDayForecastArgs } from '../../types/weather';
+import { Units } from '../../types/weather';
+import { Weather, FiveDayForecast } from '../../types/weather';
 import { getCurrentWeather, getFiveDayForecast } from '../../library/weather';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -10,9 +11,18 @@ if (!API_KEY) {
     );
 }
 
+interface GetWeatherArgs {
+    city: string;
+    units: Units;
+}
+
+// Alias
+type GetCurrentWeatherArgs = GetWeatherArgs;
+type GetFiveDayForecastArgs = GetWeatherArgs;
+
 export const weatherResolvers = {
     Query: {
-        getCurrentWeather: async (parent: any, { city, units }: GetCurrentWeatherArgs): Promise<CurrentWeather> => {
+        getCurrentWeather: async (parent: any, { city, units }: GetCurrentWeatherArgs): Promise<Weather> => {
             try {
                 return await getCurrentWeather(city, units);
             } catch (err: unknown) {
