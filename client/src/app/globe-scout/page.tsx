@@ -3,7 +3,7 @@ import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
 import { Weather } from '../../../../types/weather';
-import { useCurrentWeatherMessage } from '../../hooks/weatherHooks';
+import { useCurrentWeatherData } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
 import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
@@ -22,9 +22,10 @@ export default function GlobeScout(): JSX.Element {
         getCurrentWeather: Weather;
     }>(GET_CURRENT_WEATHER);
 
-    useCurrentWeatherMessage({
+    useCurrentWeatherData({
         currentWeatherLoading,
         currentWeatherError,
+        currentWeatherData: currentWeatherData ? currentWeatherData.getCurrentWeather : null,
         setMessage,
     });
 

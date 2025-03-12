@@ -21,12 +21,11 @@ export default function Home(): JSX.Element {
             {/* Weather Page Feature */}
             <FeatureDescription
                 title="Weather Forecast"
-                description="Weather Forecast shows a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities."
-                buttonText="View Weather Forecast"
-                buttonLink="/weather-forecast"
+                description="Weather Forecast shows a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities. Note that you must have searched a city or country from the Globe Scout page in order to access this page."
             />
 
             {/* Users Page */}
+            {/* TODO: ONLY ENABLE THIS FOR USERS THAT ARE ADMINS */}
             <FeatureDescription
                 title="Users"
                 description="A list of users who have registered on CityZen"
