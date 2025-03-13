@@ -52,7 +52,7 @@ export default function WeatherForecastButton({
                 Imperial
             </button>
 
-            {/* Weather button with icon, maxTemp / minTemp */}
+            {/* Weather button with icon and current temperature */}
             <button
                 type="button"
                 onClick={handleWeatherButtonClick}
@@ -68,8 +68,7 @@ export default function WeatherForecastButton({
                         className="mr-2.5"
                     />
                 )}
-                {currentWeatherData.maxTemperature}
-                {degreeDisplay} / {currentWeatherData.minTemperature}
+                {currentWeatherData.temperature}
                 {degreeDisplay}
             </button>
         </>
