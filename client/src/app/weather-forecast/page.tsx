@@ -1,19 +1,34 @@
 'use client';
 
-import React, { JSX } from 'react';
+import React, { JSX, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
+import { useRouter } from 'next/navigation';
+import { selectCity, selectUnits, selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
 import CurrentWeather from '../../components/weather-forecast/CurrentWeather';
 import FiveDayForecast from '../../components/weather-forecast/FiveDayForecast';
 
 export default function WeatherForecast(): JSX.Element {
     const city = useSelector(selectCity);
     const units = useSelector(selectUnits);
+    const currentWeatherData = useSelector(selectCurrentWeatherData);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!currentWeatherData) {
+            setTimeout(() => {
+                router.push('/globe-scout');
+            }, 2000);
+        }
+    }, [currentWeatherData]); // eslint-disable-line  react-hooks/exhaustive-deps
+
+    if (!currentWeatherData) {
+        return <p className="text-red-500">No weather forecast found. Redirecting to Globe Scout</p>;
+    }
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Weather forecast for {city}</h2>
-            <CurrentWeather units={units} />
+            <h2 className="title mb-3">Weather forecast for {city}</h2>
+            <CurrentWeather units={units} currentWeatherData={currentWeatherData} />
             <FiveDayForecast city={city} units={units} />
         </div>
     );

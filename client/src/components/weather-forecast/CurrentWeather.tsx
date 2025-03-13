@@ -1,22 +1,15 @@
 'use client';
 import React, { JSX } from 'react';
-import { useSelector } from 'react-redux';
 import Image from 'next/image';
-import { Units } from '../../../../types/weather';
-import { selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors'; // Assuming you have this selector
+import { Units, Weather } from '../../../../types/weather';
 import Tooltip from '../common/Tooltip';
 
 interface CurrentWeatherProps {
     units: Units;
+    currentWeatherData: Weather | null;
 }
 
-export default function CurrentWeather({ units }: CurrentWeatherProps): JSX.Element {
-    const currentWeatherData = useSelector(selectCurrentWeatherData); // This should come from Redux
-
-    if (!currentWeatherData) {
-        return <p>Loading current weather...</p>;
-    }
-
+export default function CurrentWeather({ units, currentWeatherData }: CurrentWeatherProps): JSX.Element {
     const isUnitsCelcius = units === Units.Metric;
     const degreeDisplay = isUnitsCelcius ? '°C' : '°F';
     const visibilityDisplay = isUnitsCelcius ? 'm' : 'mi';
@@ -37,44 +30,55 @@ export default function CurrentWeather({ units }: CurrentWeatherProps): JSX.Elem
     const weatherIconTooltipMessage = description;
 
     return (
-        <div className="rounded-lg shadow-lg border-2 border-gray-300 p-6 mb-6">
-            <h3 className="text-xl font-semibold mb-6 text-gray-800">Current Weather</h3>
+        <div className="card p-6 mb-6 max-w-lg mx-auto">
+            <h3 className="subtitle text-center">Current Weather</h3>
 
-            {/* Weather Card */}
-            <div className="flex flex-col items-center justify-center mb-4">
-                <Tooltip message={weatherIconTooltipMessage}>
-                    <Image
-                        src={`http://openweathermap.org/img/wn/${icon}.png`}
-                        alt="Weather Icon"
-                        width={60}
-                        height={60}
-                        className="mx-2"
-                    />
-                </Tooltip>
-                <p className="text-3xl font-bold text-gray-800 mb-2">
-                    {temperature}° {/* Display temperature */}
-                </p>
+            <div className="flex items-center justify-between mb-6">
+                {/* Weather Icon & Temperature */}
+                <div className="flex items-center space-x-4">
+                    <Tooltip message={weatherIconTooltipMessage}>
+                        <Image
+                            src={`http://openweathermap.org/img/wn/${icon}.png`}
+                            alt="Weather Icon"
+                            width={70}
+                            height={70}
+                            className="rounded-full"
+                        />
+                    </Tooltip>
+                    <p className="text-4xl font-extrabold text-gray-800">
+                        {temperature}
+                        {degreeDisplay}
+                    </p>
+                </div>
+
+                {/* Temperature Range */}
+                <div className="text-center space-y-1">
+                    <p className="text-lg text-gray-600">
+                        <span className="font-semibold">Min:</span> {minTemperature}
+                        {degreeDisplay} /<span className="font-semibold">Max:</span> {maxTemperature}
+                        {degreeDisplay}
+                    </p>
+                </div>
             </div>
 
-            {/* Weather Details */}
-            <div className="space-y-3">
-                <p className="text-sm text-gray-600 text-center">
-                    <span className="font-semibold">Min:</span> {minTemperature}
-                    {degreeDisplay} / <span className="font-semibold">Max:</span> {maxTemperature}
-                    {degreeDisplay}
-                </p>
-                <p className="text-sm text-gray-600 text-center">
-                    <span className="font-semibold">Humidity:</span> {humidity}%
-                </p>
-                <p className="text-sm text-gray-600 text-center">
-                    <span className="font-semibold">Pressure:</span> {pressure} hPa
-                </p>
-                <p className="text-sm text-gray-600 text-center">
-                    <span className="font-semibold">Visibility:</span> {visibility} {visibilityDisplay}
-                </p>
-                <p className="text-sm text-gray-600 text-center">
-                    <span className="font-semibold">Wind Speed:</span> {windSpeed} {windSpeedDisplay}
-                </p>
+            <div className="grid grid-cols-2 gap-4">
+                {/* Additional Weather Details */}
+                <div className="text-sm text-gray-600">
+                    <p>
+                        <span className="font-semibold">Humidity:</span> {humidity}%
+                    </p>
+                    <p>
+                        <span className="font-semibold">Pressure:</span> {pressure} hPa
+                    </p>
+                </div>
+                <div className="text-sm text-gray-600">
+                    <p>
+                        <span className="font-semibold">Visibility:</span> {visibility} {visibilityDisplay}
+                    </p>
+                    <p>
+                        <span className="font-semibold">Wind Speed:</span> {windSpeed} {windSpeedDisplay}
+                    </p>
+                </div>
             </div>
         </div>
     );
