@@ -26,18 +26,17 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
 
     return (
         <>
-            {/* 5-Day Weather Forecast Section */}
             {forecastLoading ? (
-                <p>Loading forecast...</p>
+                <p className="title">Loading forecast...</p>
             ) : forecastError ? (
-                <p>Error fetching forecast: {forecastError.message}</p>
+                <p className="title text-red-500">Error fetching forecast: {forecastError.message}</p>
             ) : (
                 forecastData && (
-                    <div className="rounded-lg shadow-lg border-2 border-black p-4">
-                        <h3 className="text-xl font-bold mb-4 mt-2 ms-3">5-Day Weather Forecast</h3>
+                    <div className="card p-8 mb-8">
+                        <h3 className="subtitle text-center">5-Day Weather Forecast</h3>
 
                         {/* Forecast Cards */}
-                        <div className="flex flex-wrap justify-center gap-4 overflow-x-auto mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
                             {forecastData.getFiveDayForecast.map((day: Weather, index: number) => {
                                 const {
                                     date,
@@ -57,41 +56,48 @@ export default function FiveDayForecast({ city, units }: FiveDayForecastProps): 
                                 return (
                                     <div
                                         key={index}
-                                        className="flex flex-col items-center justify-between w-64 p-4 rounded-lg shadow-lg border-2 border-black mt-6"
+                                        className="flex flex-col items-center justify-between w-full sm:w-72 lg:w-64 p-4 rounded-lg shadow-lg border-2 border-gray-300"
                                     >
-                                        {/* Date above the card */}
-                                        <h4 className="text-lg font-semibold mb-2">{date}</h4>
+                                        <h4 className="text-lg font-semibold text-center text-gray-800 mb-4">{date}</h4>
 
-                                        {/* Weather Card */}
-                                        <div className="flex flex-col items-center justify-center mb-2">
+                                        <div className="flex flex-col items-center justify-center mb-4">
                                             <Tooltip message={weatherIconTooltipMessage}>
                                                 <Image
                                                     src={`http://openweathermap.org/img/wn/${icon}.png`}
                                                     alt={description}
-                                                    width={40}
-                                                    height={40}
-                                                    className="mx-2"
+                                                    width={60}
+                                                    height={60}
+                                                    className="rounded-full"
                                                 />
                                             </Tooltip>
-                                            <p className="text-xl font-bold">
+                                            <p className="text-2xl font-bold text-gray-800 mt-2">
                                                 {temperature}
                                                 {degreeDisplay}
                                             </p>
                                         </div>
 
-                                        <p className="text-sm text-gray-500">
-                                            Min: {minTemperature}
-                                            {degreeDisplay}, Max: {maxTemperature}
-                                            {degreeDisplay}
-                                        </p>
-                                        <p className="text-sm text-gray-500">Humidity: {humidity}%</p>
-                                        <p className="text-sm text-gray-500">Pressure: {pressure} hPa</p>
-                                        <p className="text-sm text-gray-500">
-                                            Visibility: {visibility} {visibilityDisplay}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            Wind Speed: {windSpeed} {windSpeedDisplay}
-                                        </p>
+                                        <div className="text-sm text-gray-600 text-center space-y-1">
+                                            <p>
+                                                <span className="font-semibold">Min:</span> {minTemperature}
+                                                {degreeDisplay} / <span className="font-semibold">Max:</span>{' '}
+                                                {maxTemperature}
+                                                {degreeDisplay}
+                                            </p>
+                                            <p>
+                                                <span className="font-semibold">Humidity:</span> {humidity}%
+                                            </p>
+                                            <p>
+                                                <span className="font-semibold">Pressure:</span> {pressure} hPa
+                                            </p>
+                                            <p>
+                                                <span className="font-semibold">Visibility:</span> {visibility}{' '}
+                                                {visibilityDisplay}
+                                            </p>
+                                            <p>
+                                                <span className="font-semibold">Wind Speed:</span> {windSpeed}{' '}
+                                                {windSpeedDisplay}
+                                            </p>
+                                        </div>
                                     </div>
                                 );
                             })}

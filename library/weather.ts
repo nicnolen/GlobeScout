@@ -9,8 +9,8 @@ import {
     FiveDayForecastResponse,
     Units,
 } from '../types/weather';
-import CurrentWeatherModel from '../models/CurrentWeather';
-import FiveDayForecastModel from '../models/FiveDayForecast';
+import CurrentWeatherModel from '../models/CurrentWeatherCache';
+import FiveDayForecastModel from '../models/FiveDayForecastCache';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 dayjs.extend(utc);
@@ -52,27 +52,26 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
             `${process.env.OPENWEATHER_BASE_URL}/weather?q=${city}&appid=${API_KEY}&units=${units}`,
         );
 
-        const weatherData = response.data;
+        const { weather, main, wind, sys, visibility } = response.data;
 
-        const country = weatherData.sys.country;
+        const country = sys.country;
 
         const metersToMiles = 0.000621371;
-        const visibilityConversion =
-            units === 'imperial' ? weatherData.visibility * metersToMiles : weatherData.visibility;
+        const visibilityConversion = units === 'imperial' ? Math.round(visibility * metersToMiles) : visibility;
 
         const fortmattedCurrentWeather = {
-            description: weatherData.weather[0].description,
-            icon: weatherData.weather[0].icon,
-            temperature: Math.round(weatherData.main.temp),
-            minTemperature: Math.round(weatherData.main.temp_min),
-            maxTemperature: Math.round(weatherData.main.temp_max),
-            humidity: weatherData.main.humidity,
-            pressure: weatherData.main.pressure,
+            description: weather[0].description,
+            icon: weather[0].icon,
+            temperature: Math.round(main.temp),
+            minTemperature: Math.round(main.temp_min),
+            maxTemperature: Math.round(main.temp_max),
+            humidity: main.humidity,
+            pressure: main.pressure,
             visibility: visibilityConversion,
-            windSpeed: weatherData.wind.speed,
-            windDirection: weatherData.wind.deg,
-            sunrise: weatherData.sys.sunrise,
-            sunset: weatherData.sys.sunset,
+            windSpeed: wind.speed,
+            windDirection: wind.deg,
+            sunrise: sys.sunrise,
+            sunset: sys.sunset,
         };
 
         await CurrentWeatherModel.insertOne({
@@ -84,7 +83,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
 
         return fortmattedCurrentWeather;
     } catch (err: unknown) {
-        const customMessage = 'Error fetching five day forecast data from OpenWeatherMap';
+        const customMessage = 'Error fetching current weather data from OpenWeatherMap';
         catchErrorHandler(err, customMessage);
         throw err;
     }
@@ -148,11 +147,21 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 }
 
                 // Aggregate data
-                acc[formattedDate].temperatures.push(entry.main.temp ?? 0);
-                acc[formattedDate].humidity.push(entry.main.humidity ?? 0);
-                acc[formattedDate].pressure.push(entry.main.pressure ?? 0);
-                acc[formattedDate].visibility.push(entry.visibility ?? 0);
-                acc[formattedDate].windSpeed.push(entry.wind.speed ?? 0);
+                if (entry.main.temp !== undefined && entry.main.temp !== null) {
+                    acc[formattedDate].temperatures.push(entry.main.temp);
+                }
+                if (entry.main.humidity !== undefined && entry.main.humidity !== null) {
+                    acc[formattedDate].humidity.push(entry.main.humidity);
+                }
+                if (entry.main.pressure !== undefined && entry.main.pressure !== null) {
+                    acc[formattedDate].pressure.push(entry.main.pressure);
+                }
+                if (entry.visibility !== undefined && entry.visibility !== null) {
+                    acc[formattedDate].visibility.push(entry.visibility);
+                }
+                if (entry.wind.speed !== undefined && entry.wind.speed !== null) {
+                    acc[formattedDate].windSpeed.push(entry.wind.speed);
+                }
 
                 return acc;
             },
@@ -162,6 +171,13 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
         // Convert daily data into an array with averages
         const formattedForecastEntries: DailyWeather[] = Object.keys(dailyForecast).map((date) => {
             const dayData = dailyForecast[date];
+
+            const metersToMiles = 0.000621371;
+            const visibilityConversion =
+                units === 'imperial'
+                    ? Math.round(average(dayData.visibility) * metersToMiles)
+                    : Math.round(average(dayData.visibility));
+
             return {
                 date,
                 description: dayData.description,
@@ -171,7 +187,7 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 maxTemperature: Math.round(dayData.maxTemperature),
                 humidity: Math.round(average(dayData.humidity)),
                 pressure: Math.round(average(dayData.pressure)),
-                visibility: Math.round(average(dayData.visibility)),
+                visibility: visibilityConversion,
                 windSpeed: Math.round(average(dayData.windSpeed)),
             };
         });
@@ -185,8 +201,9 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
 
         // Return the forecast entries (Weather[])
         return formattedForecastEntries;
-    } catch (error) {
-        console.error(`Error fetching forecast for ${city}:`, error);
-        throw new Error('Failed to fetch 5-day forecast.');
+    } catch (err: unknown) {
+        const customMessage = 'Error fetching five day weather forecast from OpenWeatherMap';
+        catchErrorHandler(err, customMessage);
+        throw err;
     }
 }

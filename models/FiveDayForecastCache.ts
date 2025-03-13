@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { FiveDayForecastResponse, Units } from '../types/weather';
 
-interface FiveDayForecastDocument extends Document {
+interface FiveDayForecastCacheDocument extends Document {
     city: string;
     country: string;
     units: Units;
     fiveDayForecast: FiveDayForecastResponse;
 }
 
-const FiveDayForecastSchema = new Schema<FiveDayForecastDocument>(
+const FiveDayForecastCacheSchema = new Schema<FiveDayForecastCacheDocument>(
     {
         city: { type: String, required: true },
         country: { type: String, required: true },
@@ -26,4 +26,4 @@ if (!modelName) {
 }
 
 export default mongoose.models[modelName] ||
-    mongoose.model<FiveDayForecastDocument>(modelName, FiveDayForecastSchema, modelName);
+    mongoose.model<FiveDayForecastCacheDocument>(modelName, FiveDayForecastCacheSchema, modelName);
