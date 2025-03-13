@@ -1,14 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { CurrentWeatherResponse, Units } from '../types/weather';
 
-interface CurrentWeatherDocument extends Document {
+interface CurrentWeatherCacheDocument extends Document {
     city: string;
     country: string;
     units: Units;
     currentWeather: CurrentWeatherResponse;
 }
 
-const CurrentWeatherSchema = new Schema<CurrentWeatherDocument>(
+const CurrentWeatherCacheSchema = new Schema<CurrentWeatherCacheDocument>(
     {
         city: { type: String, required: true },
         country: { type: String, required: true },
@@ -18,6 +18,9 @@ const CurrentWeatherSchema = new Schema<CurrentWeatherDocument>(
     { timestamps: true },
 );
 
+// Clear every 30 minutes using Mongoose TTL
+CurrentWeatherCacheSchema.index({ createdAt: 1 }, { expireAfterSeconds: 1800 });
+
 // Use the model name from environment variable, defaulting to 'CurrentWeather'
 const modelName = process.env.CURRENT_WEATHER_CACHE_MODEL_NAME;
 
@@ -26,4 +29,4 @@ if (!modelName) {
 }
 
 export default mongoose.models[modelName] ||
-    mongoose.model<CurrentWeatherDocument>(modelName, CurrentWeatherSchema, modelName);
+    mongoose.model<CurrentWeatherCacheDocument>(modelName, CurrentWeatherCacheSchema, modelName);
