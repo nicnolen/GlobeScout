@@ -57,7 +57,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
         const country = sys.country;
 
         const metersToMiles = 0.000621371;
-        const visibilityConversion = units === 'imperial' ? visibility * Math.round(metersToMiles) : visibility;
+        const visibilityConversion = units === 'imperial' ? Math.round(visibility * metersToMiles) : visibility;
 
         const fortmattedCurrentWeather = {
             description: weather[0].description,
@@ -147,11 +147,21 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 }
 
                 // Aggregate data
-                acc[formattedDate].temperatures.push(entry.main.temp);
-                acc[formattedDate].humidity.push(entry.main.humidity);
-                acc[formattedDate].pressure.push(entry.main.pressure);
-                acc[formattedDate].visibility.push(entry.visibility);
-                acc[formattedDate].windSpeed.push(entry.wind.speed);
+                if (entry.main.temp !== undefined && entry.main.temp !== null) {
+                    acc[formattedDate].temperatures.push(entry.main.temp);
+                }
+                if (entry.main.humidity !== undefined && entry.main.humidity !== null) {
+                    acc[formattedDate].humidity.push(entry.main.humidity);
+                }
+                if (entry.main.pressure !== undefined && entry.main.pressure !== null) {
+                    acc[formattedDate].pressure.push(entry.main.pressure);
+                }
+                if (entry.visibility !== undefined && entry.visibility !== null) {
+                    acc[formattedDate].visibility.push(entry.visibility);
+                }
+                if (entry.wind.speed !== undefined && entry.wind.speed !== null) {
+                    acc[formattedDate].windSpeed.push(entry.wind.speed);
+                }
 
                 return acc;
             },
@@ -161,6 +171,13 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
         // Convert daily data into an array with averages
         const formattedForecastEntries: DailyWeather[] = Object.keys(dailyForecast).map((date) => {
             const dayData = dailyForecast[date];
+
+            const metersToMiles = 0.000621371;
+            const visibilityConversion =
+                units === 'imperial'
+                    ? Math.round(average(dayData.visibility) * metersToMiles)
+                    : Math.round(average(dayData.visibility));
+
             return {
                 date,
                 description: dayData.description,
@@ -170,7 +187,7 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
                 maxTemperature: Math.round(dayData.maxTemperature),
                 humidity: Math.round(average(dayData.humidity)),
                 pressure: Math.round(average(dayData.pressure)),
-                visibility: Math.round(average(dayData.visibility)),
+                visibility: visibilityConversion,
                 windSpeed: Math.round(average(dayData.windSpeed)),
             };
         });
