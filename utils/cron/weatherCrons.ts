@@ -2,8 +2,8 @@ import cron from 'node-cron';
 import FiveDayForecast from '../../models/FiveDayForecastCache';
 import { catchErrorHandler } from '../errorHandlers';
 
-// Clear current_weather collection at midnight
-export function scheduleClearCurrentWeatherJob(): void {
+// Clear five_day_forecast_cache collection at midnight
+export function scheduleClearFiveDayForecastCache(): void {
     cron.schedule('0 0 * * *', async () => {
         try {
             await FiveDayForecast.deleteMany({});
