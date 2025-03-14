@@ -8,10 +8,10 @@ import {
     CurrentWeatherResponse,
     FiveDayForecastResponse,
     Units,
-} from '../types/weather';
-import CurrentWeatherModel from '../models/CurrentWeatherCache';
-import FiveDayForecastModel from '../models/FiveDayForecastCache';
-import { catchErrorHandler } from '../utils/errorHandlers';
+} from '../../types/weather';
+import CurrentWeatherModel from '../../models/CurrentWeatherCache';
+import FiveDayForecastModel from '../../models/FiveDayForecastCache';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dayjs.extend(utc);
 

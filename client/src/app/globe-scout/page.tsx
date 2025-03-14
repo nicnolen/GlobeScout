@@ -9,6 +9,7 @@ import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors'
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
+import GlobeScoutMap from '../../components/globe-scout/GlobeScoutMap';
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
@@ -53,6 +54,7 @@ export default function GlobeScout(): JSX.Element {
                     />
                 )}
             </form>
+            <GlobeScoutMap />
         </div>
     );
 }

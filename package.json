@@ -27,6 +27,7 @@
     "homepage": "https://github.com/nicnolen/CityZen#readme",
     "dependencies": {
         "@apollo/server": "^4.11.3",
+        "@vis.gl/react-google-maps": "^1.5.2",
         "axios": "^1.8.2",
         "dayjs": "^1.11.13",
         "dayjs-plugin-utc": "^0.1.2",

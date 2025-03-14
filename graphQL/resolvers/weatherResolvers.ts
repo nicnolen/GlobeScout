@@ -1,6 +1,6 @@
 import { Units } from '../../types/weather';
 import { Weather, FiveDayForecast } from '../../types/weather';
-import { getCurrentWeather, getFiveDayForecast } from '../../library/weather';
+import { getCurrentWeather, getFiveDayForecast } from '../../library/graphQL/weather';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
