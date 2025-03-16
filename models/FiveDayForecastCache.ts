@@ -18,7 +18,6 @@ const FiveDayForecastCacheSchema = new Schema<FiveDayForecastCacheDocument>(
     { timestamps: true },
 );
 
-// Use the model name from environment variable, defaulting to 'CurrentWeather'
 const modelName = process.env.FIVE_DAY_FORECAST_CACHE_MODEL_NAME;
 
 if (!modelName) {

@@ -1,5 +1,5 @@
 import React, { JSX } from 'react';
-import { GET_FIVE_DAY_FORECAST } from '../../graphQL/queries';
+import { GET_FIVE_DAY_FORECAST } from '../../graphQL/weatherQueries';
 import { useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { Weather, Units } from '../../../../types/weather';

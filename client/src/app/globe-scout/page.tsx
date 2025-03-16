@@ -4,12 +4,13 @@ import { useSelector } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
 import { Weather } from '../../../../types/weather';
 import { useCurrentWeatherData } from '../../hooks/weatherHooks';
-import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
+import { GET_CURRENT_WEATHER } from '../../graphQL/weatherQueries';
+import { GET_TOP_TEN_PLACES } from '../../graphQL/googleMapsQueries';
 import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
-import GlobeScoutMap from '../../components/globe-scout/GlobeScoutMap';
+// import GlobeScoutMap from '../../components/globe-scout/GlobeScoutMap';
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
@@ -22,6 +23,11 @@ export default function GlobeScout(): JSX.Element {
     ] = useLazyQuery<{
         getCurrentWeather: Weather;
     }>(GET_CURRENT_WEATHER);
+
+    const [getTopTenPlaces, { data: topTenPlacesData, loading: topTenPlacesLoading, error: topTenPlacesError }] =
+        useLazyQuery(GET_TOP_TEN_PLACES);
+
+    console.log(topTenPlacesData, 'placesData');
 
     useCurrentWeatherData({
         currentWeatherLoading,
@@ -37,6 +43,7 @@ export default function GlobeScout(): JSX.Element {
         e.preventDefault();
 
         getCurrentWeather({ variables: { city, units } });
+        getTopTenPlaces({ variables: { locationSearch: city } });
     };
 
     return (
@@ -54,7 +61,7 @@ export default function GlobeScout(): JSX.Element {
                     />
                 )}
             </form>
-            <GlobeScoutMap />
+            {/* <GlobeScoutMap /> */}
         </div>
     );
 }

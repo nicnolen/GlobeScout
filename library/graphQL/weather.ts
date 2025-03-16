@@ -40,7 +40,6 @@ interface DailyForecastAccumulator {
 
 export async function getCurrentWeather(city: string, units: Units): Promise<Weather> {
     try {
-        // Check if the data is cached in MongoDB
         const cachedCurrentWeather = await CurrentWeatherModel.findOne({ city, units });
 
         if (cachedCurrentWeather) {
