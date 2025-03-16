@@ -6,7 +6,7 @@ import { Weather } from '../../../../types/weather';
 import { useCurrentWeatherData } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/weatherQueries';
 import { GET_TOP_TEN_PLACES } from '../../graphQL/googleMapsQueries';
-import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
+import { selectLocation, selectUnits } from '../../redux/selectors/weatherSelectors';
 import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
 import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
@@ -14,7 +14,7 @@ import WeatherForecastButton from '../../components/globe-scout/WeatherForecastB
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
-    const city = useSelector(selectCity);
+    const location = useSelector(selectLocation);
     const units = useSelector(selectUnits);
 
     const [
@@ -26,8 +26,6 @@ export default function GlobeScout(): JSX.Element {
 
     const [getTopTenPlaces, { data: topTenPlacesData, loading: topTenPlacesLoading, error: topTenPlacesError }] =
         useLazyQuery(GET_TOP_TEN_PLACES);
-
-    console.log(topTenPlacesData, 'placesData');
 
     useCurrentWeatherData({
         currentWeatherLoading,
@@ -42,16 +40,16 @@ export default function GlobeScout(): JSX.Element {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        getCurrentWeather({ variables: { city, units } });
-        getTopTenPlaces({ variables: { locationSearch: city } });
+        getCurrentWeather({ variables: { location, units } });
+        getTopTenPlaces({ variables: { locationSearch: location } });
     };
 
     return (
         <div>
-            {city && <WeatherTitle city={city} message={message} />}
+            {location && <WeatherTitle location={location} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <WeatherInput city={city} />
+                <WeatherInput location={location} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton

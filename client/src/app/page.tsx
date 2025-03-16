@@ -4,10 +4,10 @@ import FeatureDescription from '../components/home/FeatureDescription';
 export default function Home(): JSX.Element {
     return (
         <>
-            <h1 className="text-3xl font-bold mb-4">Welcome to CityZen</h1>
+            <h1 className="text-3xl font-bold mb-4">Welcome to GlobeScout</h1>
             <p className="mb-6">
-                CityZen helps you explore new places by providing insights into top attractions and weather conditions
-                for cities and countries around the world.
+                GlobeScout helps you explore new places by providing insights into top attractions and weather
+                conditions for cities and countries around the world.
             </p>
 
             {/* Globe Scout Feature */}
@@ -28,7 +28,7 @@ export default function Home(): JSX.Element {
             {/* TODO: ONLY ENABLE THIS FOR USERS THAT ARE ADMINS */}
             <FeatureDescription
                 title="Users"
-                description="A list of users who have registered on CityZen"
+                description="A list of users who have registered on GlobeScout"
                 buttonText=" View Users"
                 buttonLink="/users"
             />

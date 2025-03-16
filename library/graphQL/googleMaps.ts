@@ -50,7 +50,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                 name: place.name,
                 address: place.formatted_address,
                 rating: place.rating,
-                location: {
+                coordinates: {
                     lat: place.geometry.location.lat,
                     lng: place.geometry.location.lng,
                 },

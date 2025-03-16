@@ -6,17 +6,17 @@ import { Weather, Units } from '../../../../types/weather';
 import Tooltip from '../common/Tooltip';
 
 interface FiveDayForecastProps {
-    city: string;
+    location: string;
     units: Units;
 }
 
-export default function FiveDayForecast({ city, units }: FiveDayForecastProps): JSX.Element {
+export default function FiveDayForecast({ location, units }: FiveDayForecastProps): JSX.Element {
     const {
         data: forecastData,
         loading: forecastLoading,
         error: forecastError,
     } = useQuery(GET_FIVE_DAY_FORECAST, {
-        variables: { city, units },
+        variables: { location, units },
     });
 
     const isUnitsCelcius = units === Units.Metric;

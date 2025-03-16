@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_CURRENT_WEATHER = gql`
-    query GetCurrentWeather($city: String!, $units: Units!) {
-        getCurrentWeather(city: $city, units: $units) {
+    query GetCurrentWeather($location: String!, $units: Units!) {
+        getCurrentWeather(location: $location, units: $units) {
             description
             icon
             temperature
@@ -20,8 +20,8 @@ export const GET_CURRENT_WEATHER = gql`
 `;
 
 export const GET_FIVE_DAY_FORECAST = gql`
-    query GetFiveDayForecast($city: String!, $units: Units!) {
-        getFiveDayForecast(city: $city, units: $units) {
+    query GetFiveDayForecast($location: String!, $units: Units!) {
+        getFiveDayForecast(location: $location, units: $units) {
             date
             description
             icon

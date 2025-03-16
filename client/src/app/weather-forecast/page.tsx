@@ -3,12 +3,12 @@
 import React, { JSX, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { selectCity, selectUnits, selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
+import { selectLocation, selectUnits, selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
 import CurrentWeather from '../../components/weather-forecast/CurrentWeather';
 import FiveDayForecast from '../../components/weather-forecast/FiveDayForecast';
 
 export default function WeatherForecast(): JSX.Element {
-    const city = useSelector(selectCity);
+    const location = useSelector(selectLocation);
     const units = useSelector(selectUnits);
     const currentWeatherData = useSelector(selectCurrentWeatherData);
     const router = useRouter();
@@ -27,9 +27,9 @@ export default function WeatherForecast(): JSX.Element {
 
     return (
         <div className="p-4">
-            <h2 className="title mb-3">Weather forecast for {city}</h2>
+            <h2 className="title mb-3">Weather forecast for {location}</h2>
             <CurrentWeather units={units} currentWeatherData={currentWeatherData} />
-            <FiveDayForecast city={city} units={units} />
+            <FiveDayForecast location={location} units={units} />
         </div>
     );
 }

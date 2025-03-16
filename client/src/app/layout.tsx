@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'CityZen',
-    description: 'CityZen helps you discover top attractions and weather insights for cities and countries worldwide.',
+    title: 'GlobeScout',
+    description:
+        'GlobeScout helps you discover top attractions and weather insights for cities and countries worldwide.',
     icons: {
         icon: [
             {
