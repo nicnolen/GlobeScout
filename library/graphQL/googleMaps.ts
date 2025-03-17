@@ -19,7 +19,13 @@ interface TopTenPlacesParams {
 // Resolver function for fetching top-rated places
 export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): Promise<Place> {
     try {
-        const cachedTopTenPlaces = await TopTenPlacesModel.findOne({ location: locationSearch });
+        if (!locationSearch) {
+            throw new Error('getTopTenPlaces Error: locationSearch can not be empty');
+        }
+
+        const sanitizedLocation = locationSearch.trim().toLowerCase();
+
+        const cachedTopTenPlaces = await TopTenPlacesModel.findOne({ location: sanitizedLocation });
 
         if (cachedTopTenPlaces) {
             console.info('Cached top ten places data was found');

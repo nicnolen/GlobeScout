@@ -40,7 +40,17 @@ interface DailyForecastAccumulator {
 
 export async function getCurrentWeather(location: string, units: Units): Promise<Weather> {
     try {
-        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location, units });
+        if (!location) {
+            throw new Error('getCurrentWeather: location can not be empty.');
+        }
+
+        if (!units) {
+            throw new Error('getCurrentWeather: units can not be empty.');
+        }
+
+        const sanitizedLocation = location.trim().toLowerCase();
+
+        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location: sanitizedLocation, units });
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
@@ -90,9 +100,19 @@ export async function getCurrentWeather(location: string, units: Units): Promise
 
 export async function getFiveDayForecast(location: string, units: Units): Promise<FiveDayForecast> {
     try {
+        if (!location) {
+            throw new Error('getCurrentWeather: location can not be empty.');
+        }
+
+        if (!units) {
+            throw new Error('getCurrentWeather: units can not be empty.');
+        }
+
+        const sanitizedLocation = location.trim().toLowerCase();
+
         // Check the cache first (MongoDB)
         const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
-            location,
+            location: sanitizedLocation,
             units,
         });
 
