@@ -67,8 +67,8 @@ export default function GlobeScout(): JSX.Element {
                 ) : topTenPlacesError ? (
                     <p>Error fetching places.</p>
                 ) : (
-                    <div>
-                        <h2 className="subtitle mt-2">Top 10 Places</h2>
+                    <>
+                        <h2 className="subtitle mt-8">Top 10 Places</h2>
                         {topTenPlacesData?.getTopTenPlaces?.map((place: PlaceProps, index: number) => (
                             <TopPlacesList
                                 key={index}
@@ -80,7 +80,7 @@ export default function GlobeScout(): JSX.Element {
                                 priceLevel={place.priceLevel}
                             />
                         ))}
-                    </div>
+                    </>
                 )}
             </div>
         </div>

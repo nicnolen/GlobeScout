@@ -17,8 +17,15 @@ export default function TopPlacesList({
 
             <div className="flex-1">
                 <div className="mb-4">
-                    <h3 className="font-semibold text-xl">{name}</h3>
-                    <Link href={`https://www.google.com/maps/search/?q=${address}`} target="_blank">
+                    <h3 className="font-semibold text-xl">
+                        {name}
+                        {priceLevel !== undefined && (
+                            <span className={`font-medium text-xl ${getPriceLevelColor(priceLevel)} ml-4`}>
+                                {'$'.repeat(priceLevel)}
+                            </span>
+                        )}
+                    </h3>
+                    <Link href={`https://www.google.com/maps/search/?q=${name}`} target="_blank">
                         <span className="link">{address}</span>
                     </Link>
                 </div>
@@ -27,13 +34,7 @@ export default function TopPlacesList({
                         <span className="font-medium">{rating} </span>
                         <span className="text-gray-500">({userRatingsTotal} reviews)</span>
                     </div>
-                    <div className="flex items-center space-x-3">
-                        {priceLevel !== undefined && (
-                            <span className={`font-medium text-xl ${getPriceLevelColor(priceLevel)} ml-4`}>
-                                {'$'.repeat(priceLevel)}
-                            </span>
-                        )}
-                    </div>
+                    <div className="flex items-center space-x-3"></div>
                 </div>
             </div>
         </div>

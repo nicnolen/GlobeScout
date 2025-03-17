@@ -1,13 +1,16 @@
 'use client'; // Marking this file as a client component
 
-import React, { JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
+import { useOutsideClick } from '../../hooks/clickHooks';
 import Tooltip from './Tooltip';
+import SettingsDropdown from '../common/SettingsDropdown';
 
 export default function NavBar(): JSX.Element {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const pathname = usePathname();
     const currentWeatherData = useSelector(selectCurrentWeatherData);
 
@@ -15,13 +18,27 @@ export default function NavBar(): JSX.Element {
         return pathname === path ? 'text-yellow-400' : 'hover:text-yellow-400;';
     }
 
+    function toggleDropdown(): void {
+        setIsDropdownOpen(!isDropdownOpen);
+    }
+
+    const dropdownRef = useOutsideClick(() => setIsDropdownOpen(false));
+
     const isDisabled = !currentWeatherData;
     const disabledForecastTooltipMessage = 'Must search a city or country first';
 
     return (
         <nav className="bg-teal-500 text-white p-4 mb-4 shadow-md">
             <div className="container mx-auto">
-                <ul className="flex space-x-8 justify-center">
+                <ul className="flex space-x-8 justify-center items-center">
+                    <li className="mr-auto" ref={dropdownRef}>
+                        <button className="flex items-center text-white" onClick={toggleDropdown}>
+                            {/* 9881 is the HTML character code for a gear icon */}
+                            <span className="text-2xl mr-1.25">&#9881;</span>{' '}
+                            <span className=" hidden sm:inline ">Settings</span>
+                        </button>
+                        {isDropdownOpen && <SettingsDropdown />}
+                    </li>
                     <li>
                         <Link href="/">
                             <span className={`${isActive('/')}`}>Home</span>
