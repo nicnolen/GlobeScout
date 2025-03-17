@@ -2,8 +2,8 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { WeatherState } from '../../types/weather';
 import { Units, Weather } from '../../../../types/weather';
 
-export const setCity = (state: WeatherState, action: PayloadAction<string>) => {
-    state.city = action.payload;
+export const setLocation = (state: WeatherState, action: PayloadAction<string>) => {
+    state.location = action.payload;
 };
 export const setUnits = (state: WeatherState, action: PayloadAction<Units>) => {
     state.units = action.payload;

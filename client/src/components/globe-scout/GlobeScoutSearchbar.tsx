@@ -1,20 +1,20 @@
 import React, { JSX } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCity } from '../../redux/slices/weatherSlice';
+import { setLocation } from '../../redux/slices/weatherSlice';
 
 export interface GlobeScoutSearchbarProps {
-    city: string;
+    location: string;
 }
 
-export default function GlobeScoutSearchbar({ city }: GlobeScoutSearchbarProps): JSX.Element {
+export default function GlobeScoutSearchbar({ location }: GlobeScoutSearchbarProps): JSX.Element {
     const dispatch = useDispatch();
 
     return (
         <input
             type="text"
-            value={city}
-            onChange={(e) => dispatch(setCity(e.target.value))}
-            placeholder="Enter city"
+            value={location}
+            onChange={(e) => dispatch(setLocation(e.target.value))}
+            placeholder="Enter location name. Seperate a city and a country with a ,"
             className="flex-grow border border-gray-300 p-2 px-4 rounded-md mr-2.5"
         />
     );

@@ -3,16 +3,19 @@ import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
 import { Weather } from '../../../../types/weather';
+import { PlaceProps } from '../../../../types/googleMaps';
 import { useCurrentWeatherData } from '../../hooks/weatherHooks';
-import { GET_CURRENT_WEATHER } from '../../graphQL/queries';
-import { selectCity, selectUnits } from '../../redux/selectors/weatherSelectors';
-import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
-import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
+import { GET_CURRENT_WEATHER } from '../../graphQL/weatherQueries';
+import { GET_TOP_TEN_PLACES } from '../../graphQL/googleMapsQueries';
+import { selectLocation, selectUnits } from '../../redux/selectors/weatherSelectors';
+import GlobeScoutTitle from '../../components/globe-scout/GlobeScoutTitle';
+import GlobeScoutSearchbar from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
+import TopPlacesList from '../../components/globe-scout/GlobeScoutTopPlacesList';
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
-    const city = useSelector(selectCity);
+    const location = useSelector(selectLocation);
     const units = useSelector(selectUnits);
 
     const [
@@ -21,6 +24,9 @@ export default function GlobeScout(): JSX.Element {
     ] = useLazyQuery<{
         getCurrentWeather: Weather;
     }>(GET_CURRENT_WEATHER);
+
+    const [getTopTenPlaces, { data: topTenPlacesData, loading: topTenPlacesLoading, error: topTenPlacesError }] =
+        useLazyQuery(GET_TOP_TEN_PLACES);
 
     useCurrentWeatherData({
         currentWeatherLoading,
@@ -35,15 +41,16 @@ export default function GlobeScout(): JSX.Element {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        getCurrentWeather({ variables: { city, units } });
+        getCurrentWeather({ variables: { location, units } });
+        getTopTenPlaces({ variables: { locationSearch: location } });
     };
 
     return (
         <div>
-            {city && <WeatherTitle city={city} message={message} />}
+            {location && <GlobeScoutTitle location={location} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <WeatherInput city={city} />
+                <GlobeScoutSearchbar location={location} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton
@@ -53,6 +60,29 @@ export default function GlobeScout(): JSX.Element {
                     />
                 )}
             </form>
+
+            <div>
+                {topTenPlacesLoading ? (
+                    <p>Loading top places...</p>
+                ) : topTenPlacesError ? (
+                    <p>Error fetching places.</p>
+                ) : (
+                    <div>
+                        <h2 className="subtitle mt-2">Top 10 Places</h2>
+                        {topTenPlacesData?.getTopTenPlaces?.map((place: PlaceProps, index: number) => (
+                            <TopPlacesList
+                                key={index}
+                                rank={index + 1}
+                                name={place.name}
+                                address={place.address}
+                                rating={place.rating}
+                                userRatingsTotal={place.userRatingsTotal}
+                                priceLevel={place.priceLevel}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

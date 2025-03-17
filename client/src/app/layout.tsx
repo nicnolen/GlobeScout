@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import ApolloProviderWrapper from '../config/graphQL/ApolloProviderWrapper';
 import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
-import ApolloProviderWrapper from '../config/graphQL/apolloProviderWrapper';
 import NavBar from '../components/common/NavBar';
 import './globals.css';
 
@@ -16,8 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'CityZen',
-    description: 'CityZen helps you discover top attractions and weather insights for cities and countries worldwide.',
+    title: 'GlobeScout',
+    description:
+        'GlobeScout helps you discover top attractions and weather insights for cities and countries worldwide.',
     icons: {
         icon: [
             {
@@ -37,12 +38,12 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <div className="container mx-auto px-4 py-8 min-h-screen">
-                    <ReduxProviderWrapper>
-                        <ApolloProviderWrapper>
+                    <ApolloProviderWrapper>
+                        <ReduxProviderWrapper>
                             <NavBar />
                             {children}
-                        </ApolloProviderWrapper>
-                    </ReduxProviderWrapper>
+                        </ReduxProviderWrapper>
+                    </ApolloProviderWrapper>
                 </div>
             </body>
         </html>

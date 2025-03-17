@@ -1,5 +1,5 @@
 import { ApolloServer } from '@apollo/server';
-import { typeDefs } from '../../graphQL/queries/index';
+import { typeDefs } from '../../graphQL/schema/index';
 import { resolvers } from '../../graphQL/resolvers/index';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 

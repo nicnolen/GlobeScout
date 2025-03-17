@@ -8,10 +8,10 @@ import {
     CurrentWeatherResponse,
     FiveDayForecastResponse,
     Units,
-} from '../types/weather';
-import CurrentWeatherModel from '../models/CurrentWeatherCache';
-import FiveDayForecastModel from '../models/FiveDayForecastCache';
-import { catchErrorHandler } from '../utils/errorHandlers';
+} from '../../types/weather';
+import CurrentWeatherModel from '../../models/CurrentWeatherCache';
+import FiveDayForecastModel from '../../models/FiveDayForecastCache';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dayjs.extend(utc);
 
@@ -38,10 +38,9 @@ interface DailyForecastAccumulator {
     maxTemperature: number;
 }
 
-export async function getCurrentWeather(city: string, units: Units): Promise<Weather> {
+export async function getCurrentWeather(location: string, units: Units): Promise<Weather> {
     try {
-        // Check if the data is cached in MongoDB
-        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ city, units });
+        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location, units });
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
@@ -49,7 +48,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
         }
 
         const response = await axios.get<CurrentWeatherResponse>(
-            `${process.env.OPENWEATHER_BASE_URL}/weather?q=${city}&appid=${API_KEY}&units=${units}`,
+            `${process.env.OPENWEATHER_BASE_URL}/weather?q=${location}&appid=${API_KEY}&units=${units}`,
         );
 
         const { weather, main, wind, sys, visibility } = response.data;
@@ -75,7 +74,7 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
         };
 
         await CurrentWeatherModel.insertOne({
-            city,
+            location,
             country,
             units,
             currentWeather: fortmattedCurrentWeather,
@@ -89,11 +88,11 @@ export async function getCurrentWeather(city: string, units: Units): Promise<Wea
     }
 }
 
-export async function getFiveDayForecast(city: string, units: Units): Promise<FiveDayForecast> {
+export async function getFiveDayForecast(location: string, units: Units): Promise<FiveDayForecast> {
     try {
         // Check the cache first (MongoDB)
         const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
-            city,
+            location,
             units,
         });
 
@@ -104,7 +103,7 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
 
         // Fetch the 5-day forecast from OpenWeather API
         const response = await axios.get<FiveDayForecastResponse>(
-            `${BASE_URL}/forecast?q=${city}&appid=${API_KEY}&units=${units}`,
+            `${BASE_URL}/forecast?q=${location}&appid=${API_KEY}&units=${units}`,
         );
 
         const { list } = response.data;
@@ -193,7 +192,7 @@ export async function getFiveDayForecast(city: string, units: Units): Promise<Fi
         });
 
         await FiveDayForecastModel.insertOne({
-            city,
+            location,
             country,
             units,
             fiveDayForecast: formattedForecastEntries,

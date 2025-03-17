@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { FiveDayForecastResponse, Units } from '../types/weather';
 
 interface FiveDayForecastCacheDocument extends Document {
-    city: string;
+    location: string;
     country: string;
     units: Units;
     fiveDayForecast: FiveDayForecastResponse;
@@ -10,7 +10,7 @@ interface FiveDayForecastCacheDocument extends Document {
 
 const FiveDayForecastCacheSchema = new Schema<FiveDayForecastCacheDocument>(
     {
-        city: { type: String, required: true },
+        location: { type: String, required: true },
         country: { type: String, required: true },
         units: { type: String, required: true },
         fiveDayForecast: { type: Schema.Types.Mixed, required: true },
@@ -18,7 +18,6 @@ const FiveDayForecastCacheSchema = new Schema<FiveDayForecastCacheDocument>(
     { timestamps: true },
 );
 
-// Use the model name from environment variable, defaulting to 'CurrentWeather'
 const modelName = process.env.FIVE_DAY_FORECAST_CACHE_MODEL_NAME;
 
 if (!modelName) {

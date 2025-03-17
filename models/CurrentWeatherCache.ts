@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import { CurrentWeatherResponse, Units } from '../types/weather';
 
 interface CurrentWeatherCacheDocument extends Document {
-    city: string;
+    location: string;
     country: string;
     units: Units;
     currentWeather: CurrentWeatherResponse;
@@ -10,7 +10,7 @@ interface CurrentWeatherCacheDocument extends Document {
 
 const CurrentWeatherCacheSchema = new Schema<CurrentWeatherCacheDocument>(
     {
-        city: { type: String, required: true },
+        location: { type: String, required: true },
         country: { type: String, required: true },
         units: { type: String, required: true },
         currentWeather: { type: Schema.Types.Mixed, required: true },
