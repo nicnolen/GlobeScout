@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import ApolloProviderWrapper from '../config/graphQL/ApolloProviderWrapper';
 import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
-// import GoogleMapsProviderWrapper from '../config/googleMaps/googleMapsProviderWrapper';
 import NavBar from '../components/common/NavBar';
 import './globals.css';
 
@@ -41,10 +40,8 @@ export default function RootLayout({
                 <div className="container mx-auto px-4 py-8 min-h-screen">
                     <ApolloProviderWrapper>
                         <ReduxProviderWrapper>
-                            {/* <GoogleMapsProviderWrapper> */}
                             <NavBar />
                             {children}
-                            {/* </GoogleMapsProviderWrapper> */}
                         </ReduxProviderWrapper>
                     </ApolloProviderWrapper>
                 </div>

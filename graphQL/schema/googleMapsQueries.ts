@@ -11,7 +11,6 @@ export const GET_TOP_TEN_PLACES = `
         location: Location
         priceLevel: Int
         userRatingsTotal: Int
-        photos: [String]
     }
 
     type Query {

@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 import { expressMiddleware } from '@apollo/server/express4';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
-import apiKeys from './routes/apiKeys';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
+import { scheduleClearTopTenPlacesCache } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
 
 // Load environmental variables
@@ -39,8 +39,6 @@ async function startServer(): Promise<void> {
         // Apply Apollo Server middleware to the Express app
         server.use('/graphql', graphqlMiddleware);
 
-        // Routes
-        server.use('/api', apiKeys);
         // Serve static files from the `client/public` folder
         server.use(express.static(path.join(__dirname, 'client', 'public')));
 
@@ -51,6 +49,7 @@ async function startServer(): Promise<void> {
 
         // cron jobs
         scheduleClearFiveDayForecastCache();
+        scheduleClearTopTenPlacesCache();
 
         server.listen(PORT, () => {
             console.info(`Server is running on http://localhost:${PORT}`);

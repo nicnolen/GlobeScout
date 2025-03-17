@@ -3,14 +3,15 @@ import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLazyQuery } from '@apollo/client';
 import { Weather } from '../../../../types/weather';
+import { PlaceProps } from '../../../../types/googleMaps';
 import { useCurrentWeatherData } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/weatherQueries';
 import { GET_TOP_TEN_PLACES } from '../../graphQL/googleMapsQueries';
 import { selectLocation, selectUnits } from '../../redux/selectors/weatherSelectors';
-import WeatherTitle from '../../components/globe-scout/GlobeScoutTitle';
-import WeatherInput from '../../components/globe-scout/GlobeScoutSearchbar';
+import GlobeScoutTitle from '../../components/globe-scout/GlobeScoutTitle';
+import GlobeScoutSearchbar from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
-// import GlobeScoutMap from '../../components/globe-scout/GlobeScoutMap';
+import TopPlacesList from '../../components/globe-scout/GlobeScoutTopPlacesList';
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
@@ -46,10 +47,10 @@ export default function GlobeScout(): JSX.Element {
 
     return (
         <div>
-            {location && <WeatherTitle location={location} message={message} />}
+            {location && <GlobeScoutTitle location={location} message={message} />}
 
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <WeatherInput location={location} />
+                <GlobeScoutSearchbar location={location} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton
@@ -59,7 +60,29 @@ export default function GlobeScout(): JSX.Element {
                     />
                 )}
             </form>
-            {/* <GlobeScoutMap /> */}
+
+            <div>
+                {topTenPlacesLoading ? (
+                    <p>Loading top places...</p>
+                ) : topTenPlacesError ? (
+                    <p>Error fetching places.</p>
+                ) : (
+                    <div>
+                        <h2 className="subtitle mt-2">Top 10 Places</h2>
+                        {topTenPlacesData?.getTopTenPlaces?.map((place: PlaceProps, index: number) => (
+                            <TopPlacesList
+                                key={index}
+                                rank={index + 1}
+                                name={place.name}
+                                address={place.address}
+                                rating={place.rating}
+                                userRatingsTotal={place.userRatingsTotal}
+                                priceLevel={place.priceLevel}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

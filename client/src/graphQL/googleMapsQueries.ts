@@ -12,7 +12,6 @@ export const GET_TOP_TEN_PLACES = gql`
             }
             priceLevel
             userRatingsTotal
-            photos
         }
     }
 `;

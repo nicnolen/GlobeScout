@@ -56,7 +56,6 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                 },
                 priceLevel: place.price_level,
                 userRatingsTotal: place.user_ratings_total,
-                photos: place.photos ? place.photos.map((photo: any) => photo.photo_reference) : [],
             }));
 
         await TopTenPlacesModel.insertOne({

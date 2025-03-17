@@ -1,15 +1,19 @@
-// GraphQL query structure
-export interface Place {
+// Custom Interfaces
+export interface PlaceProps {
+    rank: number;
     name: string;
     address: string;
     rating: number;
+    userRatingsTotal: number;
+    priceLevel?: number;
+}
+
+// GraphQL query structure
+export interface Place extends PlaceProps {
     location: {
         lat: number;
         lng: number;
     };
-    priceLevel: number;
-    userRatingsTotal: number;
-    photos: string[];
 }
 
 // Google Maps API Responses
