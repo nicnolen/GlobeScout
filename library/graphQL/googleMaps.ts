@@ -34,7 +34,6 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
 
         // Create the dynamic query for Google Places API
         const textQuery = `Top rated places in ${locationSearch}`;
-        console.log(locationSearch, 'search');
 
         // Send request to Google Places API
         const response = await axios.get(
