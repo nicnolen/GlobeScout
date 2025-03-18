@@ -23,9 +23,11 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
             throw new Error('getTopTenPlaces Error: locationSearch can not be empty');
         }
 
-        const sanitizedLocation = locationSearch.trim().toLowerCase();
+        const sanitizedLocation = locationSearch.trim().replace(/\s+/g, ' ').toLowerCase();
+        // Capitalize first letter of each word for display
+        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
 
-        const cachedTopTenPlaces = await TopTenPlacesModel.findOne({ location: sanitizedLocation });
+        const cachedTopTenPlaces = await TopTenPlacesModel.findOne({ location: displayLocation });
 
         if (cachedTopTenPlaces) {
             console.info('Cached top ten places data was found');
@@ -73,7 +75,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
             }));
 
         await TopTenPlacesModel.insertOne({
-            location: locationSearch,
+            location: displayLocation,
             topTenPlaces: sortedPlaces,
         });
 

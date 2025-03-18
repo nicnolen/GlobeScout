@@ -49,8 +49,10 @@ export async function getCurrentWeather(location: string, units: Units): Promise
         }
 
         const sanitizedLocation = location.trim().toLowerCase();
+        // Capitalize first letter of each word for display
+        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
 
-        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location: sanitizedLocation, units });
+        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location: displayLocation, units });
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
@@ -84,7 +86,7 @@ export async function getCurrentWeather(location: string, units: Units): Promise
         };
 
         await CurrentWeatherModel.insertOne({
-            location,
+            location: displayLocation,
             country,
             units,
             currentWeather: fortmattedCurrentWeather,
@@ -109,10 +111,12 @@ export async function getFiveDayForecast(location: string, units: Units): Promis
         }
 
         const sanitizedLocation = location.trim().toLowerCase();
+        // Capitalize first letter of each word for display
+        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
 
         // Check the cache first (MongoDB)
         const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
-            location: sanitizedLocation,
+            location: displayLocation,
             units,
         });
 
@@ -212,7 +216,7 @@ export async function getFiveDayForecast(location: string, units: Units): Promis
         });
 
         await FiveDayForecastModel.insertOne({
-            location,
+            location: displayLocation,
             country,
             units,
             fiveDayForecast: formattedForecastEntries,
