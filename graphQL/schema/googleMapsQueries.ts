@@ -9,8 +9,8 @@ export const GET_TOP_TEN_PLACES = `
         address: String
         rating: Float
         location: Location
-        priceLevel: Int
-        userRatingsTotal: Int
+        priceLevel: String
+        userRatingCount: Int
     }
 
     type Query {

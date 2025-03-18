@@ -1,14 +1,14 @@
 import React, { JSX } from 'react';
 import Link from 'next/link';
 import { PlaceProps } from '../../../../types/googleMaps';
-import { getPriceLevelColor } from '../../utils/priceLevelColor';
+import { getPriceLevelColor, getPriceLevelSymbol } from '../../utils/priceLevel';
 
 export default function TopPlacesList({
     rank,
     name,
     address,
     rating,
-    userRatingsTotal,
+    userRatingCount,
     priceLevel,
 }: PlaceProps): JSX.Element {
     return (
@@ -21,7 +21,7 @@ export default function TopPlacesList({
                         {name}
                         {priceLevel !== undefined && (
                             <span className={`font-medium text-xl ${getPriceLevelColor(priceLevel)} ml-4`}>
-                                {'$'.repeat(priceLevel)}
+                                {getPriceLevelSymbol(priceLevel)}
                             </span>
                         )}
                     </h3>
@@ -32,7 +32,7 @@ export default function TopPlacesList({
                 <div className="flex justify-between items-center">
                     <div>
                         <span className="font-medium">{rating} </span>
-                        <span className="text-gray-500">({userRatingsTotal} reviews)</span>
+                        <span className="text-gray-500">({userRatingCount} reviews)</span>
                     </div>
                     <div className="flex items-center space-x-3"></div>
                 </div>

@@ -76,8 +76,10 @@ export default function GlobeScout(): JSX.Element {
                                 name={place.name}
                                 address={place.address}
                                 rating={place.rating}
-                                userRatingsTotal={place.userRatingsTotal}
+                                userRatingCount={place.userRatingCount}
                                 priceLevel={place.priceLevel}
+                                businessStatus={place.businessStatus}
+                                nationalPhoneNumber={place.nationalPhoneNumber}
                             />
                         ))}
                     </>

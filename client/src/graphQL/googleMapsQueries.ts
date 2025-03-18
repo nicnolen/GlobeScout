@@ -11,7 +11,7 @@ export const GET_TOP_TEN_PLACES = gql`
                 lng
             }
             priceLevel
-            userRatingsTotal
+            userRatingCount
         }
     }
 `;
