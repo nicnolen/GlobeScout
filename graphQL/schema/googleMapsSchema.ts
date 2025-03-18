@@ -16,7 +16,7 @@ export const GET_TOP_TEN_PLACES = `
 
     type RegularOpeningHours {
         weekdayDescriptions: [String]
-        openNow: Boolean
+        openNow: String
     }
 
     type Place {

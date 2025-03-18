@@ -1,7 +1,8 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { PlaceProps, PlaceResponse } from '../../types/googleMaps';
-import TopTenPlacesModel from '../../models/TopTenPlacesCache';
+import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
+import TopTenPlacesCacheModel from '../../models/TopTenPlacesCache';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dotenv.config();
@@ -16,6 +17,8 @@ interface TopTenPlacesParams {
     locationSearch: string;
 }
 
+/* QUERY RESOLVER FUNCTIONS */
+
 // Resolver function for fetching top-rated places
 export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): Promise<PlaceProps[]> {
     try {
@@ -27,7 +30,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
         // Capitalize first letter of each word for display
         const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
 
-        const cachedTopTenPlaces = await TopTenPlacesModel.findOne({ location: displayLocation });
+        const cachedTopTenPlaces = await TopTenPlacesCacheModel.findOne({ location: displayLocation });
 
         if (cachedTopTenPlaces) {
             console.info('Cached top ten places data was found');
@@ -63,6 +66,9 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
             .sort((a: PlaceResponse, b: PlaceResponse) => b.rating - a.rating)
             .slice(0, 10) // Take top 10
             .map((place: PlaceResponse) => {
+                // Convert openNow boolean to a more descriptive string
+                const openNow = checkOpenNowStatus(place as unknown as PlaceProps);
+
                 // Dynamically build the parking string based on parking options
                 const parking =
                     Object.keys(place.parkingOptions || {}) // Use '|| {}' to avoid 'undefined'
@@ -86,13 +92,13 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     regularOpeningHours: {
                         weekdayDescriptions:
                             place.regularOpeningHours?.weekdayDescriptions || 'Daily hours not available',
-                        openNow: place.regularOpeningHours?.openNow || false,
+                        openNow,
                     },
                     parking,
                 };
             });
 
-        await TopTenPlacesModel.insertOne({
+        await TopTenPlacesCacheModel.insertOne({
             location: displayLocation,
             topTenPlaces: sortedPlaces,
         });

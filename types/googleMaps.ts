@@ -14,7 +14,7 @@ export interface PlaceProps {
     parking?: string;
     regularOpeningHours?: {
         weekdayDescriptions: string[];
-        openNow: boolean;
+        openNow: string;
     };
 }
 

@@ -6,7 +6,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
-import { scheduleClearTopTenPlacesCache } from './utils/cron/googleMapsCrons';
+import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
 
 // Load environmental variables
@@ -50,6 +50,7 @@ async function startServer(): Promise<void> {
         // cron jobs
         scheduleClearFiveDayForecastCache();
         scheduleClearTopTenPlacesCache();
+        scheduleUpdateTopTenPlacesOpenNowStatus();
 
         server.listen(PORT, () => {
             console.info(`Server is running on http://localhost:${PORT}`);
