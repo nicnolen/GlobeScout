@@ -54,7 +54,7 @@ export default function TopPlacesList({
                                     <span className="text-sm font-medium">Current Status: </span>
                                     <span
                                         className={`ml-2 ${
-                                            openNow === 'Open'
+                                            openNow === 'Open' || openNow === 'Open 24 hours'
                                                 ? 'text-green-600'
                                                 : openNow.includes('Soon')
                                                   ? 'text-orange-500'

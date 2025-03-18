@@ -1,8 +1,10 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import { PlaceProps } from '../types/googleMaps';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Helper function to calculate the "openNow" status for a place
 export function checkOpenNowStatus(place: PlaceProps): string {
@@ -17,6 +19,10 @@ export function checkOpenNowStatus(place: PlaceProps): string {
     }
 
     const hours = todayHours.substring(todayHours.indexOf(':') + 1).trim();
+
+    if (hours === 'Open 24 hours') {
+        return 'Open 24 hours';
+    }
 
     if (hours === 'Closed') {
         return 'Closed';

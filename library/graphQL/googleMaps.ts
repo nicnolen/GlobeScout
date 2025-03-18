@@ -62,7 +62,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
 
         // Process the response and format the data
         const sortedPlaces = response.data.places
-            .filter((place: PlaceResponse) => place.rating) // Ensure there's a rating
+            .filter((place: PlaceResponse) => place.rating)
             .sort((a: PlaceResponse, b: PlaceResponse) => b.rating - a.rating)
             .slice(0, 10) // Take top 10
             .map((place: PlaceResponse) => {
@@ -71,8 +71,23 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
 
                 // Dynamically build the parking string based on parking options
                 const parking =
-                    Object.keys(place.parkingOptions || {}) // Use '|| {}' to avoid 'undefined'
-                        .filter((key) => place.parkingOptions![key as keyof typeof place.parkingOptions])
+                    Object.entries(place.parkingOptions || {})
+                        .reduce((acc, [key, value]) => {
+                            if (value) {
+                                const parkingOption = {
+                                    freeParkingLot: 'Free Parking Lot',
+                                    paidParkingLot: 'Paid Parking Lot',
+                                    freeStreetParking: 'Free Street Parking',
+                                    paidStreetParking: 'Paid Street Parking',
+                                    valetParking: 'Valet Parking',
+                                    freeGarageParking: 'Free Garage Parking',
+                                    paidGarageParking: 'Paid Garage Parking',
+                                }[key];
+
+                                if (parkingOption) acc.push(parkingOption);
+                            }
+                            return acc;
+                        }, [] as string[])
                         .join(', ') || 'No parking information available';
 
                 return {
