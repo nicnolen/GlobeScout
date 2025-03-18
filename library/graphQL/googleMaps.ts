@@ -52,7 +52,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     'Content-Type': 'application/json',
                     'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
                     'X-Goog-FieldMask':
-                        'places.displayName,places.formattedAddress,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber',
+                        'places.displayName,places.formattedAddress,places.generativeSummary,places.primaryTypeDisplayName,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber,places.regularOpeningHours,places.parkingOptions',
                 },
             },
         );
@@ -60,19 +60,37 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
         // Process the response and format the data
         const sortedPlaces = response.data.places
             .filter((place: PlaceResponse) => place.rating) // Ensure there's a rating
-            .sort((a: PlaceResponse, b: PlaceResponse) => b.rating - a.rating) // Sort by rating
+            .sort((a: PlaceResponse, b: PlaceResponse) => b.rating - a.rating)
             .slice(0, 10) // Take top 10
-            .map((place: PlaceResponse) => ({
-                name: place.displayName?.text || 'Unknown',
-                address: place.formattedAddress,
-                rating: place.rating,
-                coordinates: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : null,
-                priceLevel: place.priceLevel,
-                userRatingCount: place.userRatingCount,
-                websiteUri: place.websiteUri,
-                businessStatus: place.businessStatus,
-                nationalPhoneNumber: place.nationalPhoneNumber,
-            }));
+            .map((place: PlaceResponse) => {
+                // Dynamically build the parking string based on parking options
+                const parking =
+                    Object.keys(place.parkingOptions || {}) // Use '|| {}' to avoid 'undefined'
+                        .filter((key) => place.parkingOptions![key as keyof typeof place.parkingOptions])
+                        .join(', ') || 'No parking information available';
+
+                return {
+                    name: place.displayName?.text || 'Unknown',
+                    address: place.formattedAddress,
+                    description: place.generativeSummary?.description?.text || 'No description available',
+                    primaryType: place?.primaryTypeDisplayName?.text,
+                    rating: place.rating,
+                    coordinates: place.location
+                        ? { lat: place.location.latitude, lng: place.location.longitude }
+                        : null,
+                    priceLevel: place.priceLevel,
+                    userRatingCount: place.userRatingCount,
+                    websiteUri: place.websiteUri,
+                    businessStatus: place.businessStatus,
+                    nationalPhoneNumber: place.nationalPhoneNumber,
+                    regularOpeningHours: {
+                        weekdayDescriptions:
+                            place.regularOpeningHours?.weekdayDescriptions || 'Daily hours not available',
+                        openNow: place.regularOpeningHours?.openNow || false,
+                    },
+                    parking,
+                };
+            });
 
         await TopTenPlacesModel.insertOne({
             location: displayLocation,

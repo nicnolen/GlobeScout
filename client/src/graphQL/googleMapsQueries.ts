@@ -5,6 +5,8 @@ export const GET_TOP_TEN_PLACES = gql`
         getTopTenPlaces(locationSearch: $locationSearch) {
             name
             address
+            description
+            primaryType
             rating
             location {
                 lat
@@ -15,6 +17,11 @@ export const GET_TOP_TEN_PLACES = gql`
             websiteUri
             businessStatus
             nationalPhoneNumber
+            regularOpeningHours {
+                weekdayDescriptions
+                openNow
+            }
+            parking
         }
     }
 `;

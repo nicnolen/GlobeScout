@@ -4,9 +4,26 @@ export const GET_TOP_TEN_PLACES = `
         lng: Float
     }
 
+    type ParkingOptions {
+        freeParkingLot: Boolean
+        paidParkingLot: Boolean
+        freeStreetParking: Boolean
+        paidStreetParking: Boolean
+        valetParking: Boolean
+        freeGarageParking: Boolean
+        paidGarageParking: Boolean
+    }
+
+    type RegularOpeningHours {
+        weekdayDescriptions: [String]
+        openNow: Boolean
+    }
+
     type Place {
         name: String
         address: String
+        description: String
+        primaryType: String
         rating: Float
         location: Location
         priceLevel: String
@@ -14,6 +31,8 @@ export const GET_TOP_TEN_PLACES = `
         websiteUri: String
         businessStatus: String
         nationalPhoneNumber: String
+        parking: String
+        regularOpeningHours: RegularOpeningHours
     }
 
     type Query {
