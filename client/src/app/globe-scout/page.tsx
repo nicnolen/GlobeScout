@@ -78,6 +78,7 @@ export default function GlobeScout(): JSX.Element {
                                 rating={place.rating}
                                 userRatingCount={place.userRatingCount}
                                 priceLevel={place.priceLevel}
+                                websiteUri={place.websiteUri}
                                 businessStatus={place.businessStatus}
                                 nationalPhoneNumber={place.nationalPhoneNumber}
                             />

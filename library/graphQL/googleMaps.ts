@@ -50,7 +50,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     'Content-Type': 'application/json',
                     'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
                     'X-Goog-FieldMask':
-                        'places.displayName,places.formattedAddress,places.rating,places.location,places.priceLevel,places.userRatingCount,places.photos,places.websiteUri,places.businessStatus,places.nationalPhoneNumber',
+                        'places.displayName,places.formattedAddress,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber',
                 },
             },
         );
@@ -66,8 +66,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                 rating: place.rating,
                 coordinates: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : null,
                 priceLevel: place.priceLevel,
-                userRatingCount: place.userRatingsTotal,
-                photos: place.photos,
+                userRatingCount: place.userRatingCount,
                 websiteUri: place.websiteUri,
                 businessStatus: place.businessStatus,
                 nationalPhoneNumber: place.nationalPhoneNumber,

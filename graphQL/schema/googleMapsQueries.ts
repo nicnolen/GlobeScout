@@ -11,6 +11,9 @@ export const GET_TOP_TEN_PLACES = `
         location: Location
         priceLevel: String
         userRatingCount: Int
+        websiteUri: String
+        businessStatus: String
+        nationalPhoneNumber: String
     }
 
     type Query {

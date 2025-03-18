@@ -12,6 +12,9 @@ export const GET_TOP_TEN_PLACES = gql`
             }
             priceLevel
             userRatingCount
+            websiteUri
+            businessStatus
+            nationalPhoneNumber
         }
     }
 `;

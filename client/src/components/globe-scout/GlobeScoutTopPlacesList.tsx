@@ -10,6 +10,9 @@ export default function TopPlacesList({
     rating,
     userRatingCount,
     priceLevel,
+    websiteUri,
+    businessStatus,
+    nationalPhoneNumber,
 }: PlaceProps): JSX.Element {
     return (
         <div className="card p-4 mb-4 flex items-start">
@@ -29,6 +32,33 @@ export default function TopPlacesList({
                         <span className="link">{address}</span>
                     </Link>
                 </div>
+
+                {businessStatus && (
+                    <div className="mb-1">
+                        <span className="text-sm font-medium text-gray-500">Status: </span>
+                        <span
+                            className={`font-medium ${businessStatus === 'OPERATIONAL' ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                            {businessStatus}
+                        </span>
+                    </div>
+                )}
+                {nationalPhoneNumber && (
+                    <div className="mb-1">
+                        <span className="text-sm font-medium text-gray-500">Phone: </span>
+                        <a href={`tel:${nationalPhoneNumber}`} className="font-medium">
+                            {nationalPhoneNumber}
+                        </a>
+                    </div>
+                )}
+                {websiteUri && (
+                    <div className="mb-4">
+                        <span className="text-sm font-medium text-gray-500">Website: </span>
+                        <Link href={websiteUri} target="_blank" className="text-blue-600">
+                            <span className="link">{websiteUri}</span>
+                        </Link>
+                    </div>
+                )}
                 <div className="flex justify-between items-center">
                     <div>
                         <span className="font-medium">{rating} </span>

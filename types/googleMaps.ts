@@ -6,18 +6,9 @@ export interface PlaceProps {
     rating: number;
     userRatingCount: number;
     priceLevel?: string;
-    photos?: Photo[];
     websiteUri?: string;
     businessStatus: string;
     nationalPhoneNumber?: string;
-}
-
-// Google Maps API Photo response
-interface Photo {
-    height: number;
-    width: number;
-    attributions: string[];
-    reference: string;
 }
 
 // Google Maps API Place response (simplified)
@@ -28,13 +19,12 @@ export interface PlaceResponse {
     };
     formattedAddress: string;
     rating: number;
-    userRatingsTotal: number;
+    userRatingCount: number;
     priceLevel?: string;
     location: {
         latitude: number;
         longitude: number;
     };
-    photos?: Photo[];
     websiteUri?: string;
     businessStatus: string;
     nationalPhoneNumber?: string;
