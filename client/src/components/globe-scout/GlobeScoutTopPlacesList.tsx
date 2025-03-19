@@ -28,16 +28,18 @@ export default function TopPlacesList({
     const { weekdayDescriptions, openNow } = regularOpeningHours || {}; // default to empty object when regularOpeningHours is undefined
 
     return (
-        <div className="card p-4 mb-4 flex flex-wrap items-start justify-between">
-            <div className="flex-shrink-0 text-xl font-bold mr-4">{rank}.</div>
+        <div className="card p-4 mb-4 flex flex-col sm:flex-row">
+            <div className="flex-shrink-0 text-xl font-bold mr-4 mb-4 sm:mb-0">{rank}.</div>
 
-            <div className="flex-1">
+            <div className="flex-1 sm:max-w-[calc(100%-300px)]">
                 <div className="mb-4">
-                    <h3 className="font-semibold text-xl">{name}</h3>
+                    <h3 className="font-semibold text-xl">
+                        {name}{' '}
+                        {primaryType && <span className="text-sm font-medium text-gray-500">({primaryType}) </span>}
+                    </h3>
                     <div className="mb-2 flex items-center">
-                        {primaryType && <span className="text-sm font-medium text-gray-500 mr-2">{primaryType}</span>}
                         <Link href={`https://www.google.com/maps/search/?q=${name}`} target="_blank">
-                            <span className="link">{address}</span>
+                            <span className="text-blue-600 link">{address}</span>
                         </Link>
                     </div>
 
@@ -50,11 +52,11 @@ export default function TopPlacesList({
                                     {getPriceLevelSymbol(priceLevel)}
                                 </span>
                             )}
+
                             {weekdayDescriptions && openNow && (
-                                <div className="flex items-center">
-                                    <span className="text-sm font-medium">Current Status: </span>
+                                <div className="flex items-center mt-2">
                                     <span
-                                        className={`ml-2 ${
+                                        className={`${
                                             openNow === 'Open' || openNow === 'Open 24 hours'
                                                 ? 'text-green-600'
                                                 : openNow.includes('Soon')
@@ -66,7 +68,7 @@ export default function TopPlacesList({
                                     </span>
                                     <button
                                         onClick={toggleDropdown}
-                                        className="ml-4 text-blue-600 font-semibold focus:outline-none"
+                                        className="ml-2 text-blue-600 font-semibold focus:outline-none"
                                     >
                                         ({isDropdownOpen ? 'Hide Hours' : 'Show Hours'})
                                     </button>
@@ -92,12 +94,13 @@ export default function TopPlacesList({
                     <div className="mb-1">
                         <span className="text-sm font-medium text-gray-500">Status: </span>
                         <span
-                            className={`font-medium ${businessStatus === 'OPERATIONAL' ? 'text-green-600' : 'text-red-600'}`}
+                            className={`font-medium ${businessStatus === 'Operational' ? 'text-green-600' : 'text-red-600'}`}
                         >
                             {businessStatus}
                         </span>
                     </div>
                 )}
+
                 {nationalPhoneNumber && (
                     <div className="mb-1">
                         <span className="text-sm font-medium text-gray-500">Phone: </span>
@@ -106,10 +109,11 @@ export default function TopPlacesList({
                         </a>
                     </div>
                 )}
+
                 {websiteUri && (
                     <div className="mb-4">
                         <span className="text-sm font-medium text-gray-500">Website: </span>
-                        <Link href={websiteUri} target="_blank" className="text-blue-600">
+                        <Link href={websiteUri} target="_blank" className="text-blue-600 break-words">
                             <span className="link">{websiteUri}</span>
                         </Link>
                     </div>
@@ -123,8 +127,8 @@ export default function TopPlacesList({
                 )}
             </div>
 
-            <div className="sm:ml-6 sm:mt-0 mt-4 sm:flex-shrink-0 sm:w-1/2">
-                <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="sm:w-1/2 sm:ml-6 sm:mt-0 mt-4">
+                <div className="card p-6">
                     <h4 className="text-xl font-semibold text-gray-800 mb-2">Description</h4>
                     <div className="flex items-center text-gray-500 mb-4">
                         <h5 className="mr-2 text-sm font-medium">Time Zone:</h5>

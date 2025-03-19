@@ -17,6 +17,23 @@ interface TopTenPlacesParams {
     locationSearch: string;
 }
 
+enum BusinessStatus {
+    Operational = 'OPERATIONAL',
+    ClosedTemporarily = 'CLOSED_TEMPORARILY',
+    ClosedPermanently = 'CLOSED_PERMANENTLY',
+    Unspecified = 'BUSINESS_STATUS_UNSPECIFIED',
+}
+
+enum ParkingOptions {
+    freeParkingLot = 'Free Parking Lot',
+    paidParkingLot = 'Paid Parking Lot',
+    freeStreetParking = 'Free Street Parking',
+    paidStreetParking = 'Paid Street Parking',
+    valetParking = 'Valet Parking',
+    freeGarageParking = 'Free Garage Parking',
+    paidGarageParking = 'Paid Garage Parking',
+}
+
 /* QUERY RESOLVER FUNCTIONS */
 
 // Resolver function for fetching top-rated places
@@ -69,26 +86,29 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                 // Convert openNow boolean to a more descriptive string
                 const openNow = checkOpenNowStatus(place as unknown as PlaceProps);
 
+                const businessStatusMap: Record<BusinessStatus, string> = {
+                    [BusinessStatus.Unspecified]: 'Unknown',
+                    [BusinessStatus.Operational]: 'Operational',
+                    [BusinessStatus.ClosedTemporarily]: 'Temporarily Closed',
+                    [BusinessStatus.ClosedPermanently]: 'Permanently Closed',
+                };
+
+                const parkingOptionsMap: Record<ParkingOptions, string> = {
+                    [ParkingOptions.freeParkingLot]: 'Free parking lot',
+                    [ParkingOptions.paidParkingLot]: 'Paid parking lot',
+                    [ParkingOptions.freeStreetParking]: 'Free street parking',
+                    [ParkingOptions.paidStreetParking]: 'Paid street parking',
+                    [ParkingOptions.valetParking]: 'Valet parking',
+                    [ParkingOptions.freeGarageParking]: 'Free garage parking',
+                    [ParkingOptions.paidGarageParking]: 'Paid garage parking',
+                };
+
+                const businessStatus = businessStatusMap[place.businessStatus as BusinessStatus];
+
                 // Dynamically build the parking string based on parking options
                 const parking =
-                    Object.entries(place.parkingOptions || {})
-                        .reduce((acc, [key, value]) => {
-                            if (value) {
-                                const parkingOption = {
-                                    freeParkingLot: 'Free Parking Lot',
-                                    paidParkingLot: 'Paid Parking Lot',
-                                    freeStreetParking: 'Free Street Parking',
-                                    paidStreetParking: 'Paid Street Parking',
-                                    valetParking: 'Valet Parking',
-                                    freeGarageParking: 'Free Garage Parking',
-                                    paidGarageParking: 'Paid Garage Parking',
-                                }[key];
-
-                                if (parkingOption) acc.push(parkingOption);
-                            }
-                            return acc;
-                        }, [] as string[])
-                        .join(', ') || 'No parking information available';
+                    parkingOptionsMap[place.parkingOptions as unknown as ParkingOptions] ||
+                    'No parking information available';
 
                 return {
                     name: place.displayName?.text || 'Unknown',
@@ -102,7 +122,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     priceLevel: place.priceLevel,
                     userRatingCount: place.userRatingCount,
                     websiteUri: place.websiteUri,
-                    businessStatus: place.businessStatus,
+                    businessStatus,
                     nationalPhoneNumber: place.nationalPhoneNumber,
                     regularOpeningHours: {
                         weekdayDescriptions: place.regularOpeningHours?.weekdayDescriptions,
