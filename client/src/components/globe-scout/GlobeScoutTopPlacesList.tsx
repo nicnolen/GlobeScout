@@ -45,7 +45,10 @@ export default function TopPlacesList({
 
                     <div className="flex justify-between items-center">
                         <div>
-                            <span className="font-medium">{rating} </span>
+                            <span className="font-medium">
+                                <i className="fas fa-star text-yellow-500 mr-1 text-sm" />
+                                {rating}{' '}
+                            </span>
                             <span className="text-gray-500">({userRatingCount} reviews)</span>
                             {priceLevel !== undefined && (
                                 <span className={`font-medium ${getPriceLevelColor(priceLevel)} ml-2`}>
