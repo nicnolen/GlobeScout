@@ -36,6 +36,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                {/* Adding Font Awesome CDN globally */}
+                <link
+                    rel="stylesheet"
+                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+                />
+            </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <div className="container mx-auto px-4 py-8 min-h-screen">
                     <ApolloProviderWrapper>

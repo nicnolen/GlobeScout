@@ -5,13 +5,27 @@ export const GET_TOP_TEN_PLACES = gql`
         getTopTenPlaces(locationSearch: $locationSearch) {
             name
             address
+            description
+            primaryType
             rating
             location {
                 lat
                 lng
             }
             priceLevel
-            userRatingsTotal
+            userRatingCount
+            websiteUri
+            businessStatus
+            nationalPhoneNumber
+            regularOpeningHours {
+                weekdayDescriptions
+                openNow
+            }
+            timeZone {
+                id
+                version
+            }
+            parking
         }
     }
 `;

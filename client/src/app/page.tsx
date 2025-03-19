@@ -13,7 +13,7 @@ export default function Home(): JSX.Element {
             {/* Globe Scout Feature */}
             <FeatureDescription
                 title="Globe Scout"
-                description="Globe Scout lets you search for a city or country and discover the top 10 attractions in that area. You can also view the current weather and navigate to the Weather Page for a detailed 5-day forecast."
+                description="Globe Scout lets you search for a city or country and discover the top 10 attractions in that area. You can also view the current weather conditions and a detailed 5-day forecast by clicking on the button with the weather icon and the current temperature to the left of the search bar."
                 buttonText="Discover the Globe"
                 buttonLink="/globe-scout"
             />
@@ -21,7 +21,7 @@ export default function Home(): JSX.Element {
             {/* Weather Page Feature */}
             <FeatureDescription
                 title="Weather Forecast"
-                description="Weather Forecast shows a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities. Note that you must have searched a city or country from the Globe Scout page in order to access this page."
+                description="Weather Forecast shows the current weather conditions and a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities. Note that you must have searched a city or country from the Globe Scout page in order to access this page."
             />
 
             {/* Users Page */}

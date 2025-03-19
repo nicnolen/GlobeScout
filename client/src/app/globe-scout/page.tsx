@@ -67,20 +67,28 @@ export default function GlobeScout(): JSX.Element {
                 ) : topTenPlacesError ? (
                     <p>Error fetching places.</p>
                 ) : (
-                    <div>
-                        <h2 className="subtitle mt-2">Top 10 Places</h2>
+                    <>
+                        <h2 className="subtitle mt-8">Top 10 Places</h2>
                         {topTenPlacesData?.getTopTenPlaces?.map((place: PlaceProps, index: number) => (
                             <TopPlacesList
                                 key={index}
                                 rank={index + 1}
                                 name={place.name}
                                 address={place.address}
+                                description={place.description}
+                                primaryType={place.primaryType}
                                 rating={place.rating}
-                                userRatingsTotal={place.userRatingsTotal}
+                                userRatingCount={place.userRatingCount}
                                 priceLevel={place.priceLevel}
+                                websiteUri={place.websiteUri}
+                                businessStatus={place.businessStatus}
+                                nationalPhoneNumber={place.nationalPhoneNumber}
+                                regularOpeningHours={place.regularOpeningHours}
+                                parking={place.parking}
+                                timeZone={place.timeZone}
                             />
                         ))}
-                    </div>
+                    </>
                 )}
             </div>
         </div>

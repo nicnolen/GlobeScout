@@ -40,7 +40,19 @@ interface DailyForecastAccumulator {
 
 export async function getCurrentWeather(location: string, units: Units): Promise<Weather> {
     try {
-        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location, units });
+        if (!location) {
+            throw new Error('getCurrentWeather: location can not be empty.');
+        }
+
+        if (!units) {
+            throw new Error('getCurrentWeather: units can not be empty.');
+        }
+
+        const sanitizedLocation = location.trim().toLowerCase();
+        // Capitalize first letter of each word for display
+        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
+
+        const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location: displayLocation, units });
 
         if (cachedCurrentWeather) {
             console.info('Cached current weather data was found');
@@ -74,7 +86,7 @@ export async function getCurrentWeather(location: string, units: Units): Promise
         };
 
         await CurrentWeatherModel.insertOne({
-            location,
+            location: displayLocation,
             country,
             units,
             currentWeather: fortmattedCurrentWeather,
@@ -90,9 +102,21 @@ export async function getCurrentWeather(location: string, units: Units): Promise
 
 export async function getFiveDayForecast(location: string, units: Units): Promise<FiveDayForecast> {
     try {
+        if (!location) {
+            throw new Error('getCurrentWeather: location can not be empty.');
+        }
+
+        if (!units) {
+            throw new Error('getCurrentWeather: units can not be empty.');
+        }
+
+        const sanitizedLocation = location.trim().toLowerCase();
+        // Capitalize first letter of each word for display
+        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
+
         // Check the cache first (MongoDB)
         const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
-            location,
+            location: displayLocation,
             units,
         });
 
@@ -192,7 +216,7 @@ export async function getFiveDayForecast(location: string, units: Units): Promis
         });
 
         await FiveDayForecastModel.insertOne({
-            location,
+            location: displayLocation,
             country,
             units,
             fiveDayForecast: formattedForecastEntries,
