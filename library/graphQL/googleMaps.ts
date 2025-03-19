@@ -55,7 +55,7 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     'Content-Type': 'application/json',
                     'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
                     'X-Goog-FieldMask':
-                        'places.displayName,places.formattedAddress,places.generativeSummary,places.primaryTypeDisplayName,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber,places.regularOpeningHours,places.parkingOptions',
+                        'places.displayName,places.formattedAddress,places.generativeSummary,places.primaryTypeDisplayName,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber,places.regularOpeningHours,places.timeZone,places.parkingOptions',
                 },
             },
         );
@@ -105,9 +105,12 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
                     businessStatus: place.businessStatus,
                     nationalPhoneNumber: place.nationalPhoneNumber,
                     regularOpeningHours: {
-                        weekdayDescriptions:
-                            place.regularOpeningHours?.weekdayDescriptions || 'Daily hours not available',
+                        weekdayDescriptions: place.regularOpeningHours?.weekdayDescriptions,
                         openNow,
+                    },
+                    timeZone: {
+                        id: place.timeZone.id,
+                        version: place.timeZone?.version,
                     },
                     parking,
                 };

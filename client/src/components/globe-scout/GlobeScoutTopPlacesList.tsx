@@ -17,6 +17,7 @@ export default function TopPlacesList({
     nationalPhoneNumber,
     regularOpeningHours,
     parking,
+    timeZone,
 }: PlaceProps): JSX.Element {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -121,10 +122,15 @@ export default function TopPlacesList({
                     </div>
                 )}
             </div>
+
             <div className="sm:ml-6 sm:mt-0 mt-4 sm:flex-shrink-0 sm:w-1/2">
-                <div className="bg-gray-50 p-4 rounded-lg shadow-md">
-                    <h4 className="text-lg font-semibold text-gray-700">Description</h4>
-                    <p className="text-gray-600 mt-2">{description}</p>
+                <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-2">Description</h4>
+                    <div className="flex items-center text-gray-500 mb-4">
+                        <h5 className="mr-2 text-sm font-medium">Time Zone:</h5>
+                        <span className="text-sm font-light">{timeZone.id}</span>
+                    </div>
+                    <p className="text-gray-700 text-base leading-relaxed">{description}</p>
                 </div>
             </div>
         </div>

@@ -19,6 +19,11 @@ export const GET_TOP_TEN_PLACES = `
         openNow: String
     }
 
+    type TimeZone {
+        id: String
+        version: String
+    }
+
     type Place {
         name: String
         address: String
@@ -33,6 +38,7 @@ export const GET_TOP_TEN_PLACES = `
         nationalPhoneNumber: String
         parking: String
         regularOpeningHours: RegularOpeningHours
+        timeZone: TimeZone
     }
 
     type Query {

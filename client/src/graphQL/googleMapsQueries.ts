@@ -21,6 +21,10 @@ export const GET_TOP_TEN_PLACES = gql`
                 weekdayDescriptions
                 openNow
             }
+            timeZone {
+                id
+                version
+            }
             parking
         }
     }

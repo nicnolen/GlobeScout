@@ -16,6 +16,10 @@ export interface PlaceProps {
         weekdayDescriptions: string[];
         openNow: string;
     };
+    timeZone: {
+        id: string;
+        version?: string;
+    };
 }
 
 interface GenerativeSummary {
@@ -110,6 +114,10 @@ export interface PlaceResponse {
         languageCode: string;
     };
     regularOpeningHours?: RegularOpeningHours;
+    timeZone: {
+        id: string;
+        version?: string;
+    };
     parkingOptions?: {
         freeParkingLot: boolean;
         paidParkingLot: boolean;

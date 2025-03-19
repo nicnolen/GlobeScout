@@ -85,6 +85,7 @@ export default function GlobeScout(): JSX.Element {
                                 nationalPhoneNumber={place.nationalPhoneNumber}
                                 regularOpeningHours={place.regularOpeningHours}
                                 parking={place.parking}
+                                timeZone={place.timeZone}
                             />
                         ))}
                     </>
