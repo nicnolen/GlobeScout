@@ -38,21 +38,18 @@ export function checkOpenNowStatus(place: PlaceProps): string {
 
     // Check if the place is open
     for (const range of timeRanges) {
-        const [openTimeStr, closeTimeStr] = range.split('–').map((time) => time.trim());
-        // Check if closing time includes AM/PM
-        const closeHasMeridian = closeTimeStr.includes('AM') || closeTimeStr.includes('PM');
+        let [openTimeStr, closeTimeStr] = range.split('–').map((time) => time.trim());
+        // Closing time will always have AM/PM
+        const closeMeridian = closeTimeStr.match(/AM|PM/)?.[0];
 
-        // If opening time does not have AM/PM, we should use the same AM/PM as closing time
-        const openTimeWithMeridian =
-            openTimeStr.includes('AM') || openTimeStr.includes('PM')
-                ? openTimeStr
-                : `${openTimeStr} ${closeHasMeridian ? closeTimeStr.match(/AM|PM/)?.[0] || 'AM' : 'AM'}`;
-
-        const closeTimeWithMeridian = closeHasMeridian ? closeTimeStr : `${closeTimeStr} PM`;
+        // If opening time is missing AM/PM, use closing time's AM/PM
+        if (!openTimeStr.includes('AM') && !openTimeStr.includes('PM')) {
+            openTimeStr += ` ${closeMeridian}`;
+        }
 
         // Parse the opening and closing times in the correct format
-        let openingTime = dayjs.tz(openTimeWithMeridian, 'h:mm A', timeZone.id);
-        let closingTime = dayjs.tz(closeTimeWithMeridian, 'h:mm A', timeZone.id);
+        let openingTime = dayjs.tz(openTimeStr, 'h:mm A', timeZone.id);
+        let closingTime = dayjs.tz(closeTimeStr, 'h:mm A', timeZone.id);
 
         // Adjust for closing after midnight
         if (closingTime.isBefore(openingTime)) {
