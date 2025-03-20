@@ -2,7 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { PlaceProps, PlaceResponse } from '../../types/googleMaps';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
-import TopTenPlacesCacheModel from '../../models/TopTenPlacesCache';
+import TopTenPlacesCacheModel from '../../models/caches/TopTenPlacesCache';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dotenv.config();

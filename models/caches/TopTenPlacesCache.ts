@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { TopTenPlacesResponse } from '../types/googleMaps';
+import { TopTenPlacesResponse } from '../../types/googleMaps';
 
 interface TopTenPlacesCacheDocument extends Document {
     location: string;

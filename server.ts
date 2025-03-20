@@ -2,9 +2,11 @@ import express, { Express, Request, Response, RequestHandler } from 'express';
 import next from 'next';
 import path from 'path';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { expressMiddleware } from '@apollo/server/express4';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
+import usersRoutes from './routes/users';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
@@ -33,6 +35,7 @@ async function startServer(): Promise<void> {
         // Middleware to parse JSON requests before Apollo Server
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
+        server.use(cookieParser()); // Enable cookies for authentication
 
         // Explicitly cast Apollo's middleware as an Express RequestHandler
         const graphqlMiddleware = expressMiddleware(apolloServer) as unknown as RequestHandler;
@@ -41,6 +44,9 @@ async function startServer(): Promise<void> {
 
         // Serve static files from the `client/public` folder
         server.use(express.static(path.join(__dirname, 'client', 'public')));
+
+        // Routes
+        server.use('/users', usersRoutes);
 
         // Catch all route to handle Next.js pages
         server.get('*', (req: Request, res: Response) => {

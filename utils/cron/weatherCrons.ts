@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import FiveDayForecastCache from '../../models/FiveDayForecastCache';
+import FiveDayForecastCache from '../../models/caches/FiveDayForecastCache';
 import { catchErrorHandler } from '../errorHandlers';
 
 // Clear five_day_forecast_cache collection at midnight

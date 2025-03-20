@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { PlaceProps } from '../../types/googleMaps';
-import TopTenPlacesCache from '../../models/TopTenPlacesCache';
+import TopTenPlacesCache from '../../models/caches/TopTenPlacesCache';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
 import { catchErrorHandler } from '../errorHandlers';
 
