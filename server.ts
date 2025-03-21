@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import { expressMiddleware } from '@apollo/server/express4';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
-import usersRoutes from './routes/users';
+import authRoutes from './routes/auth';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
@@ -46,7 +46,7 @@ async function startServer(): Promise<void> {
         server.use(express.static(path.join(__dirname, 'client', 'public')));
 
         // Routes
-        server.use('/users', usersRoutes);
+        server.use('/', authRoutes);
 
         // Catch all route to handle Next.js pages
         server.get('*', (req: Request, res: Response) => {

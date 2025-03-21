@@ -1,21 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { UserData, UserRole } from '../../types/users';
 
-enum UserRole {
-    USER = 'user',
-    ADMIN = 'admin',
-}
-
-interface UsersDocument extends Document {
-    email: string;
+export interface UsersDocument extends UserData, Document {
     password: string;
-    role: UserRole;
-    lastLogin: Date | null;
-    active: boolean;
-    services: {
-        openWeatherApi: { requestsMade: number; maxRequests: number };
-        googleMapsApi: { requestsMade: number; maxRequests: number };
-    };
     comparePasswords(password: string): Promise<boolean>;
 }
 

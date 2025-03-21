@@ -1,7 +1,9 @@
 'use client';
 
 import React, { JSX } from 'react';
+import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import { Units } from '../../../../types/weather';
 import { selectUnits } from '../../redux/selectors/weatherSelectors';
 import { setUnits } from '../../redux/slices/weatherSlice';
@@ -9,6 +11,19 @@ import { setUnits } from '../../redux/slices/weatherSlice';
 export default function SettingsDropdown(): JSX.Element {
     const units = useSelector(selectUnits);
     const dispatch = useDispatch();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            const response = await axios.post('/logout', {}, { withCredentials: true });
+
+            if (response.status === 200) {
+                router.push('/login');
+            }
+        } catch (error) {
+            console.error('Error during logout', error);
+        }
+    };
 
     return (
         <div className="card absolute p-4">
@@ -31,6 +46,11 @@ export default function SettingsDropdown(): JSX.Element {
                     } primaryButtonHover`}
                 >
                     Imperial
+                </button>
+            </div>
+            <div className="mt-4">
+                <button onClick={handleLogout} className="button text-sm lightGrayButton primaryButtonHover">
+                    Logout
                 </button>
             </div>
         </div>

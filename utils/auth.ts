@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/users/Users';
+import Users, { UsersDocument } from '../models/users/Users';
 import { catchErrorHandler } from '../utils/errorHandlers';
-
 interface AuthenticatedRequest extends Request {
-    user?: typeof User;
+    user?: UsersDocument;
 }
 
 // JWT_SECRET must always be a string
@@ -26,7 +25,6 @@ export function createAccessToken(userId: string, role: string): string {
     }
 }
 
-// 🔥 Generate Refresh Token (Long-lived)
 export function createRefreshToken(userId: string, role: string): string {
     try {
         return jwt.sign({ id: userId, role }, JWT_SECRET, { expiresIn: JWT_REFRESH_EXPIRATION });
@@ -37,18 +35,17 @@ export function createRefreshToken(userId: string, role: string): string {
     }
 }
 
-// Middleware: Authenticate JWT
 export async function authenticateJWT(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-    const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+    const refreshToken = req.cookies?.refreshToken;
 
-    if (!token) {
+    if (refreshToken) {
         res.status(401).json({ message: 'Unauthorized' });
         return;
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { id: string; role: string };
-        const user = await User.findById(decoded.id);
+        const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string; role: string };
+        const user = await Users.findById(decoded.id);
 
         if (!user) {
             res.status(404).json({ message: 'User not found' });
@@ -71,9 +68,8 @@ export async function authenticateJWT(req: AuthenticatedRequest, res: Response, 
     }
 }
 
-// Middleware: Refresh Access Token
 export async function refreshAccessToken(req: Request, res: Response): Promise<void> {
-    const refreshToken = req.cookies?.refreshToken || req.headers.authorization?.split(' ')[1];
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
         res.status(401).json({ message: 'Refresh token missing or invalid' });
@@ -82,7 +78,7 @@ export async function refreshAccessToken(req: Request, res: Response): Promise<v
 
     try {
         const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string; role: string };
-        const user = await User.findById(decoded.id);
+        const user = await Users.findById(decoded.id);
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
@@ -97,4 +93,15 @@ export async function refreshAccessToken(req: Request, res: Response): Promise<v
         res.status(500).json({ message: customMessage, error: err });
         return;
     }
+}
+
+export function authorizeRole(allowedRoles: string[]) {
+    return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+        // Check if user exists and then check the role
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
+            res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+            return;
+        }
+        next();
+    };
 }

@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import Users from '../models/users/Users';
 import { createAccessToken, createRefreshToken } from '../utils/auth';
 import { catchErrorHandler } from '../utils/errorHandlers';
+
+const JWT_SECRET = process.env.JWT_SECRET || '';
 
 // Register User
 export async function register(req: Request, res: Response): Promise<void> {
@@ -52,14 +55,9 @@ export async function login(req: Request, res: Response): Promise<void> {
         }
 
         const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date() }, { new: true });
-
-        if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-
         const isPasswordValid = await user.comparePasswords(password);
-        if (!isPasswordValid) {
+
+        if (!user || !isPasswordValid) {
             res.status(401).json({ message: 'Invalid credentials' });
             return;
         }
@@ -67,11 +65,23 @@ export async function login(req: Request, res: Response): Promise<void> {
         const accessToken = createAccessToken(user._id.toString(), user.role);
         const refreshToken = createRefreshToken(user._id.toString(), user.role);
 
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true, // Prevent JavaScript access
+            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
+            sameSite: 'strict', // Prevent CSRF attacks
+            maxAge: 15 * 60 * 1000, // 15 minutes for the access token cookie
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
         res.status(200).json({ message: 'Login successful', accessToken });
     } catch (err: unknown) {
-        const customMessage = 'Register Route: Error registering user';
+        const customMessage = 'Login Route: User login attempt failed';
         catchErrorHandler(err, customMessage);
 
         res.status(500).json({ message: customMessage, error: err });
@@ -81,15 +91,29 @@ export async function login(req: Request, res: Response): Promise<void> {
 // Logout User
 export async function logout(req: Request, res: Response): Promise<void> {
     try {
-        // Check if refreshToken cookie exists
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            res.status(400).json({ message: 'User is not logged in.' });
+            res.status(200).json({ message: 'User is not logged in.' });
+            return;
+        }
+
+        // Get user info from the token
+        const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string };
+
+        const updatedUser = await Users.findOneAndUpdate(
+            { _id: decoded.id }, // Filter by the user ID
+            { active: false }, // Set the 'active' field to false
+            { new: true }, // Return the updated user document
+        );
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
             return;
         }
 
         res.clearCookie('refreshToken');
+
         res.status(200).json({ message: 'Logout successful' });
     } catch (err: unknown) {
         const customMessage = 'Logout Route: Error during logout';
