@@ -1,10 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import Users, { UsersDocument } from '../models/users/Users';
+import Users from '../models/users/Users';
 import { catchErrorHandler } from '../utils/errorHandlers';
-interface AuthenticatedRequest extends Request {
-    user?: UsersDocument;
-}
 
 // JWT_SECRET must always be a string
 const JWT_SECRET: string = process.env.JWT_SECRET || '';
@@ -35,39 +32,6 @@ export function createRefreshToken(userId: string, role: string): string {
     }
 }
 
-export async function authenticateJWT(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-    const refreshToken = req.cookies?.refreshToken;
-
-    if (refreshToken) {
-        res.status(401).json({ message: 'Unauthorized' });
-        return;
-    }
-
-    try {
-        const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string; role: string };
-        const user = await Users.findById(decoded.id);
-
-        if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-
-        if (!user.active) {
-            res.status(403).json({ message: 'User is not active or does not exist' });
-            return;
-        }
-
-        req.user = user;
-        next();
-    } catch (err: unknown) {
-        const customMessage = 'authenticateJWT: Error authenticating token';
-        catchErrorHandler(err, customMessage);
-
-        res.status(500).json({ message: customMessage, error: err });
-        return;
-    }
-}
-
 export async function refreshAccessToken(req: Request, res: Response): Promise<void> {
     const refreshToken = req.cookies?.refreshToken;
 
@@ -93,15 +57,4 @@ export async function refreshAccessToken(req: Request, res: Response): Promise<v
         res.status(500).json({ message: customMessage, error: err });
         return;
     }
-}
-
-export function authorizeRole(allowedRoles: string[]) {
-    return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-        // Check if user exists and then check the role
-        if (!req.user || !allowedRoles.includes(req.user.role)) {
-            res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-            return;
-        }
-        next();
-    };
 }

@@ -4,6 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { expressMiddleware } from '@apollo/server/express4';
+import passport from './utils/passport';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import authRoutes from './routes/auth';
@@ -44,6 +45,8 @@ async function startServer(): Promise<void> {
 
         // Serve static files from the `client/public` folder
         server.use(express.static(path.join(__dirname, 'client', 'public')));
+
+        server.use(passport.initialize());
 
         // Routes
         server.use('/', authRoutes);

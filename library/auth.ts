@@ -33,7 +33,7 @@ export async function register(req: Request, res: Response): Promise<void> {
         await newUser.save();
         res.status(201).json({ message: 'User registered successfully' });
     } catch (err: unknown) {
-        const customMessage = 'Register Route: Error registering user';
+        const customMessage = 'Error registering user';
         catchErrorHandler(err, customMessage);
 
         res.status(500).json({ message: customMessage, error: err });
@@ -81,7 +81,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
         res.status(200).json({ message: 'Login successful', accessToken });
     } catch (err: unknown) {
-        const customMessage = 'Login Route: User login attempt failed';
+        const customMessage = 'User login attempt failed';
         catchErrorHandler(err, customMessage);
 
         res.status(500).json({ message: customMessage, error: err });
@@ -116,7 +116,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
 
         res.status(200).json({ message: 'Logout successful' });
     } catch (err: unknown) {
-        const customMessage = 'Logout Route: Error during logout';
+        const customMessage = 'Error during logout';
         catchErrorHandler(err, customMessage);
 
         res.status(500).json({ message: customMessage, error: err });
