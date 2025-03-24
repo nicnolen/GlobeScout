@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import Users from '../models/users/Users';
-import { createAccessToken, createRefreshToken } from '../utils/auth';
+import { createAccessToken, createRefreshToken } from '../utils/authUtils';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -54,7 +54,7 @@ export async function login(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date() }, { new: true });
+        const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date(), active: true }, { new: true });
         if (!user) {
             res.status(401).json({ message: 'Invalid email' });
             return;

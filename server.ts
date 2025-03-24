@@ -1,13 +1,16 @@
 import express, { Express, Request, Response, RequestHandler } from 'express';
+import fs from 'fs';
 import next from 'next';
 import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import https from 'https';
 import { expressMiddleware } from '@apollo/server/express4';
 import passport from './utils/passport';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import authRoutes from './routes/auth';
+import usersRoutes from './routes/users';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
@@ -50,20 +53,27 @@ async function startServer(): Promise<void> {
 
         // Routes
         server.use('/', authRoutes);
+        server.use('/users', usersRoutes);
 
         // Catch all route to handle Next.js pages
         server.get('*', (req: Request, res: Response) => {
             return handle(req, res);
         });
 
-        // cron jobs
+        // Cron jobs
         scheduleClearFiveDayForecastCache();
         scheduleClearTopTenPlacesCache();
         scheduleUpdateTopTenPlacesOpenNowStatus();
 
-        server.listen(PORT, () => {
-            console.info(`Server is running on http://localhost:${PORT}`);
-            console.info(`GraphQL endpoint available at http://localhost:${PORT}/graphql`);
+        // Start HTTPS server
+        const options = {
+            key: fs.readFileSync('./private/private.key'),
+            cert: fs.readFileSync('./private/cert.pem'),
+        };
+
+        https.createServer(options, server).listen(PORT, () => {
+            console.info(`Server is running on https://localhost:${PORT}`);
+            console.info(`GraphQL endpoint available at https://localhost:${PORT}/graphql`);
         });
     } catch (err: unknown) {
         const customMessage = 'Error starting server';

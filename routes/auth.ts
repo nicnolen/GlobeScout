@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { register, login, logout } from '../library/auth';
-import { refreshAccessToken } from '../utils/auth';
+import { refreshAccessToken } from '../utils/authUtils';
 
 const router = Router();
 

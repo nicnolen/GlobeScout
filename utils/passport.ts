@@ -12,11 +12,15 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET environment variable is not defined.');
 }
 
+const cookieExtractor = (req: any) => {
+    return req.cookies ? req.cookies['accessToken'] : null; // Get 'accessToken' from cookies
+};
+
 passport.use(
     new JwtStrategy(
         {
             secretOrKey: JWT_SECRET,
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extract JWT from the Authorization header
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]), // Extract JWT from the Authorization header
         },
         async (jwtPayload: any, done: (err: any, user?: any) => void) => {
             try {

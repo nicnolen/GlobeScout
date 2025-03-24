@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import { setUser } from '../../redux/slices/usersSlice';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const LoginPage = () => {
@@ -10,6 +12,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState<string>('');
     const router = useRouter();
+    const dispatch = useDispatch();
 
     // Handle email input change
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +34,13 @@ const LoginPage = () => {
 
             if (response.status === 200) {
                 setMessage('Login successful');
+                // Fetch the user data from /users/user route
+                const userResponse = await axios.get('/users/user', { withCredentials: true });
+
+                const user = userResponse.data.user;
+
+                // Dispatch user to Redux
+                dispatch(setUser(user));
 
                 router.push('/');
             } else {

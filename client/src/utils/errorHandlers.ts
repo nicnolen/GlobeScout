@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 export function catchErrorHandler(
     err: unknown,
     customMessage: string,
-    setMessage: React.Dispatch<React.SetStateAction<string>>,
+    setMessage?: React.Dispatch<React.SetStateAction<string>>,
 ): void {
     // Check if the error is an AxiosError
     if (err instanceof AxiosError) {

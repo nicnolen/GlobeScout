@@ -24,13 +24,13 @@ export default function Home(): JSX.Element {
                 description="Weather Forecast shows the current weather conditions and a 5-day forecast with daily temperature, conditions, and useful insights to help you plan your activities. Note that you must have searched a city or country from the Globe Scout page in order to access this page."
             />
 
-            {/* Users Page */}
+            {/* Admin Page */}
             {/* TODO: ONLY ENABLE THIS FOR USERS THAT ARE ADMINS */}
             <FeatureDescription
-                title="Users"
+                title="Admin"
                 description="A list of users who have registered on GlobeScout"
-                buttonText=" View Users"
-                buttonLink="/users"
+                buttonText="View Users"
+                buttonLink="/admin"
             />
         </>
     );

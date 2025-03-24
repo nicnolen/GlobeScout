@@ -5,7 +5,9 @@ import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
+import { selectUser } from '../../redux/selectors/usersSelectors';
 import { useOutsideClick } from '../../hooks/clickHooks';
+import { useFetchUserData } from '../../hooks/usersHooks';
 import Tooltip from './Tooltip';
 import SettingsDropdown from '../common/SettingsDropdown';
 
@@ -13,6 +15,9 @@ export default function NavBar(): JSX.Element {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const pathname = usePathname();
     const currentWeatherData = useSelector(selectCurrentWeatherData);
+    const user = useSelector(selectUser);
+
+    useFetchUserData();
 
     function isActive(path: string): string {
         return pathname === path ? 'text-yellow-400' : 'hover:text-yellow-400;';
@@ -60,11 +65,13 @@ export default function NavBar(): JSX.Element {
                             </Link>
                         </Tooltip>
                     </li>
-                    <li>
-                        <Link href="/users">
-                            <span className={`${isActive('/users')}`}>Users</span>
-                        </Link>
-                    </li>
+                    {user && user.role === 'admin' && (
+                        <li>
+                            <Link href="/admin">
+                                <span className={`${isActive('/admin')}`}>Admin</span>
+                            </Link>
+                        </li>
+                    )}
                 </ul>
             </div>
         </nav>

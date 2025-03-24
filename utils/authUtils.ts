@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import Users from '../models/users/Users';
-import { catchErrorHandler } from '../utils/errorHandlers';
+import { catchErrorHandler } from './errorHandlers';
 
 // JWT_SECRET must always be a string
 const JWT_SECRET: string = process.env.JWT_SECRET || '';
