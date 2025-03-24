@@ -5,18 +5,25 @@ export function catchErrorHandler(
     customMessage: string,
     setMessage?: React.Dispatch<React.SetStateAction<string>>,
 ): void {
+    let errorMessage = customMessage;
+
     // Check if the error is an AxiosError
     if (err instanceof AxiosError) {
         // If it's an Axios error, use the response data message if available
-        if (err.response && err.response.data && err.response.data.message) {
-            console.error(`${customMessage}: ${err.response.data.message}`);
-            setMessage(`${customMessage}: ${err.response.data.message}`);
-        } else if (err instanceof Error) {
-            console.error(`${customMessage}: ${err.message}`);
-            setMessage(`${customMessage}: ${err.message}`);
+        if (err.response?.data?.message) {
+            errorMessage += `: ${err.response.data.message}`;
         } else {
-            console.error(`${customMessage}: ${err}`);
-            setMessage(`${customMessage}: ${err}`);
+            errorMessage += `: ${err.message}`;
         }
+    } else if (err instanceof Error) {
+        errorMessage += `: ${err.message}`;
+    } else {
+        errorMessage += `: Unknown error occurred`;
+    }
+
+    console.error(errorMessage);
+
+    if (setMessage) {
+        setMessage(errorMessage);
     }
 }
