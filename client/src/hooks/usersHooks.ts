@@ -13,8 +13,19 @@ export const useFetchUserData = () => {
 
             if (userResponse.status === 200) {
                 const user = userResponse.data.user;
+                localStorage.setItem('user', JSON.stringify(user));
                 // Dispatch user data to Redux
                 dispatch(setUser(user));
+            }
+
+            if (userResponse.status !== 200) {
+                // Try to load user from localStorage first
+                const storedUser = localStorage.getItem('user');
+                if (storedUser) {
+                    dispatch(setUser(JSON.parse(storedUser)));
+                } else {
+                    fetchUserData();
+                }
             }
         } catch (err: unknown) {
             const customMessage = 'User login failed';
