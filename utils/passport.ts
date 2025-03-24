@@ -1,4 +1,3 @@
-// src/config/passport.ts
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from '../models/users/Users';
@@ -13,14 +12,14 @@ if (!JWT_SECRET) {
 }
 
 const cookieExtractor = (req: any) => {
-    return req.cookies ? req.cookies['accessToken'] : null; // Get 'accessToken' from cookies
+    return req.cookies ? req.cookies['accessToken'] : null;
 };
 
 passport.use(
     new JwtStrategy(
         {
             secretOrKey: JWT_SECRET,
-            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]), // Extract JWT from the Authorization header
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]), // Extract JWT from the cookie
         },
         async (jwtPayload: any, done: (err: any, user?: any) => void) => {
             try {
