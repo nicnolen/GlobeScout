@@ -55,10 +55,15 @@ export async function login(req: Request, res: Response): Promise<void> {
         }
 
         const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date() }, { new: true });
-        const isPasswordValid = await user.comparePasswords(password);
+        if (!user) {
+            res.status(401).json({ message: 'Invalid email' });
+            return;
+        }
 
-        if (!user || !isPasswordValid) {
-            res.status(401).json({ message: 'Invalid credentials' });
+        // Validate password
+        const isPasswordValid = await user.comparePasswords(password);
+        if (!isPasswordValid) {
+            res.status(401).json({ message: 'Invalid password' });
             return;
         }
 
