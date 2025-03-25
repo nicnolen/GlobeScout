@@ -4,6 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { fetchCurrentUser } from '../../utils/fetchUserData';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -80,6 +81,11 @@ const LoginPage = () => {
                     >
                         Login
                     </button>
+                    <div className="mt-4 text-center">
+                        <Link href="/forgot" className="text-sm text-indigo-600 hover:underline">
+                            Forgot Password?
+                        </Link>
+                    </div>
                 </form>
             </div>
         </div>

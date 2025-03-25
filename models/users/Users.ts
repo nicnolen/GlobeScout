@@ -4,12 +4,16 @@ import { UserData, UserRole } from '../../types/users';
 
 export interface UsersDocument extends UserData, Document {
     password: string;
+    resetPasswordToken: string | null;
+    resetPasswordExpires: number | null;
     comparePasswords(password: string): Promise<boolean>;
 }
 
 const UsersSchema = new Schema<UsersDocument>({
     email: { type: String, required: true, unique: true, match: [/.+@.+\..+/, 'Must match an email address!'] },
     password: { type: String, required: true },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
     lastLogin: { type: Date, default: null },
     active: { type: Boolean, default: true },

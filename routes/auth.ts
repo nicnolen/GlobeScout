@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { register, login, logout } from '../library/auth';
+import { register, login, logout, forgot, resetPassword } from '../library/auth';
 import { refreshAccessToken } from '../utils/authUtils';
 
 const router = Router();
@@ -8,8 +8,10 @@ const router = Router();
 router.post('/register', passport.authenticate('jwt', { session: false }), register);
 
 router.post('/login', login);
+router.post('/forgot', forgot);
+router.post('/reset-password', resetPassword);
 
-router.post('/logout', logout);
+router.post('/logout', passport.authenticate('jwt', { session: false }), logout);
 
 router.post('/refresh', passport.authenticate('jwt', { session: false }), refreshAccessToken);
 

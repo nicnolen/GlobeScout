@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const isPublicPath = pathname === '/login' || pathname === '/forgot';
+    const isPublicPath = pathname === '/login' || pathname === '/forgot' || pathname === '/reset-password';
 
     const token = request.cookies.get('refreshToken')?.value || '';
 
@@ -26,9 +26,7 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * - login (Login Page)
-         * - forgot (Forgot Page)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico|login|forgot).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
     ],
 };
