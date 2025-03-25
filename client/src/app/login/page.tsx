@@ -27,21 +27,18 @@ const LoginPage = () => {
     const fetchUserLoginData = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/login', { email, password }, { withCredentials: true }); // Send request to /user route
+            const response = await axios.post('/login', { email, password }, { withCredentials: true });
 
             if (response.status === 200) {
                 setMessage('Login successful');
 
                 // Fetch the user data from /users/user route
-                await fetchCurrentUser(dispatch, router);
-
+                await fetchCurrentUser(dispatch);
                 router.push('/');
             }
         } catch (err: unknown) {
             const customMessage = 'User login failed';
             catchErrorHandler(err, customMessage, setMessage);
-
-            router.push('/login');
         }
     };
 
