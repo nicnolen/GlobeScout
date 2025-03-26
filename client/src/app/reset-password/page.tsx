@@ -1,26 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const ResetPassword = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
-    const [token, setToken] = useState<string | null>(null);
-
-    useEffect(() => {
-        const token = searchParams.get('token');
-        if (token) {
-            setToken(token);
-        }
-    }, [searchParams]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+
         if (!token) {
             return;
         }
