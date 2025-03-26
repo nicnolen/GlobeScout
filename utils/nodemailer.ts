@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { catchErrorHandler } from './errorHandlers';
 
 dotenv.config();
 
@@ -28,8 +29,9 @@ export const sendMail = async (to: string, subject: string, text: string) => {
         });
 
         return info;
-    } catch (error) {
-        console.error(`Error sending email: ${error}`);
-        throw new Error('Email sending failed');
+    } catch (err: unknown) {
+        const customMessage = 'Error sending email';
+        catchErrorHandler(err, customMessage);
+        throw err;
     }
 };

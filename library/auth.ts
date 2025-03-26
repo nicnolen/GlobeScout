@@ -173,8 +173,10 @@ export async function forgot(req: Request, res: Response): Promise<void> {
         await sendMail(to, subject, text);
 
         res.status(200).json({ message: 'Password reset email sent' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+    } catch (err: unknown) {
+        const customMessage = 'Error sending password reset email';
+        catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
     }
 }
 
@@ -213,8 +215,9 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
         );
 
         res.status(200).json({ message: 'Password successfully reset' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+    } catch (err: unknown) {
+        const customMessage = 'Error sending password reset email';
+        catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
     }
 }

@@ -2,6 +2,7 @@ import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from '../models/users/Users';
 import dotenv from 'dotenv';
+import { catchErrorHandler } from './errorHandlers';
 
 dotenv.config();
 
@@ -29,7 +30,9 @@ passport.use(
                 } else {
                     return done(null, false); // Authentication failed
                 }
-            } catch (err) {
+            } catch (err: unknown) {
+                const customMessage = 'Error setting up passport JWT';
+                catchErrorHandler(err, customMessage);
                 return done(err, false);
             }
         },

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Units } from '../../../../types/weather';
 import { selectUnits } from '../../redux/selectors/weatherSelectors';
 import { setUnits } from '../../redux/slices/weatherSlice';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function SettingsDropdown(): JSX.Element {
     const units = useSelector(selectUnits);
@@ -20,8 +21,9 @@ export default function SettingsDropdown(): JSX.Element {
             if (response.status === 200) {
                 router.push('/login');
             }
-        } catch (error) {
-            console.error('Error during logout', error);
+        } catch (err: unknown) {
+            const customMessage = 'Error during logout';
+            catchErrorHandler(err, customMessage);
         }
     };
 
