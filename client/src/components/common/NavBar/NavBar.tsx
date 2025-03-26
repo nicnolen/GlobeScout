@@ -4,12 +4,12 @@ import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { selectCurrentWeatherData } from '../../redux/selectors/weatherSelectors';
-import { selectUser } from '../../redux/selectors/usersSelectors';
-import { useOutsideClick, useAutoLogout } from '../../hooks/eventHooks';
-import { useFetchUserData } from '../../hooks/usersHooks';
-import Tooltip from './Tooltip';
-import SettingsDropdown from '../common/SettingsDropdown';
+import { selectCurrentWeatherData } from '../../../redux/selectors/weatherSelectors';
+import { selectUser } from '../../../redux/selectors/usersSelectors';
+import { useOutsideClick, useAutoLogout } from '../../../hooks/eventHooks';
+import { useFetchUserData } from '../../../hooks/usersHooks';
+import Tooltip from '../Tooltip';
+import SettingsDropdown from '../SettingsDropdown';
 
 export default function NavBar(): JSX.Element {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

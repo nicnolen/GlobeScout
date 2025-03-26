@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import ApolloProviderWrapper from '../config/graphQL/ApolloProviderWrapper';
 import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
-import NavBar from '../components/common/NavBar';
+import NavBarWrapper from '../components/common/NavBar/NavBarWrapper';
 import Footer from '../components/common/Footer';
 import './globals.css';
 
@@ -36,7 +36,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className="h-full">
             <head>
                 {/* Adding Font Awesome CDN globally */}
                 <link
@@ -47,8 +47,8 @@ export default function RootLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ApolloProviderWrapper>
                     <ReduxProviderWrapper>
-                        <NavBar />
-                        <div className="m-4 ">{children}</div>
+                        <NavBarWrapper />
+                        <div className="m-4">{children}</div>
                     </ReduxProviderWrapper>
                 </ApolloProviderWrapper>
                 <Footer />
