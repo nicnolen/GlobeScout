@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import ApolloProviderWrapper from '../config/graphQL/ApolloProviderWrapper';
 import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
 import NavBar from '../components/common/NavBar';
+import Footer from '../components/common/Footer';
 import './globals.css';
 
 const geistSans = Geist({
@@ -44,14 +45,13 @@ export default function RootLayout({
                 />
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <div className="container mx-auto px-4 py-8 min-h-screen">
-                    <ApolloProviderWrapper>
-                        <ReduxProviderWrapper>
-                            <NavBar />
-                            {children}
-                        </ReduxProviderWrapper>
-                    </ApolloProviderWrapper>
-                </div>
+                <ApolloProviderWrapper>
+                    <ReduxProviderWrapper>
+                        <NavBar />
+                        <div className="m-4 ">{children}</div>
+                    </ReduxProviderWrapper>
+                </ApolloProviderWrapper>
+                <Footer />
             </body>
         </html>
     );

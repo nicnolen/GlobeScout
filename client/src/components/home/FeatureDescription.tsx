@@ -15,7 +15,7 @@ export default function FeatureDescription({
     buttonLink,
 }: FeatureDescriptionProps): JSX.Element {
     return (
-        <section className="mb-8">
+        <section className="mb-8 last:mb-0">
             <h2 className="text-2xl font-semibold mb-2">{title}</h2>
             <p className="mb-4">{description}</p>
             {buttonLink && (

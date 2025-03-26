@@ -190,7 +190,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
         }
 
         if (!token) {
-            res.status(400).json({ message: 'Invalid or missing token' });
+            res.status(400).json({ message: 'Reset token is missing' });
             return;
         }
 
@@ -203,7 +203,9 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
         });
 
         if (!user) {
-            res.status(400).json({ message: 'Invalid or expired token' });
+            res.clearCookie('resetToken');
+
+            res.status(400).json({ message: 'Invalid or expired reset token' });
             return;
         }
 
@@ -224,6 +226,46 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
     } catch (err: unknown) {
         const customMessage = 'Error sending password reset email';
         catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
+    }
+}
+
+export async function verify(req: Request, res: Response): Promise<void> {
+    const accessToken = req.cookies?.accessToken;
+
+    if (!accessToken) {
+        res.status(401).json({ message: 'No access token found' });
+        return;
+    }
+
+    try {
+        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET as string) as { id: string; role: string };
+
+        if (!decoded?.id) {
+            res.status(403).json({ message: 'Invalid access token' });
+            res.clearCookie('accessToken');
+            return;
+        }
+
+        const user = await Users.findById(decoded.id);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            res.clearCookie('accessToken');
+            return;
+        }
+
+        // Generate a new access token
+        const newAccessToken = createAccessToken(user._id.toString(), user.role);
+
+        const accessTokenMaxAge = 1 * 60 * 1000; // 15 minutes
+        const accessTokenCookieOptions = cookieOptions(accessTokenMaxAge);
+        res.cookie('accessToken', newAccessToken, accessTokenCookieOptions);
+
+        res.status(200).json({ message: 'User verified' });
+    } catch (err) {
+        const customMessage = 'Error verifying the user';
+        catchErrorHandler(err, customMessage);
+        res.clearCookie('accessToken');
         res.status(500).json({ message: customMessage, error: err });
     }
 }

@@ -8,7 +8,6 @@ import { catchErrorHandler } from './errorHandlers';
 const JWT_SECRET: string = process.env.JWT_SECRET || '';
 const JWT_ACCESS_EXPIRATION = '15m'; // 15 minutes for access token
 const JWT_REFRESH_EXPIRATION = '7d'; // 7 days for refresh token
-const JWT_RESET_EXPIRATION = '1h'; // 1 hour for reset token
 
 if (!JWT_SECRET) {
     throw new Error('JWT_SECRET environment variable is not defined.');
@@ -46,29 +45,34 @@ export function createResetToken() {
     }
 }
 
-export async function refreshAccessToken(req: Request, res: Response): Promise<void> {
+export async function refreshAccessToken(req: Request): Promise<string | void> {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
-        res.status(401).json({ message: 'Refresh token missing or invalid' });
+        console.error('Refresh token missing');
         return;
     }
 
     try {
         const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string; role: string };
-        const user = await Users.findById(decoded.id);
-        if (!user) {
-            res.status(404).json({ message: 'User not found' });
+
+        if (!decoded) {
+            console.error('Invalid refresh token');
             return;
         }
 
-        const newAccessToken = createAccessToken(user._id.toString(), user.role);
-        res.status(200).json({ accessToken: newAccessToken });
+        const user = await Users.findById(decoded.id);
+        if (!user) {
+            console.error('User not found');
+            return;
+        }
+
+        const newToken = createAccessToken(user._id.toString(), user.role);
+        return newToken;
     } catch (err: unknown) {
         const customMessage = 'refreshAccessToken: Error creating new access token';
         catchErrorHandler(err, customMessage);
 
-        res.status(500).json({ message: customMessage, error: err });
         return;
     }
 }

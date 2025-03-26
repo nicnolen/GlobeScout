@@ -5,7 +5,10 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isPublicPath = pathname === '/login' || pathname === '/forgot' || pathname === '/reset-password';
 
-    const token = request.cookies.get('refreshToken')?.value || '';
+    const accessToken = request.cookies.get('accessToken')?.value || '';
+    const refreshToken = request.cookies.get('refreshToken')?.value || '';
+
+    const token = refreshToken && accessToken;
 
     if (!isPublicPath && !token) {
         return NextResponse.redirect(new URL('/login', request.url));
