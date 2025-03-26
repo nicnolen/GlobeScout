@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const ResetPasswordPage = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>('');
+    const router = useRouter();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -51,6 +53,9 @@ const ResetPasswordPage = () => {
                         className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
                     >
                         Send Reset Link
+                    </button>
+                    <button onClick={() => router.push('/login')} style={{ marginTop: '10px' }}>
+                        Back to Login
                     </button>
                 </form>
             </div>

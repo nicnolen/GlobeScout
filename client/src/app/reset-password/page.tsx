@@ -44,6 +44,9 @@ const ResetPassword = () => {
                 <button type="submit">Reset Password</button>
             </form>
             {message && <p>{message}</p>}
+            <button onClick={() => router.push('/login')} style={{ marginTop: '10px' }}>
+                Back to Login
+            </button>
         </div>
     );
 };
