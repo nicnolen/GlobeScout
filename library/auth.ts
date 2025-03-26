@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import Users from '../models/users/Users';
 import { createAccessToken, createRefreshToken, createResetToken } from '../utils/authUtils';
+import { cookieOptions } from '../utils/helpers/authHelpers';
 import { sendMail } from '../utils/nodemailer';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
@@ -73,19 +74,13 @@ export async function login(req: Request, res: Response): Promise<void> {
         const accessToken = createAccessToken(user._id.toString(), user.role);
         const refreshToken = createRefreshToken(user._id.toString(), user.role);
 
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true, // Prevent JavaScript access
-            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
-            sameSite: 'strict', // Prevent CSRF attacks
-            maxAge: 15 * 60 * 1000, // 15 minutes for the access token cookie
-        });
+        const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+        const accessTokenCookieOptions = cookieOptions(accessTokenMaxAge);
+        res.cookie('accessToken', accessToken, accessTokenCookieOptions);
 
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        const refreshTokenMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+        const refreshTokenCookieOptions = cookieOptions(refreshTokenMaxAge);
+        res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
         res.status(200).json({ message: 'Login successful', accessToken });
     } catch (err: unknown) {
@@ -109,17 +104,14 @@ export async function logout(req: Request, res: Response): Promise<void> {
         // Get user info from the token
         const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string };
 
-        const updatedUser = await Users.findOneAndUpdate(
-            { _id: decoded.id }, // Filter by the user ID
-            { active: false }, // Set the 'active' field to false
-            { new: true }, // Return the updated user document
-        );
+        const updatedUser = await Users.findOneAndUpdate({ _id: decoded.id }, { active: false }, { new: true });
 
         if (!updatedUser) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
 
+        res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
 
         res.status(200).json({ message: 'Logout successful' });
@@ -131,6 +123,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
     }
 }
 
+// Email the user with a forgot password link
 export async function forgot(req: Request, res: Response): Promise<void> {
     try {
         const { email } = req.body;
@@ -148,7 +141,7 @@ export async function forgot(req: Request, res: Response): Promise<void> {
         }
 
         const { resetToken, hashedToken } = createResetToken();
-        const resetTokenExpiration = Date.now() + 3600000; // set expiration (1 hour)
+        const resetTokenExpiration = Date.now() + 15 * 60 * 1000; // set expiration (15 mins)
 
         const updateResult = await Users.findOneAndUpdate(
             { email },
@@ -164,13 +157,18 @@ export async function forgot(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password`;
 
         const to = user.email;
         const subject = 'Password Reset';
         const text = `Click this link to reset your password: ${resetUrl}`;
 
         await sendMail(to, subject, text);
+
+        const resetTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+        const resetTokenCookieOptions = cookieOptions(resetTokenMaxAge);
+
+        res.cookie('resetToken', resetToken, resetTokenCookieOptions);
 
         res.status(200).json({ message: 'Password reset email sent' });
     } catch (err: unknown) {
@@ -182,10 +180,17 @@ export async function forgot(req: Request, res: Response): Promise<void> {
 
 // Reset Password Request (Backend)
 export async function resetPassword(req: Request, res: Response): Promise<void> {
-    const { token, password } = req.body;
+    const { password } = req.body;
+    const token = req.cookies.resetToken;
+
     try {
-        if (!token || !password) {
-            res.status(400).json({ message: 'Invalid request' });
+        if (!password) {
+            res.status(400).json({ message: 'Password can not be blank' });
+            return;
+        }
+
+        if (!token) {
+            res.status(400).json({ message: 'Invalid or missing token' });
             return;
         }
 
@@ -214,6 +219,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
             },
         );
 
+        res.clearCookie('resetToken');
         res.status(200).json({ message: 'Password successfully reset' });
     } catch (err: unknown) {
         const customMessage = 'Error sending password reset email';

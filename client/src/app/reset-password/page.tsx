@@ -12,15 +12,8 @@ const ResetPassword = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-
-        if (!token) {
-            return;
-        }
-
         try {
-            await axios.post('/reset-password', { token, password });
+            await axios.post('/reset-password', { password }, { withCredentials: true });
             setMessage('Password successfully reset.');
             router.push('/login');
         } catch (err: unknown) {
