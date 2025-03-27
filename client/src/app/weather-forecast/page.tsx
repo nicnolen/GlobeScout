@@ -26,8 +26,8 @@ export default function WeatherForecast(): JSX.Element {
     }
 
     return (
-        <div className="p-4">
-            <h2 className="title mb-3">Weather forecast for {location}</h2>
+        <div className="p-4 w-full">
+            <h2 className="pageTitle mb-3">Weather forecast for {location}</h2>
             <CurrentWeather units={units} currentWeatherData={currentWeatherData} />
             <FiveDayForecast location={location} units={units} />
         </div>

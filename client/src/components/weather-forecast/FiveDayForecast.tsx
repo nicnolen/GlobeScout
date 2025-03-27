@@ -56,7 +56,7 @@ export default function FiveDayForecast({ location, units }: FiveDayForecastProp
                                 return (
                                     <div
                                         key={index}
-                                        className="flex flex-col items-center justify-between w-full sm:w-72 lg:w-64 p-4 rounded-lg shadow-lg border-2 border-gray-300"
+                                        className="flex flex-col items-center justify-between w-full p-4 rounded-lg shadow-lg border-2 border-gray-300"
                                     >
                                         <h4 className="text-lg font-semibold text-center text-gray-800 mb-4">{date}</h4>
 
