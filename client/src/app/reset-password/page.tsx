@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const ResetPassword = () => {
@@ -23,19 +24,36 @@ const ResetPassword = () => {
     };
 
     return (
-        <div>
-            <h1>Reset Password</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>New Password</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <div className="loginContainer">
+            <div className="card max-w-md w-full p-8">
+                <h2 className="cardTitle text-center">Reset Password</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-600">
+                            New Password
+                        </label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                        Reset Password
+                    </button>
+                </form>
+                {message && <p>{message}</p>}
+                <div className="mt-4 text-center">
+                    <Link href="/login" className="text-sm text-indigo-600 hover:underline">
+                        Back to Login
+                    </Link>
                 </div>
-                <button type="submit">Reset Password</button>
-            </form>
-            {message && <p>{message}</p>}
-            <button onClick={() => router.push('/login')} style={{ marginTop: '10px' }}>
-                Back to Login
-            </button>
+            </div>
         </div>
     );
 };

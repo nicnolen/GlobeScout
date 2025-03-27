@@ -7,6 +7,7 @@ export function middleware(request: NextRequest) {
 
     const accessToken = request.cookies.get('accessToken')?.value || '';
     const refreshToken = request.cookies.get('refreshToken')?.value || '';
+    const userRole = request.cookies.get('userRole')?.value || '';
 
     const token = refreshToken && accessToken;
 
@@ -16,6 +17,10 @@ export function middleware(request: NextRequest) {
 
     if (isPublicPath && token) {
         return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    if (userRole && pathname.startsWith('/admin') && userRole !== 'admin') {
+        return NextResponse.redirect(new URL('/', request.url)); // Redirect to homepage if not admin
     }
 
     return NextResponse.next();
@@ -29,10 +34,7 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * - login page
-         * - forgot page
-         * - reset-password page
          */
-        '/((?!api|_next/static|_next/image|favicon.ico|login|forgot|reset-password).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
     ],
 };

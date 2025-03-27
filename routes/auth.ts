@@ -12,7 +12,7 @@ router.post('/login', login);
 
 router.post('/forgot', forgot);
 
-router.post('/logout', passport.authenticate('jwt', { session: false }), logout);
+router.post('/logout', logout);
 
 router.put('/reset-password', resetPassword);
 

@@ -44,9 +44,9 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full p-8 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold text-center text-gray-700 mb-8">Login</h2>
+        <div className="loginContainer">
+            <div className="card max-w-md w-full p-8">
+                <h2 className="cardTitle text-center">Login</h2>
                 <form onSubmit={fetchUserLoginData}>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600">

@@ -82,6 +82,9 @@ export async function login(req: Request, res: Response): Promise<void> {
         const refreshTokenCookieOptions = cookieOptions(refreshTokenMaxAge);
         res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
+        // Use the exact same options as the access token
+        res.cookie('userRole', user.role, accessTokenCookieOptions);
+
         res.status(200).json({ message: 'Login successful', accessToken });
     } catch (err: unknown) {
         const customMessage = 'User login attempt failed';
@@ -113,6 +116,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
 
         res.clearCookie('accessToken');
         res.clearCookie('refreshToken');
+        res.clearCookie('userRole');
 
         res.status(200).json({ message: 'Logout successful' });
     } catch (err: unknown) {

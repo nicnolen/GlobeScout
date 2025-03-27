@@ -27,13 +27,13 @@ export default function FiveDayForecast({ location, units }: FiveDayForecastProp
     return (
         <>
             {forecastLoading ? (
-                <p className="title">Loading forecast...</p>
+                <p className="cardTitle">Loading forecast...</p>
             ) : forecastError ? (
-                <p className="title text-red-500">Error fetching forecast: {forecastError.message}</p>
+                <p className="cardTitle text-red-500">Error fetching forecast: {forecastError.message}</p>
             ) : (
                 forecastData && (
                     <div className="card p-8 mb-8">
-                        <h3 className="subtitle text-center">5-Day Weather Forecast</h3>
+                        <h3 className="cardTitle text-center">5-Day Weather Forecast</h3>
 
                         {/* Forecast Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">

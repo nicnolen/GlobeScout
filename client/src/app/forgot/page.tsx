@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const ResetPasswordPage = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>('');
-    const router = useRouter();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -30,9 +29,9 @@ const ResetPasswordPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full p-8 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold text-center text-gray-700 mb-8">Reset Password</h2>
+        <div className="loginContainer">
+            <div className="card max-w-md w-full p-8">
+                <h2 className="cardTitle text-center">Forgot Password</h2>
                 <form onSubmit={handleResetPassword}>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600">
@@ -54,9 +53,11 @@ const ResetPasswordPage = () => {
                     >
                         Send Reset Link
                     </button>
-                    <button onClick={() => router.push('/login')} style={{ marginTop: '10px' }}>
-                        Back to Login
-                    </button>
+                    <div className="mt-4 text-center">
+                        <Link href="/login" className="text-sm text-indigo-600 hover:underline">
+                            Back to Login
+                        </Link>
+                    </div>
                 </form>
             </div>
         </div>

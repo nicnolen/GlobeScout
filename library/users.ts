@@ -15,7 +15,7 @@ export async function getCurrentUser(req: Request, res: Response): Promise<void>
         return;
     }
 
-    const { password, __v, _id, ...cleanedUser } = user.toObject();
+    const { password, __v, _id, resetPasswordExpires, resetPasswordToken, ...cleanedUser } = user.toObject();
 
     // If the user is authenticated and active, return a success response
     res.status(200).json({ message: 'User is active and authenticated', user: cleanedUser });

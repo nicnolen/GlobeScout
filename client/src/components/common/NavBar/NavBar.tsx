@@ -34,7 +34,7 @@ export default function NavBar(): JSX.Element {
     const disabledForecastTooltipMessage = 'Must search a city or country first';
 
     return (
-        <nav className="fixed top-0 w-full bg-teal-500 text-white p-4 shadow-md">
+        <nav>
             <ul className="flex space-x-8 justify-center items-center">
                 <li className="mr-auto" ref={dropdownRef}>
                     <button className="flex items-center text-white" onClick={toggleDropdown}>

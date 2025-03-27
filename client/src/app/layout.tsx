@@ -36,7 +36,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className="h-full">
+        <html lang="en">
             <head>
                 {/* Adding Font Awesome CDN globally */}
                 <link
@@ -47,11 +47,15 @@ export default function RootLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ApolloProviderWrapper>
                     <ReduxProviderWrapper>
-                        <NavBarWrapper />
-                        <div className="m-4">{children}</div>
+                        <div className="flex flex-col min-h-screen w-screen">
+                            <NavBarWrapper />
+                            <div className="main">{children}</div>
+                            <div className="footer">
+                                <Footer />
+                            </div>
+                        </div>
                     </ReduxProviderWrapper>
                 </ApolloProviderWrapper>
-                <Footer />
             </body>
         </html>
     );
