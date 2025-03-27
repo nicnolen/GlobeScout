@@ -12,8 +12,8 @@ router.post('/login', login);
 
 router.post('/forgot', forgot);
 
-router.post('/reset-password', resetPassword);
-
 router.post('/logout', passport.authenticate('jwt', { session: false }), logout);
+
+router.put('/reset-password', resetPassword);
 
 export default router;

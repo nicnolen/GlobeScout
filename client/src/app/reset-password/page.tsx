@@ -13,7 +13,7 @@ const ResetPassword = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('/reset-password', { password }, { withCredentials: true });
+            await axios.put('/reset-password', { password }, { withCredentials: true });
             setMessage('Password successfully reset.');
             router.push('/login');
         } catch (err: unknown) {
