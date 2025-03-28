@@ -4,10 +4,10 @@ import React, { JSX } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { Units } from '../../../../types/weather';
-import { selectUnits } from '../../redux/selectors/weatherSelectors';
-import { setUnits } from '../../redux/slices/weatherSlice';
-import { catchErrorHandler } from '../../utils/errorHandlers';
+import { Units } from '../../../../../types/weather';
+import { selectUnits } from '../../../redux/selectors/weatherSelectors';
+import { setUnits } from '../../../redux/slices/weatherSlice';
+import { catchErrorHandler } from '../../../utils/errorHandlers';
 
 export default function SettingsDropdown(): JSX.Element {
     const units = useSelector(selectUnits);
@@ -28,30 +28,26 @@ export default function SettingsDropdown(): JSX.Element {
     };
 
     return (
-        <div className="card absolute p-4">
-            <p className="settingsTitle">Units</p>
+        <div className="m-4">
+            <p className="text-xl font-semibold text-gray-800">Units</p>
 
-            <div className="flex space-x-4">
+            <div className="flex space-x-2">
                 <button
                     onClick={() => dispatch(setUnits(Units.Metric))}
-                    className={`button text-sm ${
-                        units === Units.Metric ? 'primaryButton' : 'lightGrayButton'
-                    } primaryButtonHover`}
+                    className={`button text-sm ${units === Units.Metric ? 'primaryButton' : 'secondaryButton'}`}
                 >
                     Metric
                 </button>
 
                 <button
                     onClick={() => dispatch(setUnits(Units.Imperial))}
-                    className={`button text-sm ${
-                        units === Units.Imperial ? 'primaryButton' : 'lightGrayButton'
-                    } primaryButtonHover`}
+                    className={`button text-sm ${units === Units.Imperial ? 'primaryButton' : 'secondaryButton'}`}
                 >
                     Imperial
                 </button>
             </div>
             <div className="mt-4">
-                <button onClick={handleLogout} className="button text-sm lightGrayButton primaryButtonHover">
+                <button onClick={handleLogout} className="button text-sm dangerButton">
                     Logout
                 </button>
             </div>

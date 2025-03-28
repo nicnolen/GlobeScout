@@ -1,14 +1,14 @@
-'use client'; // Marking this file as a client component
+'use client';
 
 import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { selectCurrentWeatherData } from '../../../redux/selectors/weatherSelectors';
-import { selectUser } from '../../../redux/selectors/usersSelectors';
-import { useOutsideClick, useAutoLogout } from '../../../hooks/eventHooks';
-import { useFetchUserData } from '../../../hooks/usersHooks';
-import Tooltip from '../Tooltip';
+import { selectCurrentWeatherData } from '../../../../redux/selectors/weatherSelectors';
+import { selectUser } from '../../../../redux/selectors/usersSelectors';
+import { useOutsideClick, useAutoLogout } from '../../../../hooks/eventHooks';
+import { useFetchUserData } from '../../../../hooks/usersHooks';
+import Tooltip from '../../Tooltip';
 import SettingsDropdown from '../SettingsDropdown';
 
 export default function NavBar(): JSX.Element {
@@ -35,15 +35,7 @@ export default function NavBar(): JSX.Element {
 
     return (
         <nav>
-            <ul className="flex space-x-8 justify-center items-center">
-                <li className="mr-auto" ref={dropdownRef}>
-                    <button className="flex items-center text-white" onClick={toggleDropdown}>
-                        {/* 9881 is the HTML character code for a gear icon */}
-                        <span className="text-2xl mr-1.25">&#9881;</span>{' '}
-                        <span className=" hidden sm:inline ">Settings</span>
-                    </button>
-                    {isDropdownOpen && <SettingsDropdown />}
-                </li>
+            <ul className="flex space-x-8 justify-between items-center w-full">
                 <li>
                     <Link href="/">
                         <span className={`${isActive('/')}`}>Home</span>
@@ -72,6 +64,17 @@ export default function NavBar(): JSX.Element {
                         </Link>
                     </li>
                 )}
+                <li className="ml-auto relative" ref={dropdownRef}>
+                    <button className="button" onClick={toggleDropdown}>
+                        <i className="fas fa-gear text-small mr-1.25" />
+                        <span className="hidden sm:inline">Settings</span>
+                    </button>
+                    {isDropdownOpen && (
+                        <div className="card absolute right-0 mt-2">
+                            <SettingsDropdown />
+                        </div>
+                    )}
+                </li>
             </ul>
         </nav>
     );

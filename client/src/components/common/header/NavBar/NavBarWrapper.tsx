@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import NavBar from '../NavBar/NavBar';
+import NavBar from './NavBar';
 
 const NavBarWrapper = () => {
     const pathname = usePathname();
@@ -14,8 +14,8 @@ const NavBarWrapper = () => {
     }
 
     return (
-        <div className="header">
-            <NavBar />;
+        <div className="sticky top-0 h-16 bg-teal-500 text-white p-4 mb-6 z-10">
+            <NavBar />
         </div>
     );
 };
