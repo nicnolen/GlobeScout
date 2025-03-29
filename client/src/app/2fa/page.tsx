@@ -45,7 +45,7 @@ const TwoFactorSetup = () => {
                     />
                     <button
                         onClick={handleVerifyCode}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        className="px-4 py-2 bg-blue-600 text-white text-nowrap rounded-lg hover:bg-blue-700 transition"
                     >
                         <i className="fas fa-check-circle mr-1" /> Verify
                     </button>
