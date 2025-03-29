@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const ResetPassword = () => {
-    const router = useRouter();
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

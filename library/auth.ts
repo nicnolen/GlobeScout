@@ -85,7 +85,7 @@ export async function login(req: Request, res: Response): Promise<void> {
         res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
         if (user.authentication.enabled) {
-            res.status(200).json({ message: 'Login successful, redirecting to 2fa', redirect: '/2fa' });
+            res.status(200).json({ message: 'Login successful, redirecting to 2fa' });
             return;
         }
 
@@ -348,6 +348,8 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
 
         const { methods } = findUser.authentication;
 
+        console.log(methods, 'FUCK YOU');
+
         if (isGoogleAuthEnabled && !methods.authenticator) {
             const secret = speakeasy.generateSecret({ name: 'Globe Scout' });
 
@@ -376,7 +378,7 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
 
             await Users.findOneAndUpdate(
                 { _id: user.id },
-                { 'authentication.methods.authenticator': is2faEnabled },
+                { 'authentication.methods.authenticator': is2faEnabled, 'authentication.secret': secret.base32 },
                 { new: true },
             );
 

@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const TwoFactorSetup = () => {
     const [code, setCode] = useState<string>('');
     const [message, setMessage] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleVerifyCode = async () => {
         try {
@@ -17,8 +19,10 @@ const TwoFactorSetup = () => {
                     withCredentials: true, // Include cookies in the request
                 },
             );
-            if (response.data.success) {
-                alert('2FA setup successful!');
+
+            if (response.status === 200) {
+                setMessage('2FA setup successful!');
+                router.push('/');
             }
         } catch (err: unknown) {
             const customMessage = 'Error starting server';

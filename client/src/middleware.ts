@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (token && !userRole) {
+    if (!isPublicPath && token && !userRole) {
         return NextResponse.redirect(new URL('/2fa', request.url));
     }
 
