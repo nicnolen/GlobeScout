@@ -47,7 +47,7 @@ export default function RootLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ApolloProviderWrapper>
                     <ReduxProviderWrapper>
-                        <div className="flex flex-col min-h-screen w-screen">
+                        <div className="flex flex-col min-h-screen w-full">
                             <NavBarWrapper />
                             <div className="flex h-auto flex-grow  mx-4">{children}</div>
                             <div className="h-20 flex items-center bottom-0 bg-gray-800 text-white p-4 mt-6">
