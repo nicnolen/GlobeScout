@@ -6,108 +6,123 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../../../../redux/selectors/usersSelectors';
 import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
-const TwoFactorSettings = () => {
+export default function TwoFactorSettings() {
     const [is2faEnabled, setIs2faEnabled] = useState<boolean>(false);
-    const [isGoogleAuthEnabled, setIsGoogleAuthEnabled] = useState<boolean | null>();
-    const [isEmailEnabled, setIsEmailEnabled] = useState<boolean | null>();
-    const [message, setMessage] = useState<string | null>(null);
+    const [isGoogleAuthEnabled, setIsGoogleAuthEnabled] = useState<boolean>(false);
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
 
     const user = useSelector(selectUser);
 
-    // Fetch 2FA status when the component mounts
     useEffect(() => {
-        const fetch2FAStatus = async () => {
+        const fetch2faStatus = async () => {
             try {
+                setIsUpdating(true);
                 if (!user) {
                     setMessage('No user found!');
+                    setIsUpdating(false);
                     return;
                 }
 
                 setIs2faEnabled(user.authentication.enabled);
                 if (user.authentication.enabled) {
                     setIsGoogleAuthEnabled(user.authentication.methods.authenticator);
-                    setIsEmailEnabled(user.authentication.methods.email);
                 }
+
+                setIsUpdating(false);
             } catch (err: unknown) {
-                const customMessage = 'Error fetching 2fa status';
+                const customMessage = 'Error fetching 2FA status';
                 catchErrorHandler(err, customMessage, setMessage);
+                setIsUpdating(false);
             }
         };
-        fetch2FAStatus();
+        fetch2faStatus();
     }, [user]);
 
-    // Toggle 2FA (enable or disable)
-    const toggle2FA = async (is2faEnabled?: boolean, isGoogleAuthEnabled?: boolean) => {
+    const toggle2fa = async (is2faEnabled: boolean) => {
         try {
+            setIsUpdating(true);
+            const response = await axios.patch('/toggle-2fa', { is2faEnabled }, { withCredentials: true });
+            setMessage(response.data.message);
+            setIs2faEnabled(is2faEnabled);
+            setIsUpdating(false);
+        } catch (err: unknown) {
+            const customMessage = 'Failed to update 2FA';
+            catchErrorHandler(err, customMessage, setMessage);
+            setIsUpdating(false);
+        }
+    };
+
+    const toggle2faMethod = async (isGoogleAuthEnabled: boolean) => {
+        try {
+            setIsUpdating(true);
             const response = await axios.patch(
-                '/toggle-2fa',
-                { is2faEnabled, isGoogleAuthEnabled },
+                '/toggle-2fa-method',
+                { isGoogleAuthEnabled },
                 { withCredentials: true },
             );
             setMessage(response.data.message);
-            setIs2faEnabled(is2faEnabled); // Update state based on the toggle
+            setIsGoogleAuthEnabled(isGoogleAuthEnabled);
+            setIsUpdating(false);
         } catch (err: unknown) {
-            const customMessage = 'Failed to update 2fa';
+            const customMessage = 'Failed to update 2FA methods';
             catchErrorHandler(err, customMessage, setMessage);
+            setIsUpdating(false);
         }
     };
 
     return (
-        <div className="mt-6 text-gray-800">
-            <h1 className="text-2xl font-semibold mb-4">2FA Settings</h1>
-            <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Enable 2FA</h2>
-                <div className="flex items-center space-x-4">
-                    <label htmlFor="2fa-toggle" className="text-lg">
-                        2FA:
-                    </label>
-                    <input
-                        type="checkbox"
-                        id="2fa-toggle"
-                        className="toggle"
-                        checked={is2faEnabled}
-                        onChange={() => toggle2FA(!is2faEnabled)}
-                    />
+        <>
+            <h1 className="text-xl font-semibold text-gray-800">2FA Settings</h1>
+            <div className=" text-gray-800 space-y-4">
+                <div className="flex items-center">
+                    <span className="text-sm">Enable 2FA:</span>
+                    <button
+                        className={`p-2 rounded-full ${is2faEnabled ? 'text-green-500' : 'text-gray-500'}`}
+                        onClick={() => toggle2fa(!is2faEnabled)}
+                        disabled={isUpdating}
+                    >
+                        <i className={is2faEnabled ? 'fas fa-toggle-on text-2xl' : 'fas fa-toggle-off text-2xl'} />
+                    </button>
                 </div>
 
-                {is2faEnabled ? (
-                    <div className="space-y-4 mt-4">
-                        <p className="text-sm">2FA is enabled. Options:</p>
+                {is2faEnabled && (
+                    <div className="space-y-4">
+                        <p className="text-sm">2FA is enabled. Choose your preferred method:</p>
                         <div className="space-y-2">
-                            <p className="flex items-center">
-                                Google Authenticator:{' '}
-                                <span className={`ml-2 ${isGoogleAuthEnabled ? 'text-green-500' : 'text-red-500'}`}>
-                                    {isGoogleAuthEnabled ? '✅' : '❌'}
-                                </span>
+                            <div className="flex items-center justify-between p-2 border rounded">
+                                <span>Google Authenticator</span>
+                                <i
+                                    className={`text-xl ${isUpdating ? <i className="fa-solid fa-spinner text-xl text-blue-500 animate-spin" /> : isGoogleAuthEnabled ? 'text-green-500 fas fa-check-circle' : 'text-red-500 fas fa-times-circle'}`}
+                                />
                                 {!isGoogleAuthEnabled && (
                                     <button
                                         className="ml-2 text-blue-500 hover:text-blue-700"
-                                        onClick={() => {
-                                            toggle2FA(is2faEnabled, true);
-                                        }}
+                                        onClick={() => toggle2faMethod(true)}
+                                        disabled={isUpdating}
                                     >
+                                        {isUpdating ? (
+                                            <i className="fa-solid fa-spinner text-xl text-blue-500 animate-spin" />
+                                        ) : (
+                                            <i className="fas fa-qrcode mr-1" />
+                                        )}{' '}
                                         Set up Google Authenticator
                                     </button>
                                 )}
-                            </p>
-                            <p className="flex items-center">
-                                Email:{' '}
-                                <span className={`ml-2 ${isEmailEnabled ? 'text-green-500' : 'text-red-500'}`}>
-                                    {isEmailEnabled ? '✅' : '❌'}
-                                </span>
-                            </p>
+                            </div>
+                            <div className="flex items-center justify-between p-2 border rounded">
+                                <span>Email Authentication</span>
+                                {isUpdating ? (
+                                    <i className="fa-solid fa-spinner text-xl text-blue-500 animate-spin" />
+                                ) : (
+                                    <i className="text-xl text-green-500 fas fa-check-circle" />
+                                )}
+                            </div>
                         </div>
                     </div>
-                ) : (
-                    <div className="space-y-4 mt-4">
-                        <p className="text-sm">2FA is disabled. Enable 2FA to secure your account:</p>
-
-                        {message && <p className="text-sm text-gray-600">{message}</p>}
-                    </div>
                 )}
+                {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
             </div>
-        </div>
+        </>
     );
-};
-
-export default TwoFactorSettings;
+}

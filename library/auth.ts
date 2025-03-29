@@ -85,7 +85,7 @@ export async function login(req: Request, res: Response): Promise<void> {
         res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
         if (user.authentication.enabled) {
-            res.status(200).json({ message: 'Login successful, redirecting to 2fa' });
+            res.status(200).json({ message: 'Login successful, redirecting to 2FA' });
             return;
         }
 
@@ -281,7 +281,7 @@ export async function verify(req: Request, res: Response): Promise<void> {
     }
 }
 
-export async function verify2fa(req: Request, res: Response): Promise<void> {
+export async function validate2fa(req: Request, res: Response): Promise<void> {
     const { code } = req.body;
     const user = req.user as UsersDocument;
 
@@ -327,7 +327,7 @@ export async function verify2fa(req: Request, res: Response): Promise<void> {
 
 export async function toggle2fa(req: Request, res: Response): Promise<void> {
     const user = req.user as UsersDocument;
-    const { is2faEnabled, isGoogleAuthEnabled } = req.body;
+    const { is2faEnabled } = req.body;
 
     try {
         const findUser = await Users.findOneAndUpdate(
@@ -342,15 +342,47 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
         }
 
         if (!is2faEnabled) {
-            res.status(200).json({ message: '2fa has been disabled' });
+            res.status(200).json({ message: '2FA has been disabled' });
             return;
         }
 
-        const { methods } = findUser.authentication;
+        res.status(200).json({ message: '2FA has been enabled' });
+    } catch (err: unknown) {
+        const customMessage = 'Error toggling 2FA';
+        catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
+    }
+}
 
-        console.log(methods, 'FUCK YOU');
+export async function toggle2faMethod(req: Request, res: Response): Promise<void> {
+    const user = req.user as UsersDocument;
+    const { isGoogleAuthEnabled } = req.body;
 
-        if (isGoogleAuthEnabled && !methods.authenticator) {
+    try {
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const { enabled, methods } = user.authentication;
+
+        if (!enabled) {
+            res.status(401).json({ message: '2FA is disabled' });
+            return;
+        }
+
+        async function update2FAMethod(method: string, isEnabled: boolean) {
+            const updateData: Record<string, boolean | null> = { [`authentication.methods.${method}`]: isEnabled };
+
+            // Only update the secret for authenticator method
+            if (method === 'authenticator' && !isEnabled) {
+                updateData['authentication.secret'] = null;
+            }
+
+            return await Users.findOneAndUpdate({ _id: user.id }, { $set: updateData }, { new: true });
+        }
+
+        async function generateAndSendQRCode() {
             const secret = speakeasy.generateSecret({ name: 'Globe Scout' });
 
             if (!secret.otpauth_url) {
@@ -358,10 +390,8 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
                 return;
             }
 
-            // Generate the QR code URL for the user
             const qrCodeUrl = secret.otpauth_url;
 
-            // Generate the QR code as an image using async/await
             const qrCodeImage = await QRCode.toDataURL(qrCodeUrl);
 
             if (!qrCodeImage) {
@@ -369,24 +399,35 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
                 return;
             }
 
-            // Send the QR code to the user's email using the sendMail utility
             const to = user.email;
             const subject = 'Your 2FA Setup QR Code';
             const html = `<p>Scan this QR code with your authentication app (Google Authenticator, Microsoft Authenticator, etc.) to enable 2FA:</p><img src="cid:qr-code-image" />`;
 
-            await sendMail(to, subject, html, qrCodeImage);
-
             await Users.findOneAndUpdate(
-                { _id: user.id },
-                { 'authentication.methods.authenticator': is2faEnabled, 'authentication.secret': secret.base32 },
+                { email: user.email },
+                { 'authentication.secret': secret.base32 },
                 { new: true },
             );
+
+            await sendMail(to, subject, html, qrCodeImage);
+        }
+
+        if (isGoogleAuthEnabled && !methods.authenticator) {
+            await generateAndSendQRCode();
+
+            await update2FAMethod('authenticator', true);
 
             res.status(200).json({ message: 'QR code sent to your email. Please scan it to enable authenticator' });
             return;
         }
 
-        res.status(200).json({ message: '2fa has been enabled' });
+        // Disable Google Authenticator method
+        if (!isGoogleAuthEnabled && methods.authenticator) {
+            await update2FAMethod('authenticator', false);
+
+            res.status(200).json({ message: 'Google Authenticator has been disabled.' });
+            return;
+        }
     } catch (err: unknown) {
         const customMessage = 'Error toggling 2FA';
         catchErrorHandler(err, customMessage);

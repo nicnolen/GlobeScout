@@ -13,16 +13,16 @@ const TwoFactorSetup = () => {
     const handleVerifyCode = async () => {
         try {
             const response = await axios.post(
-                '/verify-2fa',
+                '/validate-2fa',
                 { code: code },
                 {
-                    withCredentials: true, // Include cookies in the request
+                    withCredentials: true,
                 },
             );
 
             if (response.status === 200) {
                 setMessage('2FA setup successful!');
-                router.push('/');
+                setTimeout(() => router.push('/'), 1500);
             }
         } catch (err: unknown) {
             const customMessage = 'Error starting server';
@@ -31,18 +31,27 @@ const TwoFactorSetup = () => {
     };
 
     return (
-        <div>
-            <h1>Enter Code</h1>
-            <div>
-                <input
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Enter the code from your app"
-                />
-                <button onClick={handleVerifyCode}>Verify Code</button>
+        <div className="loginContainer">
+            <div className="card max-w-md w-full p-8">
+                <h1 className="cardTitle text-center">Enter Authentication Code</h1>
+                <p className="text-sm text-gray-600 mb-6 text-center">Enter the code from your authenticator app.</p>
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="text"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        placeholder="Enter code"
+                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        onClick={handleVerifyCode}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                        <i className="fas fa-check-circle mr-1" /> Verify
+                    </button>
+                </div>
+                {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
             </div>
-            {message && <p style={{ color: 'red' }}>{message}</p>}
         </div>
     );
 };

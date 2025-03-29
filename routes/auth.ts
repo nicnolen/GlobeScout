@@ -1,6 +1,16 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { register, login, logout, forgot, resetPassword, verify, verify2fa, toggle2fa } from '../library/auth';
+import {
+    register,
+    login,
+    logout,
+    forgot,
+    resetPassword,
+    verify,
+    validate2fa,
+    toggle2fa,
+    toggle2faMethod,
+} from '../library/auth';
 
 const router = Router();
 
@@ -10,7 +20,7 @@ router.post('/register', passport.authenticate('jwt', { session: false }), regis
 
 router.post('/login', login);
 
-router.post('/verify-2fa', passport.authenticate('jwt', { session: false }), verify2fa);
+router.post('/validate-2fa', passport.authenticate('jwt', { session: false }), validate2fa);
 
 router.post('/forgot', forgot);
 
@@ -19,5 +29,7 @@ router.post('/logout', logout);
 router.put('/reset-password', resetPassword);
 
 router.patch('/toggle-2fa', passport.authenticate('jwt', { session: false }), toggle2fa);
+
+router.patch('/toggle-2fa-method', passport.authenticate('jwt', { session: false }), toggle2faMethod);
 
 export default router;
