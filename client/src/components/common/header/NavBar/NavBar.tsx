@@ -9,7 +9,7 @@ import { selectUser } from '../../../../redux/selectors/usersSelectors';
 import { useOutsideClick, useAutoLogout } from '../../../../hooks/eventHooks';
 import { useFetchUserData } from '../../../../hooks/usersHooks';
 import Tooltip from '../../Tooltip';
-import SettingsDropdown from '../SettingsDropdown';
+import SettingsDropdown from '../settings/SettingsDropdown';
 
 export default function NavBar(): JSX.Element {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

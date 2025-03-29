@@ -4,10 +4,11 @@ import React, { JSX } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { Units } from '../../../../../types/weather';
-import { selectUnits } from '../../../redux/selectors/weatherSelectors';
-import { setUnits } from '../../../redux/slices/weatherSlice';
-import { catchErrorHandler } from '../../../utils/errorHandlers';
+import { Units } from '../../../../../../types/weather';
+import { selectUnits } from '../../../../redux/selectors/weatherSelectors';
+import { setUnits } from '../../../../redux/slices/weatherSlice';
+import TwoFactorAuthSettings from './TwoFactorAuthSettings';
+import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
 export default function SettingsDropdown(): JSX.Element {
     const units = useSelector(selectUnits);
@@ -46,6 +47,12 @@ export default function SettingsDropdown(): JSX.Element {
                     Imperial
                 </button>
             </div>
+
+            <div className="mt-4">
+                2FA Settings
+                <TwoFactorAuthSettings />
+            </div>
+
             <div className="mt-4">
                 <button onClick={handleLogout} className="button text-sm dangerButton">
                     Logout

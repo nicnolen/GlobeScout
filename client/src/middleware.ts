@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const isPublicPath = pathname === '/login' || pathname === '/forgot' || pathname === '/reset-password';
+    const isPublicPath =
+        pathname === '/login' || pathname === '/forgot' || pathname === '/reset-password' || pathname === '/2fa';
 
     const accessToken = request.cookies.get('accessToken')?.value || '';
     const refreshToken = request.cookies.get('refreshToken')?.value || '';
@@ -15,7 +16,11 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (isPublicPath && token) {
+    if (token && !userRole) {
+        return NextResponse.redirect(new URL('/2fa', request.url));
+    }
+
+    if (isPublicPath && token && userRole) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 

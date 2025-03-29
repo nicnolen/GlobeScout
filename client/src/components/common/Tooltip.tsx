@@ -3,13 +3,12 @@ import React, { JSX } from 'react';
 interface TooltipProps {
     message: string;
     children: React.ReactNode;
-    showTooltip?: boolean; // Controls whether tooltip should appear
+    showTooltip?: boolean;
 }
 
 export default function Tooltip({ message, children, showTooltip = true }: TooltipProps): JSX.Element {
     return (
         <div className="relative group inline-block">
-            {/* Tooltip trigger (child element) */}
             {children}
 
             {showTooltip && (

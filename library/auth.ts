@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import Users from '../models/users/Users';
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
+import Users, { UsersDocument } from '../models/users/Users';
 import { createAccessToken, createRefreshToken, createResetToken } from '../utils/authUtils';
 import { cookieOptions } from '../utils/helpers/authHelpers';
 import { sendMail } from '../utils/nodemailer';
@@ -82,10 +84,15 @@ export async function login(req: Request, res: Response): Promise<void> {
         const refreshTokenCookieOptions = cookieOptions(refreshTokenMaxAge);
         res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
+        if (user.authentication.enabled) {
+            res.status(200).json({ message: 'Login successful, redirecting to 2fa', redirect: '/2fa' });
+            return;
+        }
+
         // Use the exact same options as the access token
         res.cookie('userRole', user.role, accessTokenCookieOptions);
 
-        res.status(200).json({ message: 'Login successful', accessToken });
+        res.status(200).json({ message: 'Login successful' });
     } catch (err: unknown) {
         const customMessage = 'User login attempt failed';
         catchErrorHandler(err, customMessage);
@@ -165,9 +172,9 @@ export async function forgot(req: Request, res: Response): Promise<void> {
 
         const to = user.email;
         const subject = 'Password Reset';
-        const text = `Click this link to reset your password: ${resetUrl}`;
+        const html = `Click this link to reset your password: ${resetUrl}`;
 
-        await sendMail(to, subject, text);
+        await sendMail(to, subject, html);
 
         const resetTokenMaxAge = 15 * 60 * 1000; // 15 minutes
         const resetTokenCookieOptions = cookieOptions(resetTokenMaxAge);
@@ -237,12 +244,12 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
 export async function verify(req: Request, res: Response): Promise<void> {
     const accessToken = req.cookies?.accessToken;
 
-    if (!accessToken) {
-        res.status(401).json({ message: 'No access token found' });
-        return;
-    }
-
     try {
+        if (!accessToken) {
+            res.status(401).json({ message: 'No access token found' });
+            return;
+        }
+
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET as string) as { id: string; role: string };
 
         if (!decoded?.id) {
@@ -266,10 +273,121 @@ export async function verify(req: Request, res: Response): Promise<void> {
         res.cookie('accessToken', newAccessToken, accessTokenCookieOptions);
 
         res.status(200).json({ message: 'User verified' });
-    } catch (err) {
+    } catch (err: unknown) {
         const customMessage = 'Error verifying the user';
         catchErrorHandler(err, customMessage);
         res.clearCookie('accessToken');
+        res.status(500).json({ message: customMessage, error: err });
+    }
+}
+
+export async function verify2fa(req: Request, res: Response): Promise<void> {
+    const { code } = req.body;
+    const user = req.user as UsersDocument;
+
+    try {
+        if (!code) {
+            res.status(400).json({ message: 'Code cannot be empty' });
+            return;
+        }
+
+        if (!user.authentication.secret) {
+            res.status(401).json({ message: 'No secret was found' });
+            return;
+        }
+
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const verified = speakeasy.totp.verify({
+            secret: user.authentication.secret,
+            encoding: 'base32',
+            token: code,
+        });
+
+        if (!verified) {
+            res.status(401).json({ message: 'Invalid 2FA code' });
+            return;
+        }
+
+        const userRoleTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+        const userRoleTokenCookieOptions = cookieOptions(userRoleTokenMaxAge);
+
+        res.cookie('userRole', user.role, userRoleTokenCookieOptions);
+        res.status(200).json({ message: 'User authenticated' });
+        return;
+    } catch (err: unknown) {
+        const customMessage = 'Error verifying 2FA';
+        catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
+    }
+}
+
+export async function toggle2fa(req: Request, res: Response): Promise<void> {
+    const user = req.user as UsersDocument;
+    const { is2faEnabled, isGoogleAuthEnabled } = req.body;
+
+    try {
+        const findUser = await Users.findOneAndUpdate(
+            { _id: user.id },
+            { 'authentication.enabled': is2faEnabled },
+            { new: true },
+        );
+
+        if (!findUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        if (!is2faEnabled) {
+            res.status(200).json({ message: '2fa has been disabled' });
+            return;
+        }
+
+        const { methods } = findUser.authentication;
+
+        if (isGoogleAuthEnabled && !methods.authenticator) {
+            const secret = speakeasy.generateSecret({ name: 'Globe Scout' });
+
+            if (!secret.otpauth_url) {
+                res.status(500).json({ message: 'Error generating QR code URL.' });
+                return;
+            }
+
+            // Generate the QR code URL for the user
+            const qrCodeUrl = secret.otpauth_url;
+
+            // Generate the QR code as an image using async/await
+            const qrCodeImage = await QRCode.toDataURL(qrCodeUrl);
+
+            if (!qrCodeImage) {
+                res.status(500).json({ message: 'Error generating QR code image.' });
+                return;
+            }
+
+            // Send the QR code to the user's email using the sendMail utility
+            const to = user.email;
+            const subject = 'Your 2FA Setup QR Code';
+            const html = `<p>Scan this QR code with your authentication app (Google Authenticator, Microsoft Authenticator, etc.) to enable 2FA:</p><img src="cid:qr-code-image" />`;
+
+            await sendMail(to, subject, html, qrCodeImage);
+
+            await Users.findOneAndUpdate(
+                { _id: user.id },
+                { 'authentication.methods.authenticator': is2faEnabled },
+                { new: true },
+            );
+
+            res.status(200).json({ message: 'QR code sent to your email. Please scan it to enable authenticator' });
+            return;
+        }
+
+        res.status(200).json({ message: '2fa has been enabled' });
+    } catch (err: unknown) {
+        const customMessage = 'Error toggling 2FA';
+        catchErrorHandler(err, customMessage);
         res.status(500).json({ message: customMessage, error: err });
     }
 }

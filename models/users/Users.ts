@@ -5,7 +5,7 @@ import { UserData, UserRole } from '../../types/users';
 export interface UsersDocument extends UserData, Document {
     password: string;
     resetPasswordToken: string | null;
-    resetPasswordExpires: number | null;
+    resetPasswordExpires: Date | null;
     comparePasswords(password: string): Promise<boolean>;
 }
 
@@ -14,6 +14,14 @@ const UsersSchema = new Schema<UsersDocument>({
     password: { type: String, required: true },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
+    authentication: {
+        enabled: { type: Boolean, required: true, default: false },
+        methods: {
+            email: { type: Boolean, default: true },
+            authenticator: { type: Boolean, default: false },
+        },
+        secret: { type: String, default: null },
+    },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
     lastLogin: { type: Date, default: null },
     active: { type: Boolean, default: true },
