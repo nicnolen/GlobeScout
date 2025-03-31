@@ -14,14 +14,18 @@ const ResetPassword = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.put('/reset-password', { password }, { withCredentials: true });
+            const response = await axios.patch('/reset-password', { password }, { withCredentials: true });
             setMessage('Password successfully reset.');
-            router.push('/login');
+            if (response.status === 200) {
+                setTimeout(() => router.push('/'), 1500);
+            }
         } catch (err: unknown) {
             const customMessage = 'Error resetting password';
             catchErrorHandler(err, customMessage, setMessage);
         }
     };
+
+    const isSuccessMessage = message && message.includes('successfully') ? 'text-green-500' : 'text-red-500';
 
     return (
         <div className="loginContainer">
@@ -46,13 +50,14 @@ const ResetPassword = () => {
                     >
                         Reset Password
                     </button>
+
+                    {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}
+                    <div className="mt-4 text-center">
+                        <Link href="/login" className="text-sm text-indigo-600 hover:underline">
+                            Back to Login
+                        </Link>
+                    </div>
                 </form>
-                {message && <p>{message}</p>}
-                <div className="mt-4 text-center">
-                    <Link href="/login" className="text-sm text-indigo-600 hover:underline">
-                        Back to Login
-                    </Link>
-                </div>
             </div>
         </div>
     );

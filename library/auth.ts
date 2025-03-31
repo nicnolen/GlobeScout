@@ -225,8 +225,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
             { _id: user._id },
             {
                 password: hashedPassword,
-                resetPasswordToken: null,
-                resetPasswordExpires: null,
+                $unset: { resetPasswordToken: '', resetPasswordExpires: '' },
             },
         );
 
@@ -253,6 +252,8 @@ export async function verify(req: Request, res: Response): Promise<void> {
         if (!decoded?.id) {
             res.status(403).json({ message: 'Invalid access token' });
             res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+            res.clearCookie('userRole');
             return;
         }
 
@@ -260,6 +261,8 @@ export async function verify(req: Request, res: Response): Promise<void> {
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+            res.clearCookie('userRole');
             return;
         }
 
@@ -275,6 +278,8 @@ export async function verify(req: Request, res: Response): Promise<void> {
         const customMessage = 'Error verifying the user';
         catchErrorHandler(err, customMessage);
         res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+        res.clearCookie('userRole');
         res.status(500).json({ message: customMessage, error: err });
     }
 }

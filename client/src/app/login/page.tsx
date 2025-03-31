@@ -44,6 +44,8 @@ const LoginPage = () => {
         }
     };
 
+    const isSuccessMessage = message && message.includes('successful') ? 'text-green-500' : 'text-red-500';
+
     return (
         <div className="loginContainer">
             <div className="card max-w-md w-full p-8">
@@ -75,13 +77,13 @@ const LoginPage = () => {
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                     </div>
-                    {message && <div className="text-red-500 text-sm mb-4">{message}</div>}
                     <button
                         type="submit"
                         className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
                     >
                         Login
                     </button>
+                    {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}
                     <div className="mt-4 text-center">
                         <Link href="/forgot" className="text-sm text-indigo-600 hover:underline">
                             Forgot Password?

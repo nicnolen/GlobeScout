@@ -14,6 +14,6 @@ router.post('/forgot', forgot);
 
 router.post('/logout', logout);
 
-router.put('/reset-password', resetPassword);
+router.patch('/reset-password', resetPassword);
 
 export default router;

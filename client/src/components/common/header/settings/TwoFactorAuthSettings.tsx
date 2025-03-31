@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../../../redux/selectors/usersSelectors';
+import { setUser } from '../../../../redux/slices/usersSlice';
 import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
 export default function TwoFactorSettings() {
@@ -11,6 +12,7 @@ export default function TwoFactorSettings() {
     const [isGoogleAuthEnabled, setIsGoogleAuthEnabled] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
+    const dispatch = useDispatch();
 
     const user = useSelector(selectUser);
 
@@ -27,6 +29,8 @@ export default function TwoFactorSettings() {
                 setIs2faEnabled(user.authentication.enabled);
                 if (user.authentication.enabled) {
                     setIsGoogleAuthEnabled(user.authentication.methods.authenticator);
+                } else {
+                    setMessage('2FA has been disabled');
                 }
 
                 setIsUpdating(false);
@@ -41,9 +45,23 @@ export default function TwoFactorSettings() {
 
     const toggle2fa = async (is2faEnabled: boolean) => {
         try {
+            setMessage('');
             setIsUpdating(true);
             const response = await axios.patch('/toggle-2fa', { is2faEnabled }, { withCredentials: true });
-            setMessage(response.data.message);
+
+            if (!response.data.message.includes('enabled')) {
+                setMessage(response.data.message);
+            }
+
+            const updatedUser = {
+                ...user,
+                authentication: {
+                    ...user.authentication,
+                    enabled: is2faEnabled,
+                },
+            };
+            dispatch(setUser(updatedUser));
+
             setIs2faEnabled(is2faEnabled);
             setIsUpdating(false);
         } catch (err: unknown) {
@@ -61,6 +79,7 @@ export default function TwoFactorSettings() {
                 { isGoogleAuthEnabled },
                 { withCredentials: true },
             );
+
             setMessage(response.data.message);
             setIsGoogleAuthEnabled(isGoogleAuthEnabled);
             setIsUpdating(false);
@@ -89,6 +108,7 @@ export default function TwoFactorSettings() {
                 {is2faEnabled && (
                     <div className="space-y-4">
                         <p className="text-sm">2FA is enabled. Choose your preferred method:</p>
+
                         <div className="space-y-2">
                             <div className="flex items-center justify-between p-2 border rounded">
                                 <span>Google Authenticator</span>

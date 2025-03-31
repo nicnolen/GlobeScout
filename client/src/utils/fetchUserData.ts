@@ -30,7 +30,7 @@ export async function fetchCurrentUser(dispatch: AppDispatch): Promise<void> {
         });
 
         if (data?.getCurrentUser) {
-            dispatch(setUser(data.user));
+            dispatch(setUser(data.getCurrentUser));
             return;
         }
     } catch (err: unknown) {

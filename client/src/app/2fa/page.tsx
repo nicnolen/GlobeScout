@@ -31,6 +31,8 @@ const TwoFactorSetup = () => {
         }
     };
 
+    const isSuccessfulAuth = message && message.includes('authenticated') ? 'text-green-500' : 'text-red-500';
+
     return (
         <div className="loginContainer">
             <div className="card max-w-md w-full p-8">
@@ -51,7 +53,7 @@ const TwoFactorSetup = () => {
                         <i className="fas fa-check-circle mr-1" /> Verify
                     </button>
                 </div>
-                {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
+                {message && <p className={`${isSuccessfulAuth} mt-4 text-sm text-center`}>{message}</p>}
             </div>
         </div>
     );
