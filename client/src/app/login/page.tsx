@@ -2,10 +2,8 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { fetchCurrentUser } from '../../utils/fetchUserData';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const LoginPage = () => {
@@ -13,7 +11,6 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState<string>('');
     const router = useRouter();
-    const dispatch = useDispatch();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -36,9 +33,9 @@ const LoginPage = () => {
                 const is2FA = response.data.message.includes('2FA');
                 if (is2FA) {
                     router.push('/2fa');
+                    return;
                 }
 
-                await fetchCurrentUser(dispatch);
                 router.push('/');
             }
         } catch (err: unknown) {
