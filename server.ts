@@ -10,6 +10,7 @@ import passport from './utils/passport';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import authRoutes from './routes/auth';
+import twoFactorRoutes from './routes/2fa';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
@@ -59,6 +60,7 @@ async function startServer(): Promise<void> {
 
         // Routes
         server.use('/', authRoutes);
+        server.use('/', twoFactorRoutes);
 
         // Catch all route to handle Next.js pages
         server.get('*', (req: Request, res: Response) => {

@@ -1,16 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchCurrentUser } from '../utils/fetchUserData';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 export const useFetchUserData = () => {
+    // Note: due to React strict mode, you will see this useEffect ran twice ONLY in development
     const dispatch = useDispatch();
-    const hasFetched = useRef(false); // make sure react strict mode doesn't run this twice
 
     useEffect(() => {
-        if (hasFetched.current) {
-            return;
-        }
         async function fetchUserData(): Promise<void> {
             try {
                 await fetchCurrentUser(dispatch);
@@ -21,6 +18,5 @@ export const useFetchUserData = () => {
         }
 
         fetchUserData();
-        hasFetched.current = true;
     }, []); // eslint-disable-line  react-hooks/exhaustive-deps
 };
