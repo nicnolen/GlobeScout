@@ -10,7 +10,6 @@ import passport from './utils/passport';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import authRoutes from './routes/auth';
-import usersRoutes from './routes/users';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
@@ -36,24 +35,30 @@ async function startServer(): Promise<void> {
 
         const apolloServer = await startApolloServer();
 
+        server.use(passport.initialize());
+
         // Middleware to parse JSON requests before Apollo Server
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
         server.use(cookieParser()); // Enable cookies for authentication
 
+        // Apply passport to graphql
+        server.use('/graphql', passport.authenticate('jwt', { session: false }));
+
         // Explicitly cast Apollo's middleware as an Express RequestHandler
-        const graphqlMiddleware = expressMiddleware(apolloServer) as unknown as RequestHandler;
+        const graphqlMiddleware = expressMiddleware(apolloServer, {
+            context: async ({ req }) => {
+                return { user: req.user || null };
+            },
+        }) as unknown as RequestHandler;
         // Apply Apollo Server middleware to the Express app
         server.use('/graphql', graphqlMiddleware);
 
         // Serve static files from the `client/public` folder
         server.use(express.static(path.join(__dirname, 'client', 'public')));
 
-        server.use(passport.initialize());
-
         // Routes
         server.use('/', authRoutes);
-        server.use('/users', usersRoutes);
 
         // Catch all route to handle Next.js pages
         server.get('*', (req: Request, res: Response) => {

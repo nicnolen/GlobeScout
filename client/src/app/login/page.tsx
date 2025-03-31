@@ -30,10 +30,14 @@ const LoginPage = () => {
         try {
             const response = await axios.post('/login', { email, password }, { withCredentials: true });
 
-            if (response.status === 200) {
-                setMessage('Login successful');
+            setMessage(response.data.message);
 
-                // Fetch the user data from /users/user route
+            if (response.status === 200) {
+                const is2FA = response.data.message.includes('2FA');
+                if (is2FA) {
+                    router.push('/2fa');
+                }
+
                 await fetchCurrentUser(dispatch);
                 router.push('/');
             }

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { UserData } from '../../../types/users';
+import client from '../config/graphQL/apolloClient';
+import { GET_CURRENT_USER } from '../graphQL/usersQueries';
 import { AppDispatch } from '../redux/store';
 import { setUser } from '../redux/slices/usersSlice';
 import { catchErrorHandler } from '../utils/errorHandlers';
@@ -23,9 +24,12 @@ export async function fetchCurrentUser(dispatch: AppDispatch): Promise<void> {
             return;
         }
 
-        const { data, status } = await axios.get<{ user: UserData }>('/users/user', { withCredentials: true });
+        const { data } = await client.query({
+            query: GET_CURRENT_USER,
+            fetchPolicy: 'no-cache',
+        });
 
-        if (status === 200 && data?.user) {
+        if (data?.getCurrentUser) {
             dispatch(setUser(data.user));
             return;
         }

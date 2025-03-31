@@ -3,12 +3,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { fetchCurrentUser } from '../../utils/fetchUserData';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 const TwoFactorSetup = () => {
     const [code, setCode] = useState<string>('');
     const [message, setMessage] = useState<string | null>(null);
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const handleVerifyCode = async () => {
         try {
@@ -20,8 +23,11 @@ const TwoFactorSetup = () => {
                 },
             );
 
+            setMessage(response.data.message);
+
             if (response.status === 200) {
-                setMessage('2FA setup successful!');
+                await fetchCurrentUser(dispatch);
+                router.push('/');
                 setTimeout(() => router.push('/'), 1500);
             }
         } catch (err: unknown) {
