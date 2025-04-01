@@ -54,7 +54,7 @@ export default function SettingsDropdown(): JSX.Element {
             </div>
 
             <div className="mt-4">
-                <button onClick={handleLogout} className="button text-sm dangerButton">
+                <button onClick={handleLogout} className="button dangerButton text-sm">
                     Logout
                 </button>
             </div>

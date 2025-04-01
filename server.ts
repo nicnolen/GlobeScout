@@ -24,6 +24,16 @@ const app = next({ dev, dir: './client' });
 // Tell Express how to handle incoming requests to server Next.js pages
 const handle = app.getRequestHandler();
 
+const apiKeys = {
+    openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+};
+
+const apiBaseUrls = {
+    openWeatherUrl: process.env.OPENWEATHER_BASE_URL,
+    googleMapsTextSearchUrl: process.env.GOOGLE_MAPS_TEXT_SEARCH_URL,
+};
+
 // Connect to MongoDB
 connectToMongoDB();
 
@@ -36,12 +46,12 @@ async function startServer(): Promise<void> {
 
         const apolloServer = await startApolloServer();
 
-        server.use(passport.initialize());
-
         // Middleware to parse JSON requests before Apollo Server
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
         server.use(cookieParser()); // Enable cookies for authentication
+
+        server.use(passport.initialize());
 
         // Apply passport to graphql
         server.use('/graphql', passport.authenticate('jwt', { session: false }));
@@ -49,7 +59,7 @@ async function startServer(): Promise<void> {
         // Explicitly cast Apollo's middleware as an Express RequestHandler
         const graphqlMiddleware = expressMiddleware(apolloServer, {
             context: async ({ req }) => {
-                return { user: req.user || null };
+                return { user: req.user || null, apiKeys: apiKeys || null, apiBaseUrls: apiBaseUrls || null };
             },
         }) as unknown as RequestHandler;
         // Apply Apollo Server middleware to the Express app

@@ -61,7 +61,7 @@ const LoginPage = () => {
                             value={email}
                             onChange={handleEmailChange}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="input mt-1"
                         />
                     </div>
                     <div className="mb-6">
@@ -74,13 +74,10 @@ const LoginPage = () => {
                             value={password}
                             onChange={handlePasswordChange}
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="input mt-1"
                         />
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                    >
+                    <button type="submit" className="button primaryButton w-full">
                         Login
                     </button>
                     {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}

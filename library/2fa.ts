@@ -201,7 +201,7 @@ export async function validate2fa(req: Request, res: Response): Promise<void> {
 
         // If emailed code was invalid, check authenticator code
         if (methods.authenticator) {
-            if (authenticatorSecret) {
+            if (!authenticatorSecret) {
                 res.status(401).json({ message: 'No authenticator secret was found' });
                 return;
             }

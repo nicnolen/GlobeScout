@@ -69,11 +69,8 @@ export default function TopPlacesList({
                                     >
                                         {openNow}
                                     </span>
-                                    <button
-                                        onClick={toggleDropdown}
-                                        className="ml-2 text-blue-600 font-semibold focus:outline-none"
-                                    >
-                                        ({isDropdownOpen ? 'Hide Hours' : 'Show Hours'})
+                                    <button onClick={toggleDropdown} className="button primaryButton ml-2">
+                                        {isDropdownOpen ? 'Hide Hours' : 'Show Hours'}
                                     </button>
                                 </div>
                             )}

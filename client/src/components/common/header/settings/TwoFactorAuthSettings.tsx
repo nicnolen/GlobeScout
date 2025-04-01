@@ -116,7 +116,7 @@ export default function TwoFactorSettings() {
                                 />
                                 {!isGoogleAuthEnabled && (
                                     <button
-                                        className="ml-2 text-blue-500 hover:text-blue-700"
+                                        className="button primaryButton"
                                         onClick={() => toggle2faMethod(true)}
                                         disabled={isUpdating}
                                     >

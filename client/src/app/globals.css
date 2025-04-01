@@ -18,7 +18,7 @@ body {
 
 /* Link Styles */
 .link {
-    @apply text-blue-500 hover:underline cursor-pointer;
+    @apply text-blue-600 hover:underline cursor-pointer;
 }
 
 .disabledLink {
@@ -39,9 +39,14 @@ body {
     @apply text-3xl font-semibold text-gray-800 mb-6;
 }
 
+/* Components */
+.input {
+    @apply w-full border border-gray-300 bg-white p-2 px-4 shadow-sm rounded-md mr-2.5;
+}
+
 /* Button Styles */
 .button {
-    @apply flex items-center justify-center rounded-md cursor-pointer border-none transition-all transform active:scale-95;
+    @apply flex items-center justify-center rounded-md cursor-pointer border-none transition-all transform active:scale-95 disabled:opacity-50;
 }
 
 /* Button Colors */

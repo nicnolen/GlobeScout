@@ -15,15 +15,11 @@ import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dayjs.extend(utc);
 
-const API_KEY: string | undefined = process.env.OPENWEATHER_API_KEY;
-const BASE_URL: string | undefined = process.env.OPENWEATHER_BASE_URL;
-
-if (!API_KEY) {
-    throw new Error('OpenWeatherMap Error: API Key is missing.');
-}
-
-if (!BASE_URL) {
-    throw new Error('OpenWeatherMap Error: Base URL is missing.');
+interface GetWeatherProps {
+    location: string;
+    units: Units;
+    openWeatherApiKey: string;
+    openWeatherUrl: string;
 }
 
 interface DailyForecastAccumulator {
@@ -38,8 +34,21 @@ interface DailyForecastAccumulator {
     maxTemperature: number;
 }
 
-export async function getCurrentWeather(location: string, units: Units): Promise<Weather> {
+export async function getCurrentWeather(
+    location: string,
+    units: string,
+    openWeatherApiKey: string,
+    openWeatherUrl: string,
+): Promise<Weather> {
     try {
+        if (!openWeatherApiKey) {
+            throw new Error('OpenWeatherMap Error: API Key is missing.');
+        }
+
+        if (!openWeatherUrl) {
+            throw new Error('OpenWeatherMap Error: Base URL is missing.');
+        }
+
         if (!location) {
             throw new Error('getCurrentWeather: location can not be empty.');
         }
@@ -60,7 +69,7 @@ export async function getCurrentWeather(location: string, units: Units): Promise
         }
 
         const response = await axios.get<CurrentWeatherResponse>(
-            `${process.env.OPENWEATHER_BASE_URL}/weather?q=${location}&appid=${API_KEY}&units=${units}`,
+            `${openWeatherUrl}/weather?q=${location}&appid=${openWeatherApiKey}&units=${units}`,
         );
 
         const { weather, main, wind, sys, visibility } = response.data;
@@ -100,8 +109,21 @@ export async function getCurrentWeather(location: string, units: Units): Promise
     }
 }
 
-export async function getFiveDayForecast(location: string, units: Units): Promise<FiveDayForecast> {
+export async function getFiveDayForecast({
+    location,
+    units,
+    openWeatherApiKey,
+    openWeatherUrl,
+}: GetWeatherProps): Promise<FiveDayForecast> {
     try {
+        if (!openWeatherApiKey) {
+            throw new Error('OpenWeatherMap Error: API Key is missing.');
+        }
+
+        if (!openWeatherUrl) {
+            throw new Error('OpenWeatherMap Error: Base URL is missing.');
+        }
+
         if (!location) {
             throw new Error('getCurrentWeather: location can not be empty.');
         }
@@ -127,7 +149,7 @@ export async function getFiveDayForecast(location: string, units: Units): Promis
 
         // Fetch the 5-day forecast from OpenWeather API
         const response = await axios.get<FiveDayForecastResponse>(
-            `${BASE_URL}/forecast?q=${location}&appid=${API_KEY}&units=${units}`,
+            `${openWeatherUrl}/forecast?q=${location}&appid=${openWeatherApiKey}&units=${units}`,
         );
 
         const { list } = response.data;

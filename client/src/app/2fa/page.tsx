@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, JSX } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-export default function TwoFactorSetup() {
+export default function TwoFactorSetup(): JSX.Element {
     const [code, setCode] = useState<string>('');
-    const [message, setMessage] = useState<string | null>(null);
-    const [emailSent, setEmailSent] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
-    const handleVerifyCode = async () => {
+    async function handleValidateCode(): Promise<void> {
         try {
-            const response = await axios.post(
+            setLoading(true);
+            const response = await axios.post<{ message: string }>(
                 '/validate-2fa',
-                { code: code },
+                { code },
                 {
                     withCredentials: true,
                 },
@@ -25,24 +26,29 @@ export default function TwoFactorSetup() {
 
             if (response.status === 200) {
                 setTimeout(() => router.push('/'), 1500);
+                setLoading(false);
             }
         } catch (err: unknown) {
             const customMessage = 'Error starting server';
             catchErrorHandler(err, customMessage, setMessage);
+            setLoading(false);
         }
-    };
+    }
 
-    const handleEmailCode = async () => {
+    async function handleEmailCode(): Promise<void> {
         try {
-            const response = await axios.post('/email-2fa-code', {}, { withCredentials: true });
+            setLoading(true);
+            setMessage('');
+            const response = await axios.post<{ message: string }>('/email-2fa-code', {}, { withCredentials: true });
 
             setMessage(response.data.message);
-            setEmailSent(true);
+            setLoading(false);
         } catch (err: unknown) {
             const customMessage = 'Error sending backup code';
             catchErrorHandler(err, customMessage, setMessage);
+            setLoading(false);
         }
-    };
+    }
 
     const isSuccessfulAuth = message && message.includes('authenticated') ? 'text-green-500' : 'text-red-500';
 
@@ -57,22 +63,40 @@ export default function TwoFactorSetup() {
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         placeholder="Enter code"
-                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="input"
                     />
                     <button
-                        onClick={handleVerifyCode}
-                        className="px-4 py-2 bg-blue-600 text-white text-nowrap rounded-lg hover:bg-blue-700 transition"
+                        onClick={handleValidateCode}
+                        disabled={loading}
+                        className="button primaryButton text-nowrap"
                     >
-                        <i className="fas fa-check-circle mr-1" /> Verify
+                        {loading ? (
+                            <>
+                                <i className="fas fa-spinner fa-spin me-2 text-primary" />
+                                <span>Verifying Code</span>
+                            </>
+                        ) : (
+                            <>
+                                <i className="fas fa-check-circle me-1" />
+                                <span>Verify</span>
+                            </>
+                        )}
                     </button>
                 </div>
                 {message && <p className={`${isSuccessfulAuth} mt-4 text-sm text-center`}>{message}</p>}
                 <button
                     onClick={handleEmailCode}
-                    disabled={emailSent}
-                    className="mt-4 text-blue-600 underline text-sm disabled:opacity-50"
+                    disabled={loading}
+                    className="button mt-4 w-full text-blue-600 text-sm hover:underline disabled:no-underline disabled:pointer-events-none"
                 >
-                    {emailSent ? 'Backup code sent!' : 'Lost access to your app? Get a backup code via email'}
+                    {loading ? (
+                        <>
+                            <i className="fa fa-spinner fa-spin mr-2 text-blue-600" />
+                            <span>Sending Email</span>
+                        </>
+                    ) : (
+                        'Lost access to your app? Get a backup code via email'
+                    )}
                 </button>
             </div>
         </div>
