@@ -113,11 +113,11 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
             return;
         }
 
-        // Disable Google Authenticator method
+        // Disable Authenticator method
         if (!isGoogleAuthEnabled && methods.authenticator) {
             await update2FAMethod('authenticator', false);
 
-            res.status(200).json({ message: 'Google Authenticator has been disabled.' });
+            res.status(200).json({ message: 'Authenticator has been disabled.' });
             return;
         }
     } catch (err: unknown) {
