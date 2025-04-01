@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { FiveDayForecastResponse, Units } from '../types/weather';
+import { FiveDayForecastResponse, Units } from '../../types/weather';
 
 interface FiveDayForecastCacheDocument extends Document {
     location: string;

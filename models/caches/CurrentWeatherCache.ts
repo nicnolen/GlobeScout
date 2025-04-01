@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { CurrentWeatherResponse, Units } from '../types/weather';
+import { CurrentWeatherResponse, Units } from '../../types/weather';
 
 interface CurrentWeatherCacheDocument extends Document {
     location: string;

@@ -2,19 +2,15 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { PlaceProps, PlaceResponse } from '../../types/googleMaps';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
-import TopTenPlacesCacheModel from '../../models/TopTenPlacesCache';
+import TopTenPlacesCacheModel from '../../models/caches/TopTenPlacesCache';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dotenv.config();
 
-const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-
-if (!GOOGLE_MAPS_API_KEY) {
-    throw new Error('Google Maps Error: Google Maps API key is missing.');
-}
-
 interface TopTenPlacesParams {
     locationSearch: string;
+    googleMapsApiKey: string;
+    googleMapsTextSearchUrl: string;
 }
 
 enum BusinessStatus {
@@ -37,8 +33,20 @@ enum ParkingOptions {
 /* QUERY RESOLVER FUNCTIONS */
 
 // Resolver function for fetching top-rated places
-export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): Promise<PlaceProps[]> {
+export async function getTopTenPlaces({
+    locationSearch,
+    googleMapsApiKey,
+    googleMapsTextSearchUrl,
+}: TopTenPlacesParams): Promise<PlaceProps[]> {
     try {
+        if (!googleMapsApiKey) {
+            throw new Error('Google Maps Error: Google Maps API key is missing.');
+        }
+
+        if (!googleMapsTextSearchUrl) {
+            throw new Error('Google Maps Error: Google Maps text search URL is missing.');
+        }
+
         if (!locationSearch) {
             throw new Error('getTopTenPlaces Error: locationSearch can not be empty');
         }
@@ -54,23 +62,17 @@ export async function getTopTenPlaces({ locationSearch }: TopTenPlacesParams): P
             return cachedTopTenPlaces.topTenPlaces;
         }
 
-        const GOOGLE_MAPS_TEXT_SEARCH_URL = process.env.GOOGLE_MAPS_TEXT_SEARCH_URL;
-
-        if (!GOOGLE_MAPS_TEXT_SEARCH_URL) {
-            throw new Error('Google Maps Text Search Error: Base URL is missing.');
-        }
-
         // Create the dynamic query for Google Places API
         const textQuery = `Top rated places in ${locationSearch}`;
 
         // Send request to Google Places API
         const response = await axios.post(
-            GOOGLE_MAPS_TEXT_SEARCH_URL,
+            googleMapsTextSearchUrl,
             { textQuery },
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
+                    'X-Goog-Api-Key': googleMapsApiKey,
                     'X-Goog-FieldMask':
                         'places.displayName,places.formattedAddress,places.generativeSummary,places.primaryTypeDisplayName,places.rating,places.location,places.priceLevel,places.userRatingCount,places.websiteUri,places.businessStatus,places.nationalPhoneNumber,places.regularOpeningHours,places.timeZone,places.parkingOptions',
                 },

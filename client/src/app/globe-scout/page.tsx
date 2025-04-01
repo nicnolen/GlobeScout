@@ -46,9 +46,11 @@ export default function GlobeScout(): JSX.Element {
     };
 
     return (
-        <div>
+        <div className="w-full">
+            {/* Conditionally render the title if location is available */}
             {location && <GlobeScoutTitle location={location} message={message} />}
 
+            {/* Search bar and weather button */}
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
                 <GlobeScoutSearchbar location={location} />
 
@@ -61,6 +63,7 @@ export default function GlobeScout(): JSX.Element {
                 )}
             </form>
 
+            {/* Places List */}
             <div>
                 {topTenPlacesLoading ? (
                     <p>Loading top places...</p>

@@ -86,8 +86,8 @@ export interface FiveDayForecastResponse {
     message: number;
     cnt: number;
     list: Array<{
-        sunset: any;
-        sunrise: any;
+        sunset: number;
+        sunrise: number;
         dt: number;
         main: {
             temp: number;

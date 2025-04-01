@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { PlaceProps } from '../../types/googleMaps';
-import TopTenPlacesCache from '../../models/TopTenPlacesCache';
+import TopTenPlacesCache from '../../models/caches/TopTenPlacesCache';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
 import { catchErrorHandler } from '../errorHandlers';
 
@@ -65,10 +65,9 @@ export function scheduleUpdateTopTenPlacesOpenNowStatus(): void {
             }
 
             console.info('openNow status update complete');
-        } catch (error) {
-            console.error('Error in cron job to update openNow status:', error);
-            const customMessage = `Error running cron job for openNow status update: ${error}`;
-            catchErrorHandler(error, customMessage);
+        } catch (err: unknown) {
+            const customMessage = 'Error running cron job for openNow status update';
+            catchErrorHandler(err, customMessage);
         }
     });
 }
