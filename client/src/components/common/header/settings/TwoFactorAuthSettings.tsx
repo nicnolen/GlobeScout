@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSX } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../../../redux/selectors/usersSelectors';
 import { setUser } from '../../../../redux/slices/usersSlice';
 import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
-export default function TwoFactorSettings() {
+export default function TwoFactorSettings(): JSX.Element {
     const [is2faEnabled, setIs2faEnabled] = useState<boolean>(false);
     const [isGoogleAuthEnabled, setIsGoogleAuthEnabled] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);

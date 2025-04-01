@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, JSX } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-const ResetPassword = () => {
+export default function ResetPassword(): JSX.Element {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const router = useRouter();
@@ -45,7 +45,7 @@ const ResetPassword = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="w-fullbutton primaryButton">
+                    <button type="submit" className="w-full button primaryButton">
                         Reset Password
                     </button>
 
@@ -59,6 +59,4 @@ const ResetPassword = () => {
             </div>
         </div>
     );
-};
-
-export default ResetPassword;
+}

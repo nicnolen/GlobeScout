@@ -90,7 +90,6 @@ async function startServer(): Promise<void> {
 
         https.createServer(options, server).listen(PORT, () => {
             console.info(`Server is running on https://localhost:${PORT}`);
-            console.info(`GraphQL endpoint available at https://localhost:${PORT}/graphql`);
         });
     } catch (err: unknown) {
         const customMessage = 'Error starting server';

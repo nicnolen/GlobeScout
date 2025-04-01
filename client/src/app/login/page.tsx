@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, JSX } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-const LoginPage = () => {
+export default function LoginPage(): JSX.Element {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState<string>('');
@@ -90,6 +90,4 @@ const LoginPage = () => {
             </div>
         </div>
     );
-};
-
-export default LoginPage;
+}

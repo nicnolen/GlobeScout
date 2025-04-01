@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, JSX } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-const ResetPasswordPage = () => {
+export default function ResetPasswordPage(): JSX.Element {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState<string>('');
 
@@ -49,10 +49,7 @@ const ResetPasswordPage = () => {
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                    >
+                    <button type="submit" className="w-full button primaryButton">
                         Send Reset Link
                     </button>
                     {message && <div className={`${isEmailSent} text-sm text-center my-4`}>{message}</div>}
@@ -65,6 +62,4 @@ const ResetPasswordPage = () => {
             </div>
         </div>
     );
-};
-
-export default ResetPasswordPage;
+}

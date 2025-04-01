@@ -1,9 +1,10 @@
 'use client';
 
+import React, { JSX } from 'react';
 import { usePathname } from 'next/navigation';
 import NavBar from './NavBar';
 
-const NavBarWrapper = () => {
+export default function NavBarWrapper(): JSX.Element {
     const pathname = usePathname();
 
     // Define the pages where NavBar should NOT be displayed
@@ -18,6 +19,4 @@ const NavBarWrapper = () => {
             <NavBar />
         </div>
     );
-};
-
-export default NavBarWrapper;
+}
