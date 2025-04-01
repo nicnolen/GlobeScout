@@ -63,7 +63,7 @@ async function startServer(): Promise<void> {
         server.use('/', twoFactorRoutes);
 
         // Catch all route to handle Next.js pages
-        server.get('*', (req: Request, res: Response) => {
+        server.get(/(.*)/, (req: Request, res: Response) => {
             return handle(req, res);
         });
 
