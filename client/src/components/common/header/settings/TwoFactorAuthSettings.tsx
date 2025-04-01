@@ -27,9 +27,8 @@ export default function TwoFactorSettings() {
                 }
 
                 setIs2faEnabled(user.authentication.enabled);
-                if (user.authentication.enabled) {
-                    setIsGoogleAuthEnabled(user.authentication.methods.authenticator);
-                } else {
+                setIsGoogleAuthEnabled(user.authentication.methods.authenticator);
+                if (!user.authentication.enabled) {
                     setMessage('2FA has been disabled');
                 }
 

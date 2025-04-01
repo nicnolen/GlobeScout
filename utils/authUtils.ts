@@ -76,3 +76,8 @@ export async function refreshAccessToken(req: Request): Promise<string | void> {
         return;
     }
 }
+
+// Function to generate a random 6-digit authentication code
+export function generateAuthCode() {
+    return crypto.randomInt(100000, 999999).toString();
+}

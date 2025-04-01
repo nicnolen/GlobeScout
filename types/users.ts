@@ -15,7 +15,9 @@ export interface UserData {
             email: boolean;
             authenticator: boolean;
         };
-        secret: string;
+        authenticatorSecret: string;
+        emailCode: string;
+        emailCodeExpiration: Date;
     };
     services: {
         openWeatherApi: { requestsMade: number; maxRequests: number };

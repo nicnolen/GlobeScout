@@ -5,9 +5,10 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-const TwoFactorSetup = () => {
+export default function TwoFactorSetup() {
     const [code, setCode] = useState<string>('');
     const [message, setMessage] = useState<string | null>(null);
+    const [emailSent, setEmailSent] = useState<boolean>(false);
     const router = useRouter();
 
     const handleVerifyCode = async () => {
@@ -27,6 +28,18 @@ const TwoFactorSetup = () => {
             }
         } catch (err: unknown) {
             const customMessage = 'Error starting server';
+            catchErrorHandler(err, customMessage, setMessage);
+        }
+    };
+
+    const handleEmailCode = async () => {
+        try {
+            const response = await axios.post('/email-2fa-code', {}, { withCredentials: true });
+
+            setMessage(response.data.message);
+            setEmailSent(true);
+        } catch (err: unknown) {
+            const customMessage = 'Error sending backup code';
             catchErrorHandler(err, customMessage, setMessage);
         }
     };
@@ -54,9 +67,14 @@ const TwoFactorSetup = () => {
                     </button>
                 </div>
                 {message && <p className={`${isSuccessfulAuth} mt-4 text-sm text-center`}>{message}</p>}
+                <button
+                    onClick={handleEmailCode}
+                    disabled={emailSent}
+                    className="mt-4 text-blue-600 underline text-sm disabled:opacity-50"
+                >
+                    {emailSent ? 'Backup code sent!' : 'Lost access to your app? Get a backup code via email'}
+                </button>
             </div>
         </div>
     );
-};
-
-export default TwoFactorSetup;
+}

@@ -3,6 +3,7 @@ import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import Users, { UsersDocument } from '../models/users/Users';
 import { cookieOptions } from '../utils/helpers/authHelpers';
+import { generateAuthCode } from '../utils/authUtils';
 import { sendMail } from '../utils/nodemailer';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
@@ -53,13 +54,18 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
         }
 
         async function update2FAMethod(method: string, isEnabled: boolean) {
-            const updateData: Record<string, boolean | null> = { [`authentication.methods.${method}`]: isEnabled };
+            const updateData: Record<string, boolean> = { [`authentication.methods.${method}`]: isEnabled };
 
-            // Only update the secret for authenticator method
+            // If the method is 'authenticator' and it's being disabled, remove the authenticatorSecret
             if (method === 'authenticator' && !isEnabled) {
-                updateData['authentication.secret'] = null;
+                return await Users.findOneAndUpdate(
+                    { _id: user.id },
+                    { $set: updateData, $unset: { 'authentication.authenticatorSecret': '' } },
+                    { new: true },
+                );
             }
 
+            // Otherwise, just update the methods field
             return await Users.findOneAndUpdate({ _id: user.id }, { $set: updateData }, { new: true });
         }
 
@@ -80,15 +86,20 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
                 return;
             }
 
+            const updatedUser = await Users.findOneAndUpdate(
+                { email: user.email },
+                { 'authentication.authenticatorSecret': secret.base32 },
+                { new: true },
+            );
+
+            if (!updatedUser) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+
             const to = user.email;
             const subject = 'Your 2FA Setup QR Code';
             const html = `<p>Scan this QR code with your authentication app (Google Authenticator, Microsoft Authenticator, etc.) to enable 2FA:</p><img src="cid:qr-code-image" />`;
-
-            await Users.findOneAndUpdate(
-                { email: user.email },
-                { 'authentication.secret': secret.base32 },
-                { new: true },
-            );
 
             await sendMail(to, subject, html, qrCodeImage);
         }
@@ -116,6 +127,41 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
     }
 }
 
+export async function email2faCode(req: Request, res: Response): Promise<void> {
+    const user = req.user as UsersDocument;
+
+    try {
+        const authCode = generateAuthCode();
+        const emailCodeExpirationTime = new Date(Date.now() + 10 * 60 * 1000); // Code expires in 10 minutes
+
+        const updatedUser = await Users.findOneAndUpdate(
+            { _id: user.id },
+            {
+                'authentication.emailCode': authCode,
+                'authentication.emailCodeExpiration': emailCodeExpirationTime,
+            },
+            { new: true },
+        );
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        const to = user.email;
+        const subject = 'Your Authentication Code';
+        const html = `Your authentication code is: ${authCode}. This code will expire in 10 minutes.`;
+
+        await sendMail(to, subject, html);
+
+        res.status(200).json({ message: 'Backup code sent to your email.' });
+    } catch (err: unknown) {
+        const customMessage = 'Error sending backup code';
+        catchErrorHandler(err, customMessage);
+        res.status(500).json({ message: customMessage, error: err });
+    }
+}
+
 export async function validate2fa(req: Request, res: Response): Promise<void> {
     const { code } = req.body;
     const user = req.user as UsersDocument;
@@ -126,33 +172,60 @@ export async function validate2fa(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        if (!user.authentication.secret) {
-            res.status(401).json({ message: 'No secret was found' });
-            return;
-        }
-
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
 
-        const verified = speakeasy.totp.verify({
-            secret: user.authentication.secret,
-            encoding: 'base32',
-            token: code,
-        });
+        const { emailCode, emailCodeExpiration, methods, authenticatorSecret } = user.authentication;
 
-        if (!verified) {
-            res.status(401).json({ message: 'Invalid 2FA code' });
+        // Check if email code is being used
+        if (emailCode && emailCodeExpiration > new Date() && emailCode === code) {
+            await Users.findOneAndUpdate(
+                { _id: user.id },
+                {
+                    $unset: {
+                        'authentication.emailCode': '',
+                        'authentication.emailCodeExpiration': '',
+                    },
+                },
+            );
+
+            const userRoleTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+            const userRoleTokenCookieOptions = cookieOptions(userRoleTokenMaxAge);
+
+            res.cookie('userRole', user.role, userRoleTokenCookieOptions);
+            res.status(200).json({ message: 'User authenticated' });
             return;
         }
 
-        const userRoleTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        const userRoleTokenCookieOptions = cookieOptions(userRoleTokenMaxAge);
+        // If emailed code was invalid, check authenticator code
+        if (methods.authenticator) {
+            if (authenticatorSecret) {
+                res.status(401).json({ message: 'No authenticator secret was found' });
+                return;
+            }
 
-        res.cookie('userRole', user.role, userRoleTokenCookieOptions);
-        res.status(200).json({ message: 'User authenticated' });
-        return;
+            const verified = speakeasy.totp.verify({
+                secret: user.authentication.authenticatorSecret,
+                encoding: 'base32',
+                token: code,
+            });
+
+            if (!verified) {
+                res.status(401).json({ message: 'Invalid 2FA code' });
+                return;
+            }
+
+            const userRoleTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+            const userRoleTokenCookieOptions = cookieOptions(userRoleTokenMaxAge);
+
+            res.cookie('userRole', user.role, userRoleTokenCookieOptions);
+            res.status(200).json({ message: 'User authenticated' });
+            return;
+        }
+
+        res.status(401).json({ message: 'Invalid code' });
     } catch (err: unknown) {
         const customMessage = 'Error verifying 2FA';
         catchErrorHandler(err, customMessage);

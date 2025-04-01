@@ -7,7 +7,7 @@ export const GET_USERS = `
   type Authentication {
     enabled: Boolean
     methods: AuthMethods
-    secret: String
+    authenticatorSecret: String
   }
 
   type ServiceUsage {
