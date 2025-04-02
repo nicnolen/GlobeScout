@@ -31,5 +31,6 @@ export const GET_USERS = `
 
   type Query {
     getCurrentUser: User
+    getAllUsers: [User]
   }
 `;

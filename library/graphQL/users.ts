@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { UserData } from '../../types/users';
-import { UsersDocument } from '../../models/users/Users';
+import Users, { UsersDocument } from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export async function getCurrentUser(user: UsersDocument | null): Promise<UserData> {
@@ -28,6 +28,23 @@ export async function getCurrentUser(user: UsersDocument | null): Promise<UserDa
     } catch (err: unknown) {
         const customMessage = 'Error fetching places from Google Maps text search';
         catchErrorHandler(err, customMessage);
+        throw err;
+    }
+}
+
+export async function getAllUsers(): Promise<UserData[]> {
+    try {
+        const users = await Users.find();
+        return users.map((user) => ({
+            email: user.email,
+            role: user.role,
+            lastLogin: user.lastLogin,
+            active: user.active,
+            authentication: user.authentication,
+            services: user.services,
+        }));
+    } catch (err: unknown) {
+        catchErrorHandler(err, 'Error fetching users');
         throw err;
     }
 }
