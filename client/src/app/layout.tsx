@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import ApolloProviderWrapper from '../config/graphQL/ApolloProviderWrapper';
 import ReduxProviderWrapper from '../config/redux/reduxProviderWrapper';
-import NavBarWrapper from '../components/common/header/NavBar/NavBarWrapper';
+import NavBarWrapper from '../components/common/header/navBar/NavBarWrapper';
 import Footer from '../components/common/Footer';
 import './globals.css';
 
