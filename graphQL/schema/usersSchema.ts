@@ -33,3 +33,38 @@ export const GET_USERS = `
     getAllUsers: [User]
   }
 `;
+
+export const EDIT_USERS = `
+  input AuthMethodsInput {
+    email: Boolean
+    authenticator: Boolean
+  }
+
+  input AuthenticationInput {
+    enabled: Boolean!
+    methods: AuthMethodsInput!
+  }
+
+  input ServiceUsageInput {
+    requestsMade: Int
+    maxRequests: Int
+  }
+
+  input ServicesInput {
+    openWeatherApi: ServiceUsageInput
+    googleMapsApi: ServiceUsageInput
+  }
+
+  input EditUserInput {
+    email: String
+    role: String
+    active: Boolean
+    authentication: AuthenticationInput
+    services: ServicesInput
+  }
+
+  type Mutation {
+    editUser(email: String!, input: EditUserInput!): User
+    deleteUser(email: String!): User
+  }
+`;

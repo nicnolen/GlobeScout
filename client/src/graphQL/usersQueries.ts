@@ -55,3 +55,30 @@ export const GET_ALL_USERS = gql`
         }
     }
 `;
+
+export const EDIT_USER = gql`
+    mutation EditUser($email: String!, $input: EditUserInput!) {
+        editUser(email: $email, input: $input) {
+            email
+            role
+            active
+            authentication {
+                enabled
+                methods {
+                    email
+                    authenticator
+                }
+            }
+            services {
+                openWeatherApi {
+                    requestsMade
+                    maxRequests
+                }
+                googleMapsApi {
+                    requestsMade
+                    maxRequests
+                }
+            }
+        }
+    }
+`;
