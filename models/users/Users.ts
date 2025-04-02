@@ -25,7 +25,7 @@ const UsersSchema = new Schema<UsersDocument>({
         emailCodeExpiration: { type: Date },
     },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
-    lastLogin: { type: Date, default: null },
+    lastLogin: { type: String, default: 'Never' },
     active: { type: Boolean, default: true },
     services: {
         openWeatherApi: { requestsMade: { type: Number, default: 0 }, maxRequests: { type: Number, default: 100 } },

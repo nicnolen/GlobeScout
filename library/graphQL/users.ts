@@ -11,19 +11,23 @@ export async function getCurrentUser(user: UsersDocument | null): Promise<UserDa
             });
         }
 
-        if (!user.active) {
+        const { email, role, lastLogin, active, authentication, services } = user;
+
+        if (!active) {
             throw new GraphQLError('User account is inactive', {
                 extensions: { code: 'FORBIDDEN' },
             });
         }
 
+        const { authenticatorSecret, ...filteredAuth } = authentication;
+
         return {
-            email: user.email,
-            role: user.role,
-            lastLogin: user.lastLogin,
-            active: user.active,
-            authentication: user.authentication,
-            services: user.services,
+            email: email,
+            role: role,
+            lastLogin: lastLogin,
+            active: active,
+            authentication: filteredAuth,
+            services: services,
         };
     } catch (err: unknown) {
         const customMessage = 'Error fetching places from Google Maps text search';
@@ -35,14 +39,19 @@ export async function getCurrentUser(user: UsersDocument | null): Promise<UserDa
 export async function getAllUsers(): Promise<UserData[]> {
     try {
         const users = await Users.find();
-        return users.map((user) => ({
-            email: user.email,
-            role: user.role,
-            lastLogin: user.lastLogin,
-            active: user.active,
-            authentication: user.authentication,
-            services: user.services,
-        }));
+
+        return users.map((user) => {
+            const { authenticatorSecret, ...authenticationWithoutSecret } = user.authentication;
+
+            return {
+                email: user.email,
+                role: user.role,
+                lastLogin: user.lastLogin,
+                active: user.active,
+                authentication: authenticationWithoutSecret,
+                services: user.services,
+            };
+        });
     } catch (err: unknown) {
         catchErrorHandler(err, 'Error fetching users');
         throw err;

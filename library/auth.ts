@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import Users from '../models/users/Users';
 import { createAccessToken, createRefreshToken, createResetToken } from '../utils/authUtils';
 import { cookieOptions } from '../utils/helpers/authHelpers';
@@ -9,6 +11,8 @@ import { sendMail } from '../utils/nodemailer';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
+
+dayjs.extend(utc);
 
 // Register User
 export async function register(req: Request, res: Response): Promise<void> {
@@ -58,7 +62,8 @@ export async function login(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date(), active: true }, { new: true });
+        const lastLogin = dayjs.utc().format('MM/DD/YYYY h:mm A');
+        const user = await Users.findOneAndUpdate({ email }, { lastLogin: lastLogin, active: true }, { new: true });
         if (!user) {
             res.status(401).json({ message: 'Invalid email' });
             return;

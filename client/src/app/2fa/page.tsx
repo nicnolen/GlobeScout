@@ -68,7 +68,7 @@ export default function TwoFactorSetup(): JSX.Element {
                     <button
                         onClick={handleValidateCode}
                         disabled={loading}
-                        className="button primaryButton text-nowrap"
+                        className="button primaryButton py-2 px-4 text-nowrap"
                     >
                         {loading ? (
                             <>

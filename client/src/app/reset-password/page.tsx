@@ -45,7 +45,7 @@ export default function ResetPassword(): JSX.Element {
                             required
                         />
                     </div>
-                    <button type="submit" className="w-full button primaryButton">
+                    <button type="submit" className="w-full button primaryButton py-2 px-4">
                         Reset Password
                     </button>
 

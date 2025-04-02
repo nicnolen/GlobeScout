@@ -49,7 +49,7 @@ export default function ResetPasswordPage(): JSX.Element {
                         />
                     </div>
 
-                    <button type="submit" className="w-full button primaryButton">
+                    <button type="submit" className="w-full button primaryButton py-2 px-4">
                         Send Reset Link
                     </button>
                     {message && <div className={`${isEmailSent} text-sm text-center my-4`}>{message}</div>}

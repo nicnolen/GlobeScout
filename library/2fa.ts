@@ -180,7 +180,7 @@ export async function validate2fa(req: Request, res: Response): Promise<void> {
         const { emailCode, emailCodeExpiration, methods, authenticatorSecret } = user.authentication;
 
         // Check if email code is being used
-        if (emailCode && emailCodeExpiration > new Date() && emailCode === code) {
+        if (emailCode && emailCodeExpiration && emailCodeExpiration > new Date() && emailCode === code) {
             await Users.findOneAndUpdate(
                 { _id: user.id },
                 {
@@ -207,7 +207,7 @@ export async function validate2fa(req: Request, res: Response): Promise<void> {
             }
 
             const verified = speakeasy.totp.verify({
-                secret: user.authentication.authenticatorSecret,
+                secret: authenticatorSecret,
                 encoding: 'base32',
                 token: code,
             });

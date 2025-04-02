@@ -7,7 +7,7 @@ export enum UserRole {
 export interface UserData {
     email: string;
     role: UserRole;
-    lastLogin: Date | null;
+    lastLogin: string;
     active: boolean;
     authentication: {
         enabled: boolean;
@@ -15,9 +15,9 @@ export interface UserData {
             email: boolean;
             authenticator: boolean;
         };
-        authenticatorSecret: string;
-        emailCode: string;
-        emailCodeExpiration: Date;
+        authenticatorSecret?: string;
+        emailCode?: string;
+        emailCodeExpiration?: Date;
     };
     services: {
         openWeatherApi: { requestsMade: number; maxRequests: number };

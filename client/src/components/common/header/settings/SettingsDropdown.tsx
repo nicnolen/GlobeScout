@@ -35,14 +35,14 @@ export default function SettingsDropdown(): JSX.Element {
             <div className="flex space-x-2">
                 <button
                     onClick={() => dispatch(setUnits(Units.Metric))}
-                    className={`button text-sm ${units === Units.Metric ? 'primaryButton' : 'secondaryButton'}`}
+                    className={`button text-sm py-2 px-4 ${units === Units.Metric ? 'primaryButton' : 'secondaryButton'}`}
                 >
                     Metric
                 </button>
 
                 <button
                     onClick={() => dispatch(setUnits(Units.Imperial))}
-                    className={`button text-sm ${units === Units.Imperial ? 'primaryButton' : 'secondaryButton'}`}
+                    className={`button text-sm py-2 px-4 ${units === Units.Imperial ? 'primaryButton' : 'secondaryButton'}`}
                 >
                     Imperial
                 </button>
@@ -54,7 +54,7 @@ export default function SettingsDropdown(): JSX.Element {
             </div>
 
             <div className="mt-4">
-                <button onClick={handleLogout} className="button dangerButton text-sm">
+                <button onClick={handleLogout} className="button dangerButton py-2 px-4 text-sm">
                     Logout
                 </button>
             </div>

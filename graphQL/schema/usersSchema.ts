@@ -5,28 +5,27 @@ export const GET_USERS = `
   }
 
   type Authentication {
-    enabled: Boolean
-    methods: AuthMethods
-    authenticatorSecret: String
+    enabled: Boolean!
+    methods: AuthMethods!
   }
 
   type ServiceUsage {
-    requestsMade: Int
-    maxRequests: Int
+    requestsMade: Int!
+    maxRequests: Int!
   }
 
   type Services {
-    openWeatherApi: ServiceUsage
-    googleMapsApi: ServiceUsage
+    openWeatherApi: ServiceUsage!
+    googleMapsApi: ServiceUsage!
   }
 
   type User {
-    email: String
-    role: String
-    lastLogin: String
-    active: Boolean
-    authentication: Authentication
-    services: Services
+    email: String!
+    role: String!
+    lastLogin: String!
+    active: Boolean!
+    authentication: Authentication!
+    services: Services!
   }
 
   type Query {

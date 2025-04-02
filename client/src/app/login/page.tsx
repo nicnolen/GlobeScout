@@ -77,7 +77,7 @@ export default function LoginPage(): JSX.Element {
                             className="input mt-1"
                         />
                     </div>
-                    <button type="submit" className="button primaryButton w-full">
+                    <button type="submit" className="button primaryButton w-full py-2 px-4">
                         Login
                     </button>
                     {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}

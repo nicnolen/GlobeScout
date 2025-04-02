@@ -116,7 +116,7 @@ export default function TwoFactorSettings(): JSX.Element {
                                 />
                                 {!isGoogleAuthEnabled && (
                                     <button
-                                        className="button primaryButton"
+                                        className="button primaryButton py-2 px-4"
                                         onClick={() => toggle2faMethod(true)}
                                         disabled={isUpdating}
                                     >
