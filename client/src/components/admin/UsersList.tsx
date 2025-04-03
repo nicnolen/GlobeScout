@@ -1,12 +1,16 @@
 import React, { JSX, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
-import { GET_ALL_USERS, EDIT_USER } from '../../graphQL/usersQueries';
+import { GET_ALL_USERS, EDIT_USER, DELETE_USER } from '../../graphQL/usersQueries';
 import EditUserModal from './EditUserModal';
+import DeleteUserModal from './DeleteUserModal';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function UsersList(): JSX.Element {
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+    const [message, setMessage] = useState<string>('');
 
     const {
         data: users,
@@ -18,17 +22,27 @@ export default function UsersList(): JSX.Element {
         refetchQueries: ['getAllUsers'], // Refresh user list after edit
     });
 
-    const handleEdit = (user: UserData) => {
+    const [deleteUser] = useMutation(DELETE_USER, {
+        refetchQueries: ['getAllUsers'], // Re-fetch the user list after deletion
+    });
+
+    const handleOpenEditModal = (user: UserData) => {
         // strip out __typename and lastLogin from the user (those fields will not be mutated)
         const cleanedUser = JSON.parse(
             JSON.stringify(user, (key, value) => (key === '__typename' || key === 'lastLogin' ? undefined : value)),
         );
 
+        setMessage('');
         setSelectedUser(cleanedUser);
         setIsEditModalOpen(true);
     };
 
-    const handleSubmit = async () => {
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedUser(null);
+    };
+
+    const handleEditSubmit = async () => {
         if (!selectedUser) {
             return;
         }
@@ -37,14 +51,40 @@ export default function UsersList(): JSX.Element {
             await editUser({
                 variables: { email: selectedUser?.email, input: selectedUser },
             });
-            setIsEditModalOpen(false); // Close the modal after submitting
-        } catch (error) {
-            console.error('Error updating user:', error);
+            setMessage('User updated successfully');
+            setTimeout(() => {
+                setIsEditModalOpen(false);
+            }, 2000);
+        } catch (err: unknown) {
+            const customMessage = 'Error updating user';
+            catchErrorHandler(err, customMessage, setMessage);
         }
     };
 
-    const handleDelete = (email: string) => {
-        console.log('Delete user:', email);
+    const handleDeleteSubmit = async (email: string) => {
+        try {
+            await deleteUser({
+                variables: { email },
+            });
+            setMessage('User deleted successfully');
+            setTimeout(() => {
+                setIsDeleteModalOpen(false);
+            }, 2000);
+        } catch (err: unknown) {
+            const customMessage = 'Error deleting user';
+            catchErrorHandler(err, customMessage, setMessage);
+        }
+    };
+
+    const handleOpenDeleteModal = (user: UserData) => {
+        setMessage('');
+        setSelectedUser(user);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+        setSelectedUser(null);
     };
 
     const handleResetCalls = (email: string, api: string) => {
@@ -55,7 +95,7 @@ export default function UsersList(): JSX.Element {
         return <p>Loading users...</p>;
     }
     if (usersError) {
-        return <p style={{ color: 'red' }}>Error: {usersError.message}</p>;
+        return <p className="text-red-600">Error: {usersError.message}</p>;
     }
 
     return (
@@ -114,13 +154,13 @@ export default function UsersList(): JSX.Element {
                                 <td className="px-4 py-3 border">
                                     <div className="flex items-center justify-center space-x-2">
                                         <button
-                                            onClick={() => handleEdit(user)}
+                                            onClick={() => handleOpenEditModal(user)}
                                             className="button primaryButton px-3 py-1 text-sm"
                                         >
                                             <i className="fas fa-edit mr-1" /> Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(user.email)}
+                                            onClick={() => handleOpenDeleteModal(user)}
                                             className="button dangerButton px-3 py-1 text-sm"
                                         >
                                             <i className="fas fa-trash mr-1" /> Delete
@@ -137,8 +177,18 @@ export default function UsersList(): JSX.Element {
                 <EditUserModal
                     selectedUser={selectedUser}
                     setSelectedUser={setSelectedUser}
-                    handleClose={() => setIsEditModalOpen(false)}
-                    handleSubmit={handleSubmit}
+                    handleClose={handleCloseEditModal}
+                    handleEditSubmit={handleEditSubmit}
+                    message={message}
+                />
+            )}
+
+            {isDeleteModalOpen && selectedUser && (
+                <DeleteUserModal
+                    selectedUser={selectedUser}
+                    handleClose={handleCloseDeleteModal}
+                    handleDeleteSubmit={handleDeleteSubmit}
+                    message={message}
                 />
             )}
         </>

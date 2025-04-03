@@ -5,14 +5,16 @@ interface UserEditModalProps {
     selectedUser: UserData;
     setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>;
     handleClose: () => void;
-    handleSubmit: () => void;
+    handleEditSubmit: () => void;
+    message: string;
 }
 
 export default function EditUserModal({
     selectedUser,
     setSelectedUser,
     handleClose,
-    handleSubmit,
+    handleEditSubmit,
+    message,
 }: UserEditModalProps): JSX.Element {
     useEffect(() => {
         setSelectedUser((prev) => (prev ? { ...prev, services: { ...prev.services } } : prev));
@@ -50,7 +52,7 @@ export default function EditUserModal({
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            handleSubmit();
+                            handleEditSubmit();
                         }}
                     >
                         <div>
@@ -159,19 +161,14 @@ export default function EditUserModal({
                         </div>
 
                         <div className="flex justify-between mt-4">
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Save
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleClose}
-                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                            >
+                            <button type="button" onClick={handleClose} className="px-4 py-2 button secondaryButton">
                                 Cancel
                             </button>
+                            <button type="submit" className="px-4 py-2 button primaryButton">
+                                Save
+                            </button>
+
+                            {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
                         </div>
                     </form>
                 </div>

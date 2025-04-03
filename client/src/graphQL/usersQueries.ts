@@ -82,3 +82,26 @@ export const EDIT_USER = gql`
         }
     }
 `;
+
+export const DELETE_USER = gql`
+    mutation DeleteUser($email: String!) {
+        deleteUser(email: $email) {
+            email
+            role
+            active
+            authentication {
+                enabled
+            }
+            services {
+                openWeatherApi {
+                    requestsMade
+                    maxRequests
+                }
+                googleMapsApi {
+                    requestsMade
+                    maxRequests
+                }
+            }
+        }
+    }
+`;
