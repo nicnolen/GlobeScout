@@ -1,5 +1,3 @@
-'use client';
-
 import React, { JSX } from 'react';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';

@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { UserData } from '../../types/users';
-import Users, { UsersDocument } from '../../models/users/Users';
+import UsersModel, { UsersDocument } from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 // Queries
@@ -39,7 +39,7 @@ export async function getCurrentUser(user: UsersDocument | null): Promise<UserDa
 
 export async function getAllUsers(): Promise<UserData[]> {
     try {
-        const users = await Users.find();
+        const users = await UsersModel.find();
 
         return users.map((user) => {
             const { authenticatorSecret, ...authenticationWithoutSecret } = user.authentication;
@@ -75,7 +75,7 @@ export async function editUser(email: string, input: any): Promise<UsersDocument
         }
 
         // Perform the update
-        const updatedUser = await Users.findOneAndUpdate(
+        const updatedUser = await UsersModel.findOneAndUpdate(
             { email },
             { $set: updatedInput }, // Use the modified input object
             { new: true, runValidators: true },
@@ -98,7 +98,7 @@ export async function editUser(email: string, input: any): Promise<UsersDocument
 
 export async function deleteUser(email: string): Promise<UsersDocument | null> {
     try {
-        const deletedUser = await Users.findOneAndDelete({ email });
+        const deletedUser = await UsersModel.findOneAndDelete({ email });
 
         if (!deletedUser) {
             throw new GraphQLError(`User with email ${email} not found`, {

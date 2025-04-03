@@ -1,5 +1,3 @@
-'use client';
-
 import React, { JSX, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';

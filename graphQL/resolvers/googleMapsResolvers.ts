@@ -1,4 +1,5 @@
 import { getTopTenPlaces } from '../../library/graphQL/googleMaps';
+
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 interface GetTopTenPlacesArgs {
@@ -7,11 +8,13 @@ interface GetTopTenPlacesArgs {
 
 export const placeResolvers = {
     Query: {
-        getTopTenPlaces: async (parent: any, { locationSearch }: GetTopTenPlacesArgs, context: any) => {
+        getTopTenPlaces: async (_parent: unknown, { locationSearch }: GetTopTenPlacesArgs, context: any) => {
             try {
                 const googleMapsApiKey = context.apiKeys.googleMapsApiKey;
                 const googleMapsTextSearchUrl = context.apiBaseUrls.googleMapsTextSearchUrl;
-                return await getTopTenPlaces({ locationSearch, googleMapsApiKey, googleMapsTextSearchUrl });
+                const user = context.user;
+
+                return await getTopTenPlaces({ locationSearch, googleMapsApiKey, googleMapsTextSearchUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching top ten locations from Google Maps';
                 catchErrorHandler(err, customMessage);

@@ -9,8 +9,10 @@ import {
     FiveDayForecastResponse,
     Units,
 } from '../../types/weather';
+import { UserData } from '../../types/users';
 import CurrentWeatherModel from '../../models/caches/CurrentWeatherCache';
 import FiveDayForecastModel from '../../models/caches/FiveDayForecastCache';
+import { incrementRequestCount } from '../../utils/helpers/rateLimitHelpers';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dayjs.extend(utc);
@@ -20,6 +22,7 @@ interface GetWeatherProps {
     units: Units;
     openWeatherApiKey: string;
     openWeatherUrl: string;
+    user: UserData;
 }
 
 interface DailyForecastAccumulator {
@@ -39,6 +42,7 @@ export async function getCurrentWeather(
     units: string,
     openWeatherApiKey: string,
     openWeatherUrl: string,
+    user: UserData,
 ): Promise<Weather> {
     try {
         if (!openWeatherApiKey) {
@@ -67,6 +71,8 @@ export async function getCurrentWeather(
             console.info('Cached current weather data was found');
             return cachedCurrentWeather.currentWeather;
         }
+
+        await incrementRequestCount(user.email, 'openWeatherApi');
 
         const response = await axios.get<CurrentWeatherResponse>(
             `${openWeatherUrl}/weather?q=${location}&appid=${openWeatherApiKey}&units=${units}`,
@@ -114,6 +120,7 @@ export async function getFiveDayForecast({
     units,
     openWeatherApiKey,
     openWeatherUrl,
+    user,
 }: GetWeatherProps): Promise<FiveDayForecast> {
     try {
         if (!openWeatherApiKey) {
@@ -146,6 +153,8 @@ export async function getFiveDayForecast({
             console.info('Cached five day forecast data was found');
             return cachedFiveDayForecast.fiveDayForecast;
         }
+
+        await incrementRequestCount(user.email, 'openWeatherApi');
 
         // Fetch the 5-day forecast from OpenWeather API
         const response = await axios.get<FiveDayForecastResponse>(

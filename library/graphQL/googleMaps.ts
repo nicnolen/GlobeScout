@@ -1,8 +1,10 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { PlaceProps, PlaceResponse } from '../../types/googleMaps';
+import { UserData } from '../../types/users';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
 import TopTenPlacesCacheModel from '../../models/caches/TopTenPlacesCache';
+import { incrementRequestCount } from '../../utils/helpers/rateLimitHelpers';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dotenv.config();
@@ -11,6 +13,7 @@ interface TopTenPlacesParams {
     locationSearch: string;
     googleMapsApiKey: string;
     googleMapsTextSearchUrl: string;
+    user: UserData;
 }
 
 enum BusinessStatus {
@@ -37,6 +40,7 @@ export async function getTopTenPlaces({
     locationSearch,
     googleMapsApiKey,
     googleMapsTextSearchUrl,
+    user,
 }: TopTenPlacesParams): Promise<PlaceProps[]> {
     try {
         if (!googleMapsApiKey) {
@@ -61,6 +65,8 @@ export async function getTopTenPlaces({
             console.info('Cached top ten places data was found');
             return cachedTopTenPlaces.topTenPlaces;
         }
+
+        await incrementRequestCount(user.email, 'googleMapsApi');
 
         // Create the dynamic query for Google Places API
         const textQuery = `Top rated places in ${locationSearch}`;

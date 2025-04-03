@@ -1,4 +1,3 @@
-'use client';
 import React, { JSX } from 'react';
 import Image from 'next/image';
 import { Units, Weather } from '../../../../types/weather';

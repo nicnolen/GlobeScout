@@ -15,14 +15,16 @@ type GetFiveDayForecastArgs = GetWeatherArgs;
 export const weatherResolvers = {
     Query: {
         getCurrentWeather: async (
-            parent: any,
+            _parent: unknown,
             { location, units }: GetCurrentWeatherArgs,
             context: any,
         ): Promise<Weather> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;
                 const openWeatherUrl = context.apiBaseUrls.openWeatherUrl;
-                return await getCurrentWeather(location, units, openWeatherApiKey, openWeatherUrl);
+                const user = context.user;
+
+                return await getCurrentWeather(location, units, openWeatherApiKey, openWeatherUrl, user);
             } catch (err: unknown) {
                 const customMessage = 'Error fetching current weather data from OpenWeatherMap';
                 catchErrorHandler(err, customMessage);
@@ -30,14 +32,16 @@ export const weatherResolvers = {
             }
         },
         getFiveDayForecast: async (
-            parent: any,
+            _parent: unknown,
             { location, units }: GetFiveDayForecastArgs,
             context: any,
         ): Promise<FiveDayForecast> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;
                 const openWeatherUrl = context.apiBaseUrls.openWeatherUrl;
-                return await getFiveDayForecast({ location, units, openWeatherApiKey, openWeatherUrl });
+                const user = context.user;
+
+                return await getFiveDayForecast({ location, units, openWeatherApiKey, openWeatherUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching five day forecast data from OpenWeatherMap';
                 catchErrorHandler(err, customMessage);
