@@ -2,9 +2,10 @@ import React, { JSX, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
 import { GET_ALL_USERS, EDIT_USER, DELETE_USER } from '../../graphQL/usersQueries';
+import { removeFields } from '../../utils/helpers/graphQLHelpers';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
-import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function UsersList(): JSX.Element {
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -28,9 +29,7 @@ export default function UsersList(): JSX.Element {
 
     const handleOpenEditModal = (user: UserData) => {
         // strip out __typename and lastLogin from the user (those fields will not be mutated)
-        const cleanedUser = JSON.parse(
-            JSON.stringify(user, (key, value) => (key === '__typename' || key === 'lastLogin' ? undefined : value)),
-        );
+        const cleanedUser = removeFields(user, ['__typename', 'lastLogin']);
 
         setMessage('');
         setSelectedUser(cleanedUser);

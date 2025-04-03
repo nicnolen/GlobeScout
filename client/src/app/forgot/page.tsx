@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
