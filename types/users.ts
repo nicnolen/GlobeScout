@@ -7,7 +7,7 @@ export enum UserRole {
 export interface UserData {
     email: string;
     role: UserRole;
-    lastLogin: string;
+    lastLogin?: string;
     active: boolean;
     authentication: {
         enabled: boolean;

@@ -5,23 +5,8 @@ import { GET_ALL_USERS, EDIT_USER } from '../../graphQL/usersQueries';
 import EditUserModal from './EditUserModal';
 
 export default function UsersList(): JSX.Element {
-    const [showModal, setShowModal] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-    const [updatedUser, setUpdatedUser] = useState<any>({});
-
-    console.log(updatedUser, 'updated');
-
-    const stripTypename = (obj: any) => {
-        if (!obj || typeof obj !== 'object') return obj;
-
-        const { __typename, ...cleanedObj } = obj;
-
-        // Recursively strip __typename from nested objects
-        return Object.keys(cleanedObj).reduce((acc, key) => {
-            acc[key] = stripTypename(cleanedObj[key]);
-            return acc;
-        }, {} as any);
-    };
 
     const {
         data: users,
@@ -30,33 +15,29 @@ export default function UsersList(): JSX.Element {
     } = useQuery<{ getAllUsers: UserData[] }>(GET_ALL_USERS);
 
     const [editUser] = useMutation(EDIT_USER, {
-        refetchQueries: ['GetAllUsers'], // Refresh user list after edit
+        refetchQueries: ['getAllUsers'], // Refresh user list after edit
     });
 
     const handleEdit = (user: UserData) => {
-        setSelectedUser(user);
-        setUpdatedUser({
-            ...user,
-            services: { ...user.services },
-        });
-        setShowModal(true);
-    };
+        // strip out __typename and lastLogin from the user (those fields will not be mutated)
+        const cleanedUser = JSON.parse(
+            JSON.stringify(user, (key, value) => (key === '__typename' || key === 'lastLogin' ? undefined : value)),
+        );
 
-    const handleCloseModal = () => {
-        setShowModal(false); // Close the modal
+        setSelectedUser(cleanedUser);
+        setIsEditModalOpen(true);
     };
 
     const handleSubmit = async () => {
+        if (!selectedUser) {
+            return;
+        }
+
         try {
-            const cleanedUser = stripTypename(updatedUser);
-
-            // Remove lastLogin before sending the mutation
-            const { lastLogin, ...userWithoutLastLogin } = cleanedUser;
-
             await editUser({
-                variables: { email: selectedUser?.email, input: userWithoutLastLogin },
+                variables: { email: selectedUser?.email, input: selectedUser },
             });
-            setShowModal(false); // Close the modal after submitting
+            setIsEditModalOpen(false); // Close the modal after submitting
         } catch (error) {
             console.error('Error updating user:', error);
         }
@@ -152,14 +133,14 @@ export default function UsersList(): JSX.Element {
                 </table>
             </div>
 
-            <EditUserModal
-                showModal={showModal}
-                selectedUser={selectedUser}
-                updatedUser={updatedUser}
-                setUpdatedUser={setUpdatedUser}
-                handleCloseModal={handleCloseModal}
-                handleSubmit={handleSubmit}
-            />
+            {isEditModalOpen && (
+                <EditUserModal
+                    selectedUser={selectedUser}
+                    setSelectedUser={setSelectedUser}
+                    handleClose={() => setIsEditModalOpen(false)}
+                    handleSubmit={handleSubmit}
+                />
+            )}
         </>
     );
 }
