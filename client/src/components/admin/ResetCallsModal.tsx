@@ -1,46 +1,58 @@
 import React, { JSX } from 'react';
+import { useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
+import { RESET_SINGLE_API_CALLS } from '../../graphQL/usersQueries';
+import { catchErrorHandler } from '../../utils/errorHandlers';
+import Modal from '../common/Modal';
 
 interface ResetCallsModalProps {
     selectedUser: UserData | null;
     serviceToReset: string;
     handleClose: () => void;
-    handleResetCallsSubmit: (email: string, service: string) => void;
     message: string;
+    setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ResetCallsModal({
     selectedUser,
     serviceToReset,
     handleClose,
-    handleResetCallsSubmit,
     message,
+    setMessage,
 }: ResetCallsModalProps): JSX.Element {
-    if (!selectedUser) return null;
+    const [resetApiUsage] = useMutation(RESET_SINGLE_API_CALLS, {
+        refetchQueries: ['getAllUsers'],
+    });
+
+    const handleResetCallsSubmit = async (email: string, service: string) => {
+        try {
+            await resetApiUsage({ variables: { email, service } });
+            setMessage(`${service} request count reset for ${email}`);
+            handleClose();
+        } catch (err: unknown) {
+            catchErrorHandler(err, 'Failed to reset usage', setMessage);
+        }
+    };
+
+    const modalFooter = (
+        <div className="flex justify-end">
+            <button
+                onClick={() => {
+                    handleResetCallsSubmit(selectedUser.email, serviceToReset);
+                }}
+                className="px-4 py-2 button dangerButton"
+            >
+                Reset
+            </button>
+            {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
+        </div>
+    );
 
     return (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-96">
-                <h3 className="text-xl font-semibold mb-4">Reset API Calls</h3>
-                <p className="mb-4">
-                    Are you sure you want to reset <strong>{serviceToReset}</strong> requests for{' '}
-                    <strong>{selectedUser.email}</strong>?
-                </p>
-                <div className="flex justify-end space-x-4">
-                    <button onClick={handleClose} className="px-4 py-2 button secondaryButton">
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => {
-                            handleResetCallsSubmit(selectedUser.email, serviceToReset);
-                        }}
-                        className="px-4 py-2 button dangerButton"
-                    >
-                        Reset
-                    </button>
-                </div>
-                {message && <p className="text-sm text-gray-600 mt-4">{message}</p>}
-            </div>
-        </div>
+        <Modal isOpen={true} onClose={handleClose} title="Reset Api Calls" footer={modalFooter} size="md">
+            <p className="mb-4">
+                Are you sure you want to reset <b>{serviceToReset}</b> requests for <b>{selectedUser.email}</b>?
+            </p>
+        </Modal>
     );
 }

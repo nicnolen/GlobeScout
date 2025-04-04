@@ -1,45 +1,61 @@
 import React, { JSX } from 'react';
+import { useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
+import { DELETE_USER } from '../../graphQL/usersQueries';
+import Modal from '../common/Modal';
+import { catchErrorHandler } from '../../utils/errorHandlers';
 
 interface UserDeleteModalProps {
     selectedUser: UserData | null;
-    handleDeleteSubmit: (email: string) => void;
     handleClose: () => void;
     message: string;
+    setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function EditUserModal({
+export default function DeleteUserModal({
     selectedUser,
     handleClose,
-    handleDeleteSubmit,
     message,
+    setMessage,
 }: UserDeleteModalProps): JSX.Element {
-    if (!selectedUser) return null;
+    const [deleteUser] = useMutation(DELETE_USER, {
+        refetchQueries: ['getAllUsers'],
+    });
+
+    const handleDeleteSubmit = async (email: string) => {
+        try {
+            await deleteUser({
+                variables: { email },
+            });
+            setMessage('User deleted successfully');
+            setTimeout(() => {
+                handleClose();
+            }, 2000);
+        } catch (err: unknown) {
+            const customMessage = 'Error deleting user';
+            catchErrorHandler(err, customMessage, setMessage);
+        }
+    };
+
+    const modalFooter = (
+        <div className="flex justify-end">
+            <button
+                type="button"
+                onClick={() => handleDeleteSubmit(selectedUser.email)}
+                className="px-4 py-2 button dangerButton"
+            >
+                Delete User
+            </button>
+            {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
+        </div>
+    );
 
     return (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-96">
-                <h3 className="text-xl font-semibold mb-4">Confirm Deletion</h3>
-                <p className="mb-4">
-                    Are you sure you want to delete the user <strong>{selectedUser.email}</strong>? This action cannot
-                    be undone.
-                </p>
-                <div className="flex justify-end space-x-4">
-                    <button onClick={handleClose} className="px-4 py-2 button secondaryButton">
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => {
-                            handleDeleteSubmit(selectedUser.email);
-                        }}
-                        className="px-4 py-2 button dangerButton"
-                    >
-                        Delete
-                    </button>
-
-                    {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
-                </div>
-            </div>
-        </div>
+        <Modal isOpen={true} onClose={handleClose} title="Delete User" footer={modalFooter} size="md">
+            <p className="mb-4">
+                Are you sure you want to delete the user <strong>{selectedUser.email}</strong>? This action cannot be
+                undone.
+            </p>
+        </Modal>
     );
 }

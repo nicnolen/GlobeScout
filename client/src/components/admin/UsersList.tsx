@@ -1,9 +1,8 @@
 import React, { JSX, useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { UserData } from '../../../../types/users';
-import { GET_ALL_USERS, EDIT_USER, DELETE_USER, RESET_SINGLE_API_CALLS } from '../../graphQL/usersQueries';
+import { GET_ALL_USERS } from '../../graphQL/usersQueries';
 import { removeFields } from '../../utils/helpers/graphQLHelpers';
-import { catchErrorHandler } from '../../utils/errorHandlers';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
 import ResetCallsModal from './ResetCallsModal';
@@ -22,22 +21,11 @@ export default function UsersList(): JSX.Element {
         error: usersError,
     } = useQuery<{ getAllUsers: UserData[] }>(GET_ALL_USERS);
 
-    const [editUser] = useMutation(EDIT_USER, {
-        refetchQueries: ['getAllUsers'],
-    });
-
-    const [deleteUser] = useMutation(DELETE_USER, {
-        refetchQueries: ['getAllUsers'],
-    });
-
-    const [resetApiUsage] = useMutation(RESET_SINGLE_API_CALLS, {
-        refetchQueries: ['getAllUsers'],
-    });
-
     const handleOpenEditModal = (user: UserData) => {
         // strip out __typename and lastLogin from the user (those fields will not be mutated)
         const cleanedUser = removeFields(user, ['__typename', 'lastLogin']);
 
+        setMessage('');
         setSelectedUser(cleanedUser);
         setIsEditModalOpen(true);
     };
@@ -45,44 +33,10 @@ export default function UsersList(): JSX.Element {
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setSelectedUser(null);
-        setMessage('');
-    };
-
-    const handleEditSubmit = async () => {
-        if (!selectedUser) {
-            return;
-        }
-
-        try {
-            await editUser({
-                variables: { email: selectedUser?.email, input: selectedUser },
-            });
-            setMessage('User updated successfully');
-            setTimeout(() => {
-                setIsEditModalOpen(false);
-            }, 2000);
-        } catch (err: unknown) {
-            const customMessage = 'Error updating user';
-            catchErrorHandler(err, customMessage, setMessage);
-        }
-    };
-
-    const handleDeleteSubmit = async (email: string) => {
-        try {
-            await deleteUser({
-                variables: { email },
-            });
-            setMessage('User deleted successfully');
-            setTimeout(() => {
-                setIsDeleteModalOpen(false);
-            }, 2000);
-        } catch (err: unknown) {
-            const customMessage = 'Error deleting user';
-            catchErrorHandler(err, customMessage, setMessage);
-        }
     };
 
     const handleOpenDeleteModal = (user: UserData) => {
+        setMessage('');
         setSelectedUser(user);
         setIsDeleteModalOpen(true);
     };
@@ -90,21 +44,10 @@ export default function UsersList(): JSX.Element {
     const handleCloseDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
-        setMessage('');
-    };
-
-    const handleResetCallsSubmit = async (email: string, service: string) => {
-        try {
-            await resetApiUsage({ variables: { email, service } });
-            setMessage(`${service} request count reset for ${email}`);
-            setIsResetCallsModalOpen(false);
-        } catch (err) {
-            catchErrorHandler(err, 'Failed to reset usage', setMessage);
-            setIsResetCallsModalOpen(false);
-        }
     };
 
     const handleOpenResetCallsModal = (email: string, service: string) => {
+        setMessage('');
         setSelectedUser({ email } as UserData); // minimal shape needed for modal
         setServiceToReset(service);
         setIsResetCallsModalOpen(true);
@@ -112,7 +55,6 @@ export default function UsersList(): JSX.Element {
 
     const handleCloseResetCallsModal = () => {
         setIsResetCallsModalOpen(false);
-        setMessage('');
     };
 
     if (usersLoading) {
@@ -202,8 +144,8 @@ export default function UsersList(): JSX.Element {
                     selectedUser={selectedUser}
                     setSelectedUser={setSelectedUser}
                     handleClose={handleCloseEditModal}
-                    handleEditSubmit={handleEditSubmit}
                     message={message}
+                    setMessage={setMessage}
                 />
             )}
 
@@ -211,8 +153,8 @@ export default function UsersList(): JSX.Element {
                 <DeleteUserModal
                     selectedUser={selectedUser}
                     handleClose={handleCloseDeleteModal}
-                    handleDeleteSubmit={handleDeleteSubmit}
                     message={message}
+                    setMessage={setMessage}
                 />
             )}
 
@@ -221,8 +163,8 @@ export default function UsersList(): JSX.Element {
                     selectedUser={selectedUser}
                     serviceToReset={serviceToReset}
                     handleClose={handleCloseResetCallsModal}
-                    handleResetCallsSubmit={handleResetCallsSubmit}
                     message={message}
+                    setMessage={setMessage}
                 />
             )}
         </>
