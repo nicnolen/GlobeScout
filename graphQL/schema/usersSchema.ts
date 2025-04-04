@@ -66,5 +66,6 @@ export const EDIT_USERS = `
   type Mutation {
     editUser(email: String!, input: EditUserInput!): User
     deleteUser(email: String!): User
+    resetSingleApiCalls(email: String!, service: String!): User
   }
 `;

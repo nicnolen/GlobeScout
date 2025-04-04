@@ -1,16 +1,19 @@
 import React, { JSX, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
-import { GET_ALL_USERS, EDIT_USER, DELETE_USER } from '../../graphQL/usersQueries';
+import { GET_ALL_USERS, EDIT_USER, DELETE_USER, RESET_SINGLE_API_CALLS } from '../../graphQL/usersQueries';
 import { removeFields } from '../../utils/helpers/graphQLHelpers';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 import EditUserModal from './EditUserModal';
 import DeleteUserModal from './DeleteUserModal';
+import ResetCallsModal from './ResetCallsModal';
 
 export default function UsersList(): JSX.Element {
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+    const [isResetCallsModalOpen, setIsResetCallsModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+    const [serviceToReset, setServiceToReset] = useState(null);
     const [message, setMessage] = useState<string>('');
 
     const {
@@ -20,18 +23,21 @@ export default function UsersList(): JSX.Element {
     } = useQuery<{ getAllUsers: UserData[] }>(GET_ALL_USERS);
 
     const [editUser] = useMutation(EDIT_USER, {
-        refetchQueries: ['getAllUsers'], // Refresh user list after edit
+        refetchQueries: ['getAllUsers'],
     });
 
     const [deleteUser] = useMutation(DELETE_USER, {
-        refetchQueries: ['getAllUsers'], // Re-fetch the user list after deletion
+        refetchQueries: ['getAllUsers'],
+    });
+
+    const [resetApiUsage] = useMutation(RESET_SINGLE_API_CALLS, {
+        refetchQueries: ['getAllUsers'],
     });
 
     const handleOpenEditModal = (user: UserData) => {
         // strip out __typename and lastLogin from the user (those fields will not be mutated)
         const cleanedUser = removeFields(user, ['__typename', 'lastLogin']);
 
-        setMessage('');
         setSelectedUser(cleanedUser);
         setIsEditModalOpen(true);
     };
@@ -39,6 +45,7 @@ export default function UsersList(): JSX.Element {
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setSelectedUser(null);
+        setMessage('');
     };
 
     const handleEditSubmit = async () => {
@@ -76,7 +83,6 @@ export default function UsersList(): JSX.Element {
     };
 
     const handleOpenDeleteModal = (user: UserData) => {
-        setMessage('');
         setSelectedUser(user);
         setIsDeleteModalOpen(true);
     };
@@ -84,10 +90,29 @@ export default function UsersList(): JSX.Element {
     const handleCloseDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
+        setMessage('');
     };
 
-    const handleResetCalls = (email: string, api: string) => {
-        console.log(`Reset calls for ${api} of user: ${email}`);
+    const handleResetCallsSubmit = async (email: string, service: string) => {
+        try {
+            await resetApiUsage({ variables: { email, service } });
+            setMessage(`${service} request count reset for ${email}`);
+            setIsResetCallsModalOpen(false);
+        } catch (err) {
+            catchErrorHandler(err, 'Failed to reset usage', setMessage);
+            setIsResetCallsModalOpen(false);
+        }
+    };
+
+    const handleOpenResetCallsModal = (email: string, service: string) => {
+        setSelectedUser({ email } as UserData); // minimal shape needed for modal
+        setServiceToReset(service);
+        setIsResetCallsModalOpen(true);
+    };
+
+    const handleCloseResetCallsModal = () => {
+        setIsResetCallsModalOpen(false);
+        setMessage('');
     };
 
     if (usersLoading) {
@@ -142,7 +167,7 @@ export default function UsersList(): JSX.Element {
                                                     {user.services[service]?.maxRequests}
                                                 </span>
                                                 <button
-                                                    onClick={() => handleResetCalls(user.email, service)}
+                                                    onClick={() => handleOpenResetCallsModal(user.email, service)}
                                                     className="button dangerButton ml-2 px-2 py-1 text-xs"
                                                 >
                                                     Reset
@@ -187,6 +212,16 @@ export default function UsersList(): JSX.Element {
                     selectedUser={selectedUser}
                     handleClose={handleCloseDeleteModal}
                     handleDeleteSubmit={handleDeleteSubmit}
+                    message={message}
+                />
+            )}
+
+            {isResetCallsModalOpen && selectedUser && (
+                <ResetCallsModal
+                    selectedUser={selectedUser}
+                    serviceToReset={serviceToReset}
+                    handleClose={handleCloseResetCallsModal}
+                    handleResetCallsSubmit={handleResetCallsSubmit}
                     message={message}
                 />
             )}

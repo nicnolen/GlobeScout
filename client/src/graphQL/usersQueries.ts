@@ -105,3 +105,21 @@ export const DELETE_USER = gql`
         }
     }
 `;
+
+export const RESET_SINGLE_API_CALLS = gql`
+    mutation ResetSingleAPiCalls($email: String!, $service: String!) {
+        resetSingleApiCalls(email: $email, service: $service) {
+            email
+            services {
+                openWeatherApi {
+                    requestsMade
+                    maxRequests
+                }
+                googleMapsApi {
+                    requestsMade
+                    maxRequests
+                }
+            }
+        }
+    }
+`;

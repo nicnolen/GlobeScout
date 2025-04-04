@@ -96,6 +96,27 @@ export async function editUser(email: string, input: any): Promise<UsersDocument
     }
 }
 
+export async function resetSingleApiCalls(email: string, service: string): Promise<UsersDocument | null> {
+    try {
+        // Construct the dynamic path to the service's requestsMade field
+        const servicePath = `services.${service}.requestsMade`;
+
+        const updatedUser = await UsersModel.findOneAndUpdate({ email }, { $set: { [servicePath]: 0 } }, { new: true });
+
+        if (!updatedUser) {
+            throw new GraphQLError(`User with email ${email} not found`, {
+                extensions: { code: 'NOT_FOUND' },
+            });
+        }
+
+        return updatedUser;
+    } catch (err: unknown) {
+        const customMessage = 'Failed to reset API usage';
+        catchErrorHandler(err, customMessage);
+        throw err;
+    }
+}
+
 export async function deleteUser(email: string): Promise<UsersDocument | null> {
     try {
         const deletedUser = await UsersModel.findOneAndDelete({ email });

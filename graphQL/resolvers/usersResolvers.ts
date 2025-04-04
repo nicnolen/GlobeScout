@@ -1,4 +1,4 @@
-import { getCurrentUser, getAllUsers, editUser, deleteUser } from '../../library/graphQL/users';
+import { getCurrentUser, getAllUsers, editUser, deleteUser, resetSingleApiCalls } from '../../library/graphQL/users';
 
 export const usersResolvers = {
     Query: {
@@ -16,6 +16,9 @@ export const usersResolvers = {
         },
         deleteUser: async (_parent: unknown, args: { email: string }) => {
             return await deleteUser(args.email);
+        },
+        resetSingleApiCalls: async (_parent: unknown, args: { email: string; service: string }) => {
+            return await resetSingleApiCalls(args.email, args.service);
         },
     },
 };
