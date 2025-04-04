@@ -5,7 +5,8 @@ interface ModalProps {
     onClose: () => void;
     title: string;
     children: ReactNode;
-    footer?: ReactNode;
+    footerButtons: ReactNode;
+    message?: string;
     size?: 'sm' | 'md' | 'lg' | 'xl';
     closeOnOutsideClick?: boolean;
 }
@@ -15,7 +16,8 @@ export default function Modal({
     onClose,
     title,
     children,
-    footer,
+    footerButtons,
+    message,
     size = 'md',
     closeOnOutsideClick = true,
 }: ModalProps): JSX.Element | null {
@@ -69,20 +71,8 @@ export default function Modal({
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b">
                     <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                    >
-                        <span className="sr-only">Close</span>
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
+                    <button type="button" onClick={onClose} className="button">
+                        <i className="fas fa-x" />
                     </button>
                 </div>
 
@@ -90,7 +80,10 @@ export default function Modal({
                 <div className="p-6 overflow-y-auto max-h-[calc(100vh-200px)]">{children}</div>
 
                 {/* Footer */}
-                {footer && <div className="px-4 py-3 bg-gray-50 border-t flex justify-end space-x-3">{footer}</div>}
+                <div className="px-4 py-3 bg-gray-50 border-t flex justify-end items-center">
+                    {message && <span className="text-sm text-gray-600 mr-3">{message}</span>}
+                    <div className="flex space-x-3">{footerButtons}</div>
+                </div>
             </div>
         </div>
     );

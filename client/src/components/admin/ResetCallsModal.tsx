@@ -34,22 +34,26 @@ export default function ResetCallsModal({
         }
     };
 
-    const modalFooter = (
-        <div className="flex justify-end">
-            <button
-                onClick={() => {
-                    handleResetCallsSubmit(selectedUser.email, serviceToReset);
-                }}
-                className="px-4 py-2 button dangerButton"
-            >
-                Reset
-            </button>
-            {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
-        </div>
+    const footerButtons = (
+        <button
+            onClick={() => {
+                handleResetCallsSubmit(selectedUser.email, serviceToReset);
+            }}
+            className="px-4 py-2 button dangerButton"
+        >
+            Reset
+        </button>
     );
 
     return (
-        <Modal isOpen={true} onClose={handleClose} title="Reset Api Calls" footer={modalFooter} size="md">
+        <Modal
+            isOpen={true}
+            onClose={handleClose}
+            title="Reset Api Calls"
+            footerButtons={footerButtons}
+            message={message}
+            size="md"
+        >
             <p className="mb-4">
                 Are you sure you want to reset <b>{serviceToReset}</b> requests for <b>{selectedUser.email}</b>?
             </p>

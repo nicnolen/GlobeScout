@@ -61,7 +61,7 @@ export default function LoginPage(): JSX.Element {
                             value={email}
                             onChange={handleEmailChange}
                             required
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                         />
                     </div>
                     <div className="mb-6">
@@ -74,7 +74,7 @@ export default function LoginPage(): JSX.Element {
                             value={password}
                             onChange={handlePasswordChange}
                             required
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                         />
                     </div>
                     <button type="submit" className="button primaryButton w-full py-2 px-4">

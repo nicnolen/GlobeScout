@@ -63,7 +63,7 @@ export default function TwoFactorSetup(): JSX.Element {
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         placeholder="Enter code"
-                        className="input"
+                        className="input w-full"
                     />
                     <button
                         onClick={handleValidateCode}

@@ -45,7 +45,7 @@ export default function ResetPasswordPage(): JSX.Element {
                             value={email}
                             onChange={handleEmailChange}
                             required
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                         />
                     </div>
 

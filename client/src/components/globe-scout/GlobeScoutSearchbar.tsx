@@ -15,7 +15,7 @@ export default function GlobeScoutSearchbar({ location }: GlobeScoutSearchbarPro
             value={location}
             onChange={(e) => dispatch(setLocation(e.target.value))}
             placeholder="Enter location name. Seperate a city and a country with a ,"
-            className="input"
+            className="input w-full"
         />
     );
 }

@@ -84,14 +84,14 @@ export default function UsersList(): JSX.Element {
                             )}
                         </tr>
                     </thead>
-                    <tbody className="text-gray-800">
+                    <tbody>
                         {users?.getAllUsers?.map((user: UserData) => (
                             <tr key={user.email} className="even:bg-gray-100 hover:bg-gray-200 transition">
                                 <td className="px-4 py-3 border">{user.email}</td>
                                 <td className="px-4 py-3 border">{user.role}</td>
                                 <td className="px-4 py-3 border">{user.lastLogin}</td>
                                 <td
-                                    className={`px-4 py-3 border font-bold ${user.active ? 'text-green-600' : 'text-red-600'}`}
+                                    className={`px-4 py-3 border border-black font-bold ${user.active ? 'text-green-600' : 'text-red-600'}`}
                                 >
                                     {user.active ? 'Active' : 'Inactive'}
                                 </td>
@@ -144,8 +144,6 @@ export default function UsersList(): JSX.Element {
                     selectedUser={selectedUser}
                     setSelectedUser={setSelectedUser}
                     handleClose={handleCloseEditModal}
-                    message={message}
-                    setMessage={setMessage}
                 />
             )}
 

@@ -41,7 +41,7 @@ export default function ResetPassword(): JSX.Element {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                             required
                         />
                     </div>
