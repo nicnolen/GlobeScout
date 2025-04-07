@@ -8,7 +8,7 @@ export default function NavBarWrapper(): JSX.Element {
     const pathname = usePathname();
 
     // Define the pages where NavBar should NOT be displayed
-    const isExcludedPage = ['/login', '/forgot', '/2fa', '/reset-password'].includes(pathname);
+    const isExcludedPage = ['/login', '/forgot', '/2fa', '/reset-password', '/register'].includes(pathname);
 
     if (isExcludedPage) {
         return null;

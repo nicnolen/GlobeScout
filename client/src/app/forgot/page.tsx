@@ -54,7 +54,7 @@ export default function ResetPasswordPage(): JSX.Element {
                     </button>
                     {message && <div className={`${isEmailSent} text-sm text-center my-4`}>{message}</div>}
                     <div className="mt-4 text-center">
-                        <Link href="/login" className="text-sm text-indigo-600 hover:underline">
+                        <Link href="/login" className="link text-sm">
                             Back to Login
                         </Link>
                     </div>

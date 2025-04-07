@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-export default function LoginPage(): JSX.Element {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+export default function RegisterPage(): JSX.Element {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [message, setMessage] = useState<string>('');
     const router = useRouter();
 
@@ -22,24 +22,28 @@ export default function LoginPage(): JSX.Element {
         setMessage('');
     };
 
-    const fetchUserLoginData = async (event: React.FormEvent) => {
-        event.preventDefault();
+    const handleRegisterSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         try {
-            const response = await axios.post('/login', { email, password }, { withCredentials: true });
+            const response = await axios.post(
+                '/register',
+                { email, password },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
 
             setMessage(response.data.message);
-
-            if (response.status === 200) {
-                const is2FA = response.data.message.includes('2FA');
-                if (is2FA) {
-                    router.push('/2fa');
-                    return;
-                }
-
-                router.push('/');
+            if (response.status === 201) {
+                setTimeout(() => {
+                    router.push('/login');
+                }, 2000);
             }
         } catch (err: unknown) {
-            const customMessage = 'User login failed';
+            const customMessage = 'Failed to register user';
             catchErrorHandler(err, customMessage, setMessage);
         }
     };
@@ -49,8 +53,8 @@ export default function LoginPage(): JSX.Element {
     return (
         <div className="loginContainer">
             <div className="card max-w-md w-full p-8">
-                <h2 className="cardTitle text-center">Login</h2>
-                <form onSubmit={fetchUserLoginData}>
+                <h2 className="cardTitle text-center">Register New Account</h2>
+                <form onSubmit={handleRegisterSubmit}>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600">
                             Email:
@@ -78,15 +82,12 @@ export default function LoginPage(): JSX.Element {
                         />
                     </div>
                     <button type="submit" className="button primaryButton w-full py-2 px-4">
-                        Login
+                        Register
                     </button>
-                    {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}
-                    <div className="mt-4 text-center flex flex-col space-y-2">
-                        <Link href="/register" className="link text-sm">
-                            Sign Up For A New Account
-                        </Link>
-                        <Link href="/forgot" className="link text-sm">
-                            Forgot Password
+                    <div className="mt-4 text-center">
+                        {message && <div className={`${isSuccessMessage} text-sm text-center my-4`}>{message}</div>}
+                        <Link href="/login" className="link text-sm">
+                            Back to Login
                         </Link>
                     </div>
                 </form>
