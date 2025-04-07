@@ -8,7 +8,7 @@ import { PlaceProps } from '../../../../types/googleMaps';
 import { useCurrentWeatherData } from '../../hooks/weatherHooks';
 import { GET_CURRENT_WEATHER } from '../../graphQL/weatherQueries';
 import { GET_TOP_TEN_PLACES } from '../../graphQL/googleMapsQueries';
-import { selectLocation, selectUnits } from '../../redux/selectors/weatherSelectors';
+import { selectLocationSearch, selectUnits } from '../../redux/selectors/weatherSelectors';
 import GlobeScoutTitle from '../../components/globe-scout/GlobeScoutTitle';
 import GlobeScoutSearchbar from '../../components/globe-scout/GlobeScoutSearchbar';
 import WeatherForecastButton from '../../components/globe-scout/WeatherForecastButton';
@@ -16,7 +16,7 @@ import TopPlacesList from '../../components/globe-scout/GlobeScoutTopPlacesList'
 
 export default function GlobeScout(): JSX.Element {
     const [message, setMessage] = useState<string>('');
-    const location = useSelector(selectLocation);
+    const locationSearch = useSelector(selectLocationSearch);
     const units = useSelector(selectUnits);
 
     const [
@@ -42,18 +42,18 @@ export default function GlobeScout(): JSX.Element {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        getCurrentWeather({ variables: { location, units } });
-        getTopTenPlaces({ variables: { locationSearch: location } });
+        getCurrentWeather({ variables: { locationSearch, units } });
+        getTopTenPlaces({ variables: { locationSearch: locationSearch } });
     };
 
     return (
         <div className="w-full">
-            {/* Conditionally render the title if location is available */}
-            {location && <GlobeScoutTitle location={location} message={message} />}
+            {/* Conditionally render the title if locationSearch is available */}
+            {locationSearch && <GlobeScoutTitle locationSearch={locationSearch} message={message} />}
 
             {/* Search bar and weather button */}
             <form onSubmit={handleSubmit} className="flex items-center mb-2.5">
-                <GlobeScoutSearchbar location={location} />
+                <GlobeScoutSearchbar locationSearch={locationSearch} />
 
                 {currentWeatherData && (
                     <WeatherForecastButton

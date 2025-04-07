@@ -21,7 +21,7 @@ export const GET_WEATHER = `
   }
 
   type Query {
-    getCurrentWeather(location: String!, units: Units!): Weather
-    getFiveDayForecast(location: String!, units: Units!): [Weather]
+    getCurrentWeather(locationSearch: String!, units: Units!): Weather
+    getFiveDayForecast(locationSearch: String!, units: Units!): [Weather]
   }
 `;
