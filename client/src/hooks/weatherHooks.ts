@@ -22,7 +22,7 @@ export const useCurrentWeatherData = ({
         if (currentWeatherLoading) {
             setMessage('Loading...');
         } else if (currentWeatherError) {
-            setMessage(`An error occurred with Apollo: ${currentWeatherError.message}`);
+            setMessage(currentWeatherError.message);
         } else {
             dispatch(setCurrentWeatherData(currentWeatherData));
             setMessage('');

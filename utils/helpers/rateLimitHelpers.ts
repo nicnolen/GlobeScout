@@ -25,7 +25,7 @@ export async function incrementRequestCount(email: string, apiName: string): Pro
 
         // Check if making the request would exceed the maxRequests limit
         if (api.requestsMade >= api.maxRequests) {
-            throw new Error(`API request limit reached for ${apiName}. Please try again later.`);
+            throw new Error(`${apiName} request limit reached: ${api.requestsMade}/${api.maxRequests} requests made.`);
         }
 
         // Increment the requestsMade count for the API if it is within the limit
@@ -34,7 +34,7 @@ export async function incrementRequestCount(email: string, apiName: string): Pro
             {
                 $inc: { [`services.${apiName}.requestsMade`]: 1 }, // Increment the requestsMade count
             },
-            { new: true }, // Return the updated user document (optional, but useful for logging)
+            { new: true },
         );
     } catch (err: unknown) {
         const customMessage = 'Error updating the requestsMade count for OpenWeather API';

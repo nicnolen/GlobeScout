@@ -69,7 +69,7 @@ export default function GlobeScout(): JSX.Element {
                 {topTenPlacesLoading ? (
                     <p>Loading top places...</p>
                 ) : topTenPlacesError ? (
-                    <p>Error fetching places.</p>
+                    <p>{topTenPlacesError.message}</p>
                 ) : (
                     <>
                         <h2 className="subtitle mt-8">Top 10 Places</h2>
