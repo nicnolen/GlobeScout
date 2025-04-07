@@ -20,8 +20,8 @@ export default function NavBarWrapper(): JSX.Element {
             <Image
                 src="/images/GlobeScoutLogoLarge.webp"
                 alt="GlobeScout Logo"
-                width={75}
-                height={75}
+                width={64}
+                height={64}
                 className="object-contain"
                 priority
                 unoptimized
