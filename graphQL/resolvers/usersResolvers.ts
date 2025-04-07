@@ -1,9 +1,10 @@
 import { getCurrentUser, getAllUsers, editUser, deleteUser, resetSingleApiCalls } from '../../library/graphQL/users';
+import { Context } from '../../types/graphQLContext';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export const usersResolvers = {
     Query: {
-        getCurrentUser: async (_parent: unknown, _args: unknown, context: any) => {
+        getCurrentUser: async (_parent: unknown, _args: unknown, context: Context) => {
             try {
                 return await getCurrentUser(context.user);
             } catch (err: unknown) {

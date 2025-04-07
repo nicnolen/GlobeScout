@@ -1,19 +1,20 @@
 import { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
-import Users, { UsersDocument } from '../models/users/Users';
+import Users from '../models/users/Users';
+import { User } from '../types/users';
 import { cookieOptions } from '../utils/helpers/authHelpers';
 import { generateAuthCode } from '../utils/authUtils';
 import { sendMail } from '../utils/nodemailer';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 export async function toggle2fa(req: Request, res: Response): Promise<void> {
-    const user = req.user as UsersDocument;
+    const user = req.user as User;
     const { is2faEnabled } = req.body;
 
     try {
         const findUser = await Users.findOneAndUpdate(
-            { _id: user.id },
+            { _id: user._id },
             { 'authentication.enabled': is2faEnabled },
             { new: true },
         );
@@ -37,7 +38,7 @@ export async function toggle2fa(req: Request, res: Response): Promise<void> {
 }
 
 export async function toggle2faMethod(req: Request, res: Response): Promise<void> {
-    const user = req.user as UsersDocument;
+    const user = req.user as User;
     const { isGoogleAuthEnabled } = req.body;
 
     try {
@@ -59,14 +60,14 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
             // If the method is 'authenticator' and it's being disabled, remove the authenticatorSecret
             if (method === 'authenticator' && !isEnabled) {
                 return await Users.findOneAndUpdate(
-                    { _id: user.id },
+                    { _id: user._id },
                     { $set: updateData, $unset: { 'authentication.authenticatorSecret': '' } },
                     { new: true },
                 );
             }
 
             // Otherwise, just update the methods field
-            return await Users.findOneAndUpdate({ _id: user.id }, { $set: updateData }, { new: true });
+            return await Users.findOneAndUpdate({ _id: user._id }, { $set: updateData }, { new: true });
         }
 
         async function generateAndSendQRCode() {
@@ -128,14 +129,14 @@ export async function toggle2faMethod(req: Request, res: Response): Promise<void
 }
 
 export async function email2faCode(req: Request, res: Response): Promise<void> {
-    const user = req.user as UsersDocument;
+    const user = req.user as User;
 
     try {
         const authCode = generateAuthCode();
         const emailCodeExpirationTime = new Date(Date.now() + 10 * 60 * 1000); // Code expires in 10 minutes
 
         const updatedUser = await Users.findOneAndUpdate(
-            { _id: user.id },
+            { _id: user._id },
             {
                 'authentication.emailCode': authCode,
                 'authentication.emailCodeExpiration': emailCodeExpirationTime,
@@ -164,7 +165,7 @@ export async function email2faCode(req: Request, res: Response): Promise<void> {
 
 export async function validate2fa(req: Request, res: Response): Promise<void> {
     const { code } = req.body;
-    const user = req.user as UsersDocument;
+    const user = req.user as User;
 
     try {
         if (!code) {
@@ -182,7 +183,7 @@ export async function validate2fa(req: Request, res: Response): Promise<void> {
         // Check if email code is being used
         if (emailCode && emailCodeExpiration && emailCodeExpiration > new Date() && emailCode === code) {
             await Users.findOneAndUpdate(
-                { _id: user.id },
+                { _id: user._id },
                 {
                     $unset: {
                         'authentication.emailCode': '',

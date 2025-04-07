@@ -4,8 +4,8 @@ import { GraphQLError } from 'graphql';
 export function validateWeatherProps(props: {
     locationSearch: string;
     units: string;
-    openWeatherApiKey: string;
-    openWeatherUrl: string;
+    openWeatherApiKey: string | null;
+    openWeatherUrl: string | null;
 }) {
     const { locationSearch, units, openWeatherApiKey, openWeatherUrl } = props;
 

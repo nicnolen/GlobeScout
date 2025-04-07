@@ -1,5 +1,5 @@
 import { getTopTenPlaces } from '../../library/graphQL/googleMaps';
-
+import { Context } from '../../types/graphQLContext';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 interface GetTopTenPlacesArgs {
@@ -8,7 +8,7 @@ interface GetTopTenPlacesArgs {
 
 export const placeResolvers = {
     Query: {
-        getTopTenPlaces: async (_parent: unknown, { locationSearch }: GetTopTenPlacesArgs, context: any) => {
+        getTopTenPlaces: async (_parent: unknown, { locationSearch }: GetTopTenPlacesArgs, context: Context) => {
             try {
                 const googleMapsApiKey = context.apiKeys.googleMapsApiKey;
                 const googleMapsTextSearchUrl = context.apiBaseUrls.googleMapsTextSearchUrl;

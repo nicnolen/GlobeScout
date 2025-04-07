@@ -26,7 +26,7 @@ const UsersSchema = new Schema<UsersDocument>({
     },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
     lastLogin: { type: String, default: 'Never' },
-    active: { type: Boolean, default: true },
+    active: { type: Boolean, default: false },
     services: {
         openWeatherApi: { requestsMade: { type: Number, default: 0 }, maxRequests: { type: Number, default: 100 } },
         googleMapsApi: { requestsMade: { type: Number, default: 0 }, maxRequests: { type: Number, default: 50 } },

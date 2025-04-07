@@ -23,9 +23,9 @@ dayjs.extend(utc);
 interface GetWeatherProps {
     locationSearch: string;
     units: Units;
-    openWeatherApiKey: string;
-    openWeatherUrl: string;
-    user: UserData;
+    openWeatherApiKey: string | null;
+    openWeatherUrl: string | null;
+    user: UserData | null;
 }
 
 interface DailyForecastAccumulator {
@@ -43,11 +43,15 @@ interface DailyForecastAccumulator {
 export async function getCurrentWeather(
     locationSearch: string,
     units: string,
-    openWeatherApiKey: string,
-    openWeatherUrl: string,
-    user: UserData,
+    openWeatherApiKey: string | null,
+    openWeatherUrl: string | null,
+    user: UserData | null,
 ): Promise<Weather> {
     try {
+        if (!user) {
+            throw new GraphQLError('No valid user was found.');
+        }
+
         // Validate input properties
         validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 
@@ -110,6 +114,10 @@ export async function getFiveDayForecast({
     user,
 }: GetWeatherProps): Promise<FiveDayForecast> {
     try {
+        if (!user) {
+            throw new GraphQLError('No valid user was found.');
+        }
+
         // Validate input properties
         validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 

@@ -1,5 +1,5 @@
-import { Units } from '../../types/weather';
-import { Weather, FiveDayForecast } from '../../types/weather';
+import { Weather, FiveDayForecast, Units } from '../../types/weather';
+import { Context } from '../../types/graphQLContext';
 import { getCurrentWeather, getFiveDayForecast } from '../../library/graphQL/weather';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -17,7 +17,7 @@ export const weatherResolvers = {
         getCurrentWeather: async (
             _parent: unknown,
             { locationSearch, units }: GetCurrentWeatherArgs,
-            context: any,
+            context: Context,
         ): Promise<Weather> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;
@@ -34,7 +34,7 @@ export const weatherResolvers = {
         getFiveDayForecast: async (
             _parent: unknown,
             { locationSearch, units }: GetFiveDayForecastArgs,
-            context: any,
+            context: Context,
         ): Promise<FiveDayForecast> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;

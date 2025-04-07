@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongoose';
+
 export enum UserRole {
     USER = 'user',
     ADMIN = 'admin',
@@ -23,4 +25,12 @@ export interface UserData {
         openWeatherApi: { requestsMade: number; maxRequests: number };
         googleMapsApi: { requestsMade: number; maxRequests: number };
     };
+}
+
+export interface User extends UserData {
+    _id: ObjectId;
+    password: string;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: string;
+    __v: number;
 }

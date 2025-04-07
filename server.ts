@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import https from 'https';
 import { expressMiddleware } from '@apollo/server/express4';
+import { User } from './types/users';
+import { Context } from './types/graphQLContext';
 import passport from './utils/passport';
 import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
@@ -25,13 +27,13 @@ const app = next({ dev, dir: './client' });
 const handle = app.getRequestHandler();
 
 const apiKeys = {
-    openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+    openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? null,
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? null,
 };
 
 const apiBaseUrls = {
-    openWeatherUrl: process.env.OPENWEATHER_BASE_URL,
-    googleMapsTextSearchUrl: process.env.GOOGLE_MAPS_TEXT_SEARCH_URL,
+    openWeatherUrl: process.env.OPENWEATHER_BASE_URL ?? null,
+    googleMapsTextSearchUrl: process.env.GOOGLE_MAPS_TEXT_SEARCH_URL ?? null,
 };
 
 // Connect to MongoDB
@@ -58,8 +60,14 @@ async function startServer(): Promise<void> {
 
         // Explicitly cast Apollo's middleware as an Express RequestHandler
         const graphqlMiddleware = expressMiddleware(apolloServer, {
-            context: async ({ req }) => {
-                return { user: req.user || null, apiKeys: apiKeys || null, apiBaseUrls: apiBaseUrls || null };
+            context: async ({ req }): Promise<Context> => {
+                // Type assertion to match your custom User type
+                const user = req.user as User | null;
+                return {
+                    user,
+                    apiKeys: apiKeys || null,
+                    apiBaseUrls: apiBaseUrls || null,
+                };
             },
         }) as unknown as RequestHandler;
         // Apply Apollo Server middleware to the Express app
