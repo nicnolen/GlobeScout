@@ -1,6 +1,6 @@
 import React, { JSX, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserData } from '../../../../types/users';
+import { UserData, UserRole } from '../../../../types/users';
 import { EDIT_USER } from '../../graphQL/usersMutations';
 import Modal from '../common/Modal';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -38,6 +38,16 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setSelectedUser((prev) => (prev ? { ...prev, [name]: value } : prev));
+    };
+
+    const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { value } = e.target;
+        setSelectedUser((prev) => {
+            if (!prev) return prev;
+
+            // Type assertion to ensure role is of type UserRole
+            return { ...prev, role: value as UserRole };
+        });
     };
 
     const handleBooleanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -121,9 +131,9 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                 <div>
                     <label className="font-bold mb-2">Role:</label>
                     <select
-                        name="active"
-                        value={selectedUser?.role ? 'admin' : 'user'}
-                        onChange={handleBooleanChange}
+                        name="role"
+                        value={selectedUser?.role || 'user'}
+                        onChange={handleRoleChange}
                         className="input w-full"
                     >
                         <option value="admin">Admin</option>
