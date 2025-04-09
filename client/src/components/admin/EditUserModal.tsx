@@ -221,31 +221,31 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <div className="card space-y-3 p-4 mb-5">
                         <label className="block text-sm font-semibold text-gray-800 mb-4">Max Requests:</label>
 
-                        {Object.keys(selectedUser.services || {})
-                            .filter((service) => service !== '__typename' && selectedUser.services[service] !== null)
-                            .every((service) => selectedUser.services[service] === null) ? (
-                            <span className="text-sm text-gray-500">None</span>
+                        {Object.entries(selectedUser.services || {}).filter(
+                            ([service, value]) => service !== '__typename' && value !== null,
+                        ).length === 0 ? (
+                            <span className="text-sm">None</span>
                         ) : (
-                            Object.keys(selectedUser.services || {})
-                                .filter(
-                                    (service) => service !== '__typename' && selectedUser.services[service] !== null,
-                                )
-                                .map((service) => (
+                            Object.entries(selectedUser.services || {})
+                                .filter(([service, value]) => service !== '__typename' && value !== null)
+                                .map(([service, value]) => (
                                     <div key={service} className="flex items-center justify-between rounded-md px-3">
-                                        {/* Service Name + Input */}
                                         <div className="flex items-center gap-6 w-full max-w-sm">
                                             <span className="text-sm text-gray-800 w-24">{service}</span>
                                             <input
                                                 type="number"
-                                                value={selectedUser?.services[service]?.maxRequests || 50}
+                                                value={value.maxRequests}
                                                 onChange={(e) =>
                                                     handleMaxRequestsChange(service, parseInt(e.target.value, 10))
                                                 }
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '' || e.target.value === null) {
+                                                        handleMaxRequestsChange(service, 50);
+                                                    }
+                                                }}
                                                 className="w-24 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
-
-                                        {/* Revoke Button */}
                                         <button
                                             type="button"
                                             onClick={() => handleServiceChange(service)}
@@ -259,7 +259,6 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                         )}
                     </div>
 
-                    {/* Add New Service */}
                     <div>
                         <label className="font-bold">Add New Service:</label>
                         <select
@@ -267,16 +266,14 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                             value=""
                             onChange={(e) => {
                                 const newService = e.target.value;
-                                if (!newService) return;
-
-                                handleServiceChange(newService);
+                                if (newService) handleServiceChange(newService);
                             }}
                         >
                             <option value="" disabled>
                                 Select a service to add
                             </option>
                             {availableServices
-                                .filter((s) => !(selectedUser?.services && selectedUser.services[s]))
+                                .filter((service) => !(selectedUser?.services && selectedUser.services[service]))
                                 .map((service) => (
                                     <option key={service} value={service}>
                                         {service}

@@ -97,26 +97,20 @@ export default function UsersList(): JSX.Element {
                                 </td>
                                 <td className="px-4 py-3 border">{user.authentication?.enabled ? 'Yes' : 'No'}</td>
                                 <td className="px-4 py-3 border">
-                                    {Object.keys(user.services || {})
-                                        .filter(
-                                            (service) => service !== '__typename' && user.services[service] !== null,
-                                        )
-                                        .every((service) => user.services[service] === null) ? (
-                                        <span className="text-sm text-gray-500">None</span>
+                                    {Object.entries(user.services || {}).filter(
+                                        ([service, value]) => service !== '__typename' && value !== null,
+                                    ).length === 0 ? (
+                                        <span className="text-sm">None</span>
                                     ) : (
-                                        Object.keys(user.services || {})
-                                            .filter(
-                                                (service) =>
-                                                    service !== '__typename' && user.services[service] !== null,
-                                            )
-                                            .map((service) => (
+                                        Object.entries(user.services || {})
+                                            .filter(([service, value]) => service !== '__typename' && value !== null)
+                                            .map(([service, { requestsMade, maxRequests }]) => (
                                                 <div
                                                     key={service}
                                                     className="flex items-center justify-between text-sm mb-1"
                                                 >
                                                     <span>
-                                                        {service}: {user.services[service]?.requestsMade} /{' '}
-                                                        {user.services[service]?.maxRequests}
+                                                        {service}: {requestsMade} / {maxRequests}
                                                     </span>
                                                     <button
                                                         onClick={() => handleOpenResetCallsModal(user.email, service)}
