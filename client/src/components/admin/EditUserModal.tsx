@@ -221,30 +221,34 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <div className="card space-y-3 p-4 mb-5">
                         <label className="block text-sm font-semibold text-gray-800 mb-4">Max Requests:</label>
 
-                        {Object.keys(selectedUser?.services || {}).map((service) => (
-                            <div key={service} className="flex items-center justify-between rounded-md px-3">
-                                {/* Service Name + Input */}
-                                <div className="flex items-center gap-6 w-full max-w-sm">
-                                    <span className="text-sm text-gray-800 w-24">{service}</span>
-                                    <input
-                                        type="number"
-                                        value={selectedUser?.services[service]?.maxRequests || 50}
-                                        onChange={(e) => handleMaxRequestsChange(service, parseInt(e.target.value, 10))}
-                                        className="w-24 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
-                                    />
-                                </div>
+                        {Object.keys(selectedUser?.services || {})
+                            .filter((service) => selectedUser.services[service] !== null)
+                            .map((service) => (
+                                <div key={service} className="flex items-center justify-between rounded-md px-3">
+                                    {/* Service Name + Input */}
+                                    <div className="flex items-center gap-6 w-full max-w-sm">
+                                        <span className="text-sm text-gray-800 w-24">{service}</span>
+                                        <input
+                                            type="number"
+                                            value={selectedUser?.services[service]?.maxRequests || 50}
+                                            onChange={(e) =>
+                                                handleMaxRequestsChange(service, parseInt(e.target.value, 10))
+                                            }
+                                            className="w-24 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
 
-                                {/* Revoke Button */}
-                                <button
-                                    type="button"
-                                    onClick={() => handleServiceChange(service)}
-                                    className="button dangerButton px-3 py-1 text-sm"
-                                >
-                                    <i className="fas fa-times mr-1" />
-                                    Revoke
-                                </button>
-                            </div>
-                        ))}
+                                    {/* Revoke Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleServiceChange(service)}
+                                        className="button dangerButton px-3 py-1 text-sm"
+                                    >
+                                        <i className="fas fa-times mr-1" />
+                                        Revoke
+                                    </button>
+                                </div>
+                            ))}
                     </div>
 
                     {/* Add New Service */}

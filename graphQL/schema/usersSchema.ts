@@ -10,13 +10,13 @@ export const GET_USERS = `
   }
 
   type ServiceUsage {
-    requestsMade: Int!
-    maxRequests: Int!
+    requestsMade: Int
+    maxRequests: Int
   }
 
   type Services {
-    openWeatherApi: ServiceUsage!
-    googleMapsApi: ServiceUsage!
+    openWeatherApi: ServiceUsage
+    googleMapsApi: ServiceUsage
   }
 
   type User {

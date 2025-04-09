@@ -44,13 +44,20 @@ export async function getAllUsers(): Promise<UserData[]> {
         return users.map((user) => {
             const { authenticatorSecret, ...authenticationWithoutSecret } = user.authentication;
 
+            // Filter out services that are empty objects
+            const filteredServices = Object.fromEntries(
+                Object.entries(user.services).filter(([_, value]) => {
+                    return value && Object.values(value).some((v) => v != null);
+                }),
+            );
+
             return {
                 email: user.email,
                 role: user.role,
                 lastLogin: user.lastLogin,
                 active: user.active,
                 authentication: authenticationWithoutSecret,
-                services: user.services,
+                services: filteredServices,
             };
         });
     } catch (err: unknown) {

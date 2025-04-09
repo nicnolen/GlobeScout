@@ -28,8 +28,8 @@ const UsersSchema = new Schema<UsersDocument>({
     lastLogin: { type: String, default: 'Never' },
     active: { type: Boolean, default: false },
     services: {
-        openWeatherApi: { requestsMade: { type: Number, default: 0 }, maxRequests: { type: Number, default: 100 } },
-        googleMapsApi: { requestsMade: { type: Number, default: 0 }, maxRequests: { type: Number, default: 50 } },
+        openWeatherApi: { requestsMade: { type: Number }, maxRequests: { type: Number } },
+        googleMapsApi: { requestsMade: { type: Number }, maxRequests: { type: Number } },
     },
 });
 

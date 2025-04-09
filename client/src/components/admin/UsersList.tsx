@@ -98,7 +98,9 @@ export default function UsersList(): JSX.Element {
                                 <td className="px-4 py-3 border">{user.authentication?.enabled ? 'Yes' : 'No'}</td>
                                 <td className="px-4 py-3 border">
                                     {Object.keys(user.services || {})
-                                        .filter((service) => service !== '__typename')
+                                        .filter(
+                                            (service) => service !== '__typename' && user.services[service] !== null,
+                                        )
                                         .map((service) => (
                                             <div
                                                 key={service}

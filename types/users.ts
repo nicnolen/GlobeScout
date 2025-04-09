@@ -22,8 +22,8 @@ export interface UserData {
         emailCodeExpiration?: Date;
     };
     services: {
-        openWeatherApi: { requestsMade: number; maxRequests: number };
-        googleMapsApi: { requestsMade: number; maxRequests: number };
+        openWeatherApi?: { requestsMade: number; maxRequests: number };
+        googleMapsApi?: { requestsMade: number; maxRequests: number };
     };
 }
 
