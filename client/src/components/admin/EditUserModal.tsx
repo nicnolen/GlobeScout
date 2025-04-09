@@ -1,6 +1,6 @@
 import React, { JSX, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserData, UserRole } from '../../../../types/users';
+import { UserData } from '../../../../types/users';
 import { EDIT_USER } from '../../graphQL/usersMutations';
 import Modal from '../common/Modal';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -35,24 +35,11 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setSelectedUser((prev) => (prev ? { ...prev, [name]: value } : prev));
-    };
-
-    const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { value } = e.target;
-        setSelectedUser((prev) => {
-            if (!prev) return prev;
-
-            // Type assertion to ensure role is of type UserRole
-            return { ...prev, role: value as UserRole };
-        });
-    };
-
-    const handleBooleanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setSelectedUser((prev) => (prev ? { ...prev, [name]: value === 'true' } : prev));
+        setSelectedUser((prev) =>
+            prev ? { ...prev, [name]: value === 'true' || value === 'false' ? value === 'true' : value } : prev,
+        );
     };
 
     const handleServiceChange = (service: string) => {
@@ -126,7 +113,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                         type="email"
                         name="email"
                         value={selectedUser?.email || ''}
-                        onChange={handleInputChange}
+                        onChange={handleChange}
                         className="input w-full"
                     />
                 </div>
@@ -136,7 +123,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <select
                         name="role"
                         value={selectedUser?.role || 'user'}
-                        onChange={handleRoleChange}
+                        onChange={handleChange}
                         className="input w-full"
                     >
                         <option value="admin">Admin</option>
@@ -149,7 +136,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <select
                         name="active"
                         value={selectedUser?.active ? 'true' : 'false'}
-                        onChange={handleBooleanChange}
+                        onChange={handleChange}
                         className="input w-full"
                     >
                         <option value="true">True</option>
