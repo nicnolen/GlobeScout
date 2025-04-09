@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import User from '../models/users/Users';
+import UserModel from '../models/users/Users';
+import { User } from '../types/users';
 import dotenv from 'dotenv';
 import { catchErrorHandler } from './errorHandlers';
 
@@ -12,7 +13,15 @@ if (!JWT_SECRET) {
     throw new Error('JWT_SECRET environment variable is not defined.');
 }
 
-const cookieExtractor = (req: any) => {
+interface Request {
+    cookies: { [key: string]: string };
+}
+
+interface JwtPayload {
+    id: string;
+}
+
+const cookieExtractor = (req: Request) => {
     return req.cookies ? req.cookies['accessToken'] : null;
 };
 
@@ -22,9 +31,9 @@ passport.use(
             secretOrKey: JWT_SECRET,
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]), // Extract JWT from the cookie
         },
-        async (jwtPayload: any, done: (err: any, user: any) => void) => {
+        async (jwtPayload: JwtPayload, done: (err: unknown, user: User | false) => void) => {
             try {
-                const user = await User.findById(jwtPayload.id); // Find user by the id in the JWT payload
+                const user = await UserModel.findById(jwtPayload.id); // Find user by the id in the JWT payload
                 if (user) {
                     return done(null, user); // Successfully authenticated
                 } else {
