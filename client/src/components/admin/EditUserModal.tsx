@@ -1,4 +1,4 @@
-import React, { JSX, useState } from 'react';
+import React, { JSX, useState, useRef } from 'react';
 import { useMutation } from '@apollo/client';
 import { UserData } from '../../../../types/users';
 import { EDIT_USER } from '../../graphQL/usersMutations';
@@ -13,10 +13,13 @@ interface UserEditModalProps {
 
 export default function EditUserModal({ selectedUser, setSelectedUser, handleClose }: UserEditModalProps): JSX.Element {
     const [message, setMessage] = useState<string>('');
+    const initialUserRef = useRef(selectedUser);
 
     const [editUser] = useMutation(EDIT_USER, {
         refetchQueries: ['getAllUsers'],
     });
+
+    const isUserChanged = JSON.stringify(selectedUser) !== JSON.stringify(initialUserRef.current);
 
     const handleEditSubmit = async () => {
         if (!selectedUser) {
@@ -129,7 +132,12 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
     const availableServices = ['openWeatherApi', 'googleMapsApi'];
 
     const footerButtons = (
-        <button type="submit" onClick={handleEditSubmit} className="px-4 py-2 button primaryButton">
+        <button
+            type="submit"
+            onClick={handleEditSubmit}
+            className="px-4 py-2 button primaryButton"
+            disabled={!isUserChanged}
+        >
             Edit User
         </button>
     );
@@ -190,8 +198,9 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                         name="authenticationEnabled"
                         checked={selectedUser.authentication.enabled}
                         onChange={handleAuthChange}
+                        className="cursor-pointer"
                     />
-                    <label htmlFor="authenticationEnabled" className="ml-2 block text-sm">
+                    <label htmlFor="authenticationEnabled" className="ml-2 block text-sm cursor-pointer">
                         Authentication Enabled
                     </label>
                 </div>
@@ -209,6 +218,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                                             id={method}
                                             checked={selectedUser.authentication.methods[method] ?? false}
                                             onChange={(e) => handleAuthMethodChange(method, e.target.checked)}
+                                            className="cursor-pointer"
                                         />
                                         <label htmlFor={method} className="cursor-pointer capitalize text-sm">
                                             {method}
@@ -245,7 +255,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                                                         handleMaxRequestsChange(service, 1);
                                                     }
                                                 }}
-                                                className="w-24 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
+                                                className="w-20 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
                                         <button

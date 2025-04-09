@@ -22,6 +22,28 @@ export function useOutsideClick(callback: () => void) {
     return ref;
 }
 
+export function useEscKey(isOpen: boolean, onClose: () => void) {
+    useEffect(() => {
+        const handleEscKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscKey);
+
+        // Prevent scrolling on body when modal is open
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscKey);
+            document.body.style.overflow = 'auto';
+        };
+    }, [isOpen, onClose]);
+}
+
 export function useAutoLogout() {
     const router = useRouter();
 
