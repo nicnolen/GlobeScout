@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect, JSX } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
@@ -110,13 +108,13 @@ export default function TwoFactorSettings(): JSX.Element {
 
                         <div className="space-y-2">
                             <div className="flex items-center justify-between p-2 border rounded">
-                                <span>Google Authenticator</span>
+                                <span>Authenticator</span>
                                 <i
                                     className={`text-xl ${isUpdating ? <i className="fa-solid fa-spinner text-xl text-blue-500 animate-spin" /> : isGoogleAuthEnabled ? 'text-green-500 fas fa-check-circle' : 'text-red-500 fas fa-times-circle'}`}
                                 />
                                 {!isGoogleAuthEnabled && (
                                     <button
-                                        className="button primaryButton"
+                                        className="button primaryButton py-2 px-4"
                                         onClick={() => toggle2faMethod(true)}
                                         disabled={isUpdating}
                                     >
@@ -125,7 +123,7 @@ export default function TwoFactorSettings(): JSX.Element {
                                         ) : (
                                             <i className="fas fa-qrcode mr-1" />
                                         )}{' '}
-                                        Set up Google Authenticator
+                                        Set up Authenticator
                                     </button>
                                 )}
                             </div>

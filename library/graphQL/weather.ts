@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { GraphQLError } from 'graphql';
 import {
     Weather,
     FiveDayForecast,
@@ -9,17 +10,22 @@ import {
     FiveDayForecastResponse,
     Units,
 } from '../../types/weather';
+import { UserData } from '../../types/users';
 import CurrentWeatherModel from '../../models/caches/CurrentWeatherCache';
 import FiveDayForecastModel from '../../models/caches/FiveDayForecastCache';
+import { incrementRequestCount } from '../../utils/helpers/rateLimitHelpers';
+import { validateWeatherProps } from '../../utils/helpers/weatherHelpers';
+import { formatLocation } from '../../utils/helpers/helpers';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dayjs.extend(utc);
 
 interface GetWeatherProps {
-    location: string;
+    locationSearch: string;
     units: Units;
-    openWeatherApiKey: string;
-    openWeatherUrl: string;
+    openWeatherApiKey: string | null;
+    openWeatherUrl: string | null;
+    user: UserData | null;
 }
 
 interface DailyForecastAccumulator {
@@ -35,32 +41,21 @@ interface DailyForecastAccumulator {
 }
 
 export async function getCurrentWeather(
-    location: string,
+    locationSearch: string,
     units: string,
-    openWeatherApiKey: string,
-    openWeatherUrl: string,
+    openWeatherApiKey: string | null,
+    openWeatherUrl: string | null,
+    user: UserData | null,
 ): Promise<Weather> {
     try {
-        if (!openWeatherApiKey) {
-            throw new Error('OpenWeatherMap Error: API Key is missing.');
+        if (!user) {
+            throw new GraphQLError('No valid user was found.');
         }
 
-        if (!openWeatherUrl) {
-            throw new Error('OpenWeatherMap Error: Base URL is missing.');
-        }
+        // Validate input properties
+        validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 
-        if (!location) {
-            throw new Error('getCurrentWeather: location can not be empty.');
-        }
-
-        if (!units) {
-            throw new Error('getCurrentWeather: units can not be empty.');
-        }
-
-        const sanitizedLocation = location.trim().toLowerCase();
-        // Capitalize first letter of each word for display
-        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
-
+        const displayLocation = formatLocation(locationSearch);
         const cachedCurrentWeather = await CurrentWeatherModel.findOne({ location: displayLocation, units });
 
         if (cachedCurrentWeather) {
@@ -68,8 +63,10 @@ export async function getCurrentWeather(
             return cachedCurrentWeather.currentWeather;
         }
 
+        await incrementRequestCount(user.email, 'openWeatherApi');
+
         const response = await axios.get<CurrentWeatherResponse>(
-            `${openWeatherUrl}/weather?q=${location}&appid=${openWeatherApiKey}&units=${units}`,
+            `${openWeatherUrl}/weather?q=${locationSearch}&appid=${openWeatherApiKey}&units=${units}`,
         );
 
         const { weather, main, wind, sys, visibility } = response.data;
@@ -104,39 +101,28 @@ export async function getCurrentWeather(
         return fortmattedCurrentWeather;
     } catch (err: unknown) {
         const customMessage = 'Error fetching current weather data from OpenWeatherMap';
-        catchErrorHandler(err, customMessage);
-        throw err;
+        const finalMessage = catchErrorHandler(err, customMessage);
+        throw new GraphQLError(finalMessage);
     }
 }
 
 export async function getFiveDayForecast({
-    location,
+    locationSearch,
     units,
     openWeatherApiKey,
     openWeatherUrl,
+    user,
 }: GetWeatherProps): Promise<FiveDayForecast> {
     try {
-        if (!openWeatherApiKey) {
-            throw new Error('OpenWeatherMap Error: API Key is missing.');
+        if (!user) {
+            throw new GraphQLError('No valid user was found.');
         }
 
-        if (!openWeatherUrl) {
-            throw new Error('OpenWeatherMap Error: Base URL is missing.');
-        }
+        // Validate input properties
+        validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 
-        if (!location) {
-            throw new Error('getCurrentWeather: location can not be empty.');
-        }
+        const displayLocation = formatLocation(locationSearch);
 
-        if (!units) {
-            throw new Error('getCurrentWeather: units can not be empty.');
-        }
-
-        const sanitizedLocation = location.trim().toLowerCase();
-        // Capitalize first letter of each word for display
-        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
-
-        // Check the cache first (MongoDB)
         const cachedFiveDayForecast = await FiveDayForecastModel.findOne({
             location: displayLocation,
             units,
@@ -147,13 +133,14 @@ export async function getFiveDayForecast({
             return cachedFiveDayForecast.fiveDayForecast;
         }
 
-        // Fetch the 5-day forecast from OpenWeather API
+        await incrementRequestCount(user.email, 'openWeatherApi');
+
         const response = await axios.get<FiveDayForecastResponse>(
-            `${openWeatherUrl}/forecast?q=${location}&appid=${openWeatherApiKey}&units=${units}`,
+            `${openWeatherUrl}/forecast?q=${locationSearch}&appid=${openWeatherApiKey}&units=${units}`,
         );
 
-        const { list } = response.data;
-        const country = response.data.city.country;
+        const { list, city } = response.data;
+        const country = city.country;
 
         // Determine today's date
         const today = dayjs().format('dddd MM/DD/YYYY');
@@ -248,7 +235,7 @@ export async function getFiveDayForecast({
         return formattedForecastEntries;
     } catch (err: unknown) {
         const customMessage = 'Error fetching five day weather forecast from OpenWeatherMap';
-        catchErrorHandler(err, customMessage);
-        throw err;
+        const finalMessage = catchErrorHandler(err, customMessage);
+        throw new GraphQLError(finalMessage);
     }
 }

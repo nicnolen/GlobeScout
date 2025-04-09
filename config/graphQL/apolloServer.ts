@@ -1,4 +1,5 @@
 import { ApolloServer } from '@apollo/server';
+import { Context } from '../../types/graphQLContext';
 import { typeDefs } from '../../graphQL/schema/index';
 import { resolvers } from '../../graphQL/resolvers/index';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -9,7 +10,7 @@ const apolloServer = new ApolloServer({
     resolvers,
 });
 
-export async function startApolloServer(): Promise<ApolloServer> {
+export async function startApolloServer(): Promise<ApolloServer<Context>> {
     try {
         await apolloServer.start();
         console.info('Apollo server successfully started');

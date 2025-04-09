@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/verify', passport.authenticate('jwt', { session: false }), verify);
 
-router.post('/register', passport.authenticate('jwt', { session: false }), register);
+router.post('/register', register);
 
 router.post('/login', login);
 

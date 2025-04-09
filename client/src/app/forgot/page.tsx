@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -45,16 +45,16 @@ export default function ResetPasswordPage(): JSX.Element {
                             value={email}
                             onChange={handleEmailChange}
                             required
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                         />
                     </div>
 
-                    <button type="submit" className="w-full button primaryButton">
+                    <button type="submit" className="w-full button primaryButton py-2 px-4">
                         Send Reset Link
                     </button>
                     {message && <div className={`${isEmailSent} text-sm text-center my-4`}>{message}</div>}
                     <div className="mt-4 text-center">
-                        <Link href="/login" className="text-sm text-indigo-600 hover:underline">
+                        <Link href="/login" className="link text-sm">
                             Back to Login
                         </Link>
                     </div>

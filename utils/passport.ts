@@ -22,7 +22,7 @@ passport.use(
             secretOrKey: JWT_SECRET,
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]), // Extract JWT from the cookie
         },
-        async (jwtPayload: any, done: (err: any, user?: any) => void) => {
+        async (jwtPayload: any, done: (err: any, user: any) => void) => {
             try {
                 const user = await User.findById(jwtPayload.id); // Find user by the id in the JWT payload
                 if (user) {

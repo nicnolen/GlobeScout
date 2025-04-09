@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, JSX } from 'react';
+import { JSX, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -41,11 +41,11 @@ export default function ResetPassword(): JSX.Element {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="input mt-1"
+                            className="input mt-1 w-full"
                             required
                         />
                     </div>
-                    <button type="submit" className="w-full button primaryButton">
+                    <button type="submit" className="w-full button primaryButton py-2 px-4">
                         Reset Password
                     </button>
 

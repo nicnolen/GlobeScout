@@ -1,5 +1,3 @@
-'use client';
-
 import React, { JSX } from 'react';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
@@ -35,7 +33,7 @@ export default function WeatherForecastButton({
             type="button"
             onClick={handleWeatherButtonClick}
             disabled={isLoading || !!isError || !currentWeatherData} // !!error will convert ApolloError to true and null to false
-            className={`button primaryButton ${isLoading ? 'disabled:cursor-wait' : 'disabled:cursor-not-allowed'}`}
+            className={`button primaryButton py-2 px-4 ${isLoading ? 'disabled:cursor-wait' : 'disabled:cursor-not-allowed'}`}
         >
             {currentWeatherData.icon && (
                 <Image

@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongoose';
+
 export enum UserRole {
     USER = 'user',
     ADMIN = 'admin',
@@ -7,7 +9,7 @@ export enum UserRole {
 export interface UserData {
     email: string;
     role: UserRole;
-    lastLogin: Date | null;
+    lastLogin?: string;
     active: boolean;
     authentication: {
         enabled: boolean;
@@ -15,12 +17,20 @@ export interface UserData {
             email: boolean;
             authenticator: boolean;
         };
-        authenticatorSecret: string;
-        emailCode: string;
-        emailCodeExpiration: Date;
+        authenticatorSecret?: string;
+        emailCode?: string;
+        emailCodeExpiration?: Date;
     };
     services: {
-        openWeatherApi: { requestsMade: number; maxRequests: number };
-        googleMapsApi: { requestsMade: number; maxRequests: number };
+        openWeatherApi?: { requestsMade: number; maxRequests: number };
+        googleMapsApi?: { requestsMade: number; maxRequests: number };
     };
+}
+
+export interface User extends UserData {
+    _id: ObjectId;
+    password: string;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: string;
+    __v: number;
 }

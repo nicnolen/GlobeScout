@@ -1,14 +1,14 @@
 import React, { JSX } from 'react';
 
 interface GlobeScoutTitleProps {
-    location: string;
+    locationSearch: string;
     message: string;
 }
 
-export default function GlobeScoutTitle({ location, message }: GlobeScoutTitleProps): JSX.Element {
+export default function GlobeScoutTitle({ locationSearch, message }: GlobeScoutTitleProps): JSX.Element {
     return (
         <div>
-            {location && !message && <h1>{location}</h1>}
+            {locationSearch && !message && <h1>{locationSearch}</h1>}
             {message && <p>{message}</p>}
         </div>
     );

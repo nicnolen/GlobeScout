@@ -1,16 +1,21 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { GraphQLError } from 'graphql';
 import { PlaceProps, PlaceResponse } from '../../types/googleMaps';
+import { UserData } from '../../types/users';
 import { checkOpenNowStatus } from '../../utils/checkOpenNowStatus';
 import TopTenPlacesCacheModel from '../../models/caches/TopTenPlacesCache';
+import { incrementRequestCount } from '../../utils/helpers/rateLimitHelpers';
+import { formatLocation } from '../../utils/helpers/helpers';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 dotenv.config();
 
 interface TopTenPlacesParams {
     locationSearch: string;
-    googleMapsApiKey: string;
-    googleMapsTextSearchUrl: string;
+    googleMapsApiKey: string | null;
+    googleMapsTextSearchUrl: string | null;
+    user: UserData | null;
 }
 
 enum BusinessStatus {
@@ -37,23 +42,26 @@ export async function getTopTenPlaces({
     locationSearch,
     googleMapsApiKey,
     googleMapsTextSearchUrl,
+    user,
 }: TopTenPlacesParams): Promise<PlaceProps[]> {
     try {
+        if (!user) {
+            throw new GraphQLError('No valid user was found.');
+        }
+
         if (!googleMapsApiKey) {
-            throw new Error('Google Maps Error: Google Maps API key is missing.');
+            throw new GraphQLError('Google Maps Error: Google Maps API key is missing.');
         }
 
         if (!googleMapsTextSearchUrl) {
-            throw new Error('Google Maps Error: Google Maps text search URL is missing.');
+            throw new GraphQLError('Google Maps Error: Google Maps text search URL is missing.');
         }
 
         if (!locationSearch) {
-            throw new Error('getTopTenPlaces Error: locationSearch can not be empty');
+            throw new GraphQLError('Location is required, please provide a valid city or country.');
         }
 
-        const sanitizedLocation = locationSearch.trim().replace(/\s+/g, ' ').toLowerCase();
-        // Capitalize first letter of each word for display
-        const displayLocation = sanitizedLocation.replace(/\b\w/g, (char) => char.toUpperCase());
+        const displayLocation = formatLocation(locationSearch);
 
         const cachedTopTenPlaces = await TopTenPlacesCacheModel.findOne({ location: displayLocation });
 
@@ -61,6 +69,8 @@ export async function getTopTenPlaces({
             console.info('Cached top ten places data was found');
             return cachedTopTenPlaces.topTenPlaces;
         }
+
+        await incrementRequestCount(user.email, 'googleMapsApi');
 
         // Create the dynamic query for Google Places API
         const textQuery = `Top rated places in ${locationSearch}`;
@@ -146,7 +156,7 @@ export async function getTopTenPlaces({
         return sortedPlaces;
     } catch (err: unknown) {
         const customMessage = 'Error fetching places from Google Maps text search';
-        catchErrorHandler(err, customMessage);
-        throw err;
+        const finalMessage = catchErrorHandler(err, customMessage);
+        throw new GraphQLError(finalMessage);
     }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -63,12 +63,12 @@ export default function TwoFactorSetup(): JSX.Element {
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         placeholder="Enter code"
-                        className="input"
+                        className="input w-full"
                     />
                     <button
                         onClick={handleValidateCode}
                         disabled={loading}
-                        className="button primaryButton text-nowrap"
+                        className="button primaryButton py-2 px-4 text-nowrap"
                     >
                         {loading ? (
                             <>

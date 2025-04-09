@@ -2,13 +2,17 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import Users from '../models/users/Users';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import UsersModel from '../models/users/Users';
 import { createAccessToken, createRefreshToken, createResetToken } from '../utils/authUtils';
 import { cookieOptions } from '../utils/helpers/authHelpers';
 import { sendMail } from '../utils/nodemailer';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
+
+dayjs.extend(utc);
 
 // Register User
 export async function register(req: Request, res: Response): Promise<void> {
@@ -24,14 +28,14 @@ export async function register(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findOne({ email });
+        const user = await UsersModel.findOne({ email });
 
         if (user) {
             res.status(409).json({ message: `User with email ${user.email} already exists` });
             return;
         }
 
-        const newUser = new Users({ email, password });
+        const newUser = new UsersModel({ email, password });
 
         // Need to use save to trigger Mongoose pre('save') hook to hash passwords before storing them
         await newUser.save();
@@ -58,7 +62,12 @@ export async function login(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findOneAndUpdate({ email }, { lastLogin: new Date(), active: true }, { new: true });
+        const lastLogin = dayjs.utc().format('MM/DD/YYYY h:mm A');
+        const user = await UsersModel.findOneAndUpdate(
+            { email },
+            { lastLogin: lastLogin, active: true },
+            { new: true },
+        );
         if (!user) {
             res.status(401).json({ message: 'Invalid email' });
             return;
@@ -112,7 +121,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
         // Get user info from the token
         const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string };
 
-        const updatedUser = await Users.findOneAndUpdate({ _id: decoded.id }, { active: false }, { new: true });
+        const updatedUser = await UsersModel.findOneAndUpdate({ _id: decoded.id }, { active: false }, { new: true });
 
         if (!updatedUser) {
             res.status(404).json({ message: 'User not found' });
@@ -142,7 +151,7 @@ export async function forgot(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findOne({ email });
+        const user = await UsersModel.findOne({ email });
 
         if (!user) {
             res.status(404).json({ message: 'User not found' });
@@ -152,7 +161,7 @@ export async function forgot(req: Request, res: Response): Promise<void> {
         const { resetToken, hashedToken } = createResetToken();
         const resetTokenExpiration = Date.now() + 15 * 60 * 1000; // set expiration (15 mins)
 
-        const updateResult = await Users.findOneAndUpdate(
+        const updateResult = await UsersModel.findOneAndUpdate(
             { email },
             {
                 resetPasswordToken: hashedToken,
@@ -206,7 +215,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
         // Hash the token to compare with the stored token in the DB
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-        const user = await Users.findOne({
+        const user = await UsersModel.findOne({
             resetPasswordToken: hashedToken,
             resetPasswordExpires: { $gt: Date.now() }, // Ensure token has not expired
         });
@@ -221,7 +230,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        await Users.findOneAndUpdate(
+        await UsersModel.findOneAndUpdate(
             { _id: user._id },
             {
                 password: hashedPassword,
@@ -257,7 +266,7 @@ export async function verify(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const user = await Users.findById(decoded.id);
+        const user = await UsersModel.findById(decoded.id);
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             res.clearCookie('accessToken');

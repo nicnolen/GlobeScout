@@ -4,7 +4,11 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isPublicPath =
-        pathname === '/login' || pathname === '/forgot' || pathname === '/reset-password' || pathname === '/2fa';
+        pathname === '/login' ||
+        pathname === '/forgot' ||
+        pathname === '/reset-password' ||
+        pathname === '/2fa' ||
+        pathname === '/register';
 
     const accessToken = request.cookies.get('accessToken')?.value || '';
     const refreshToken = request.cookies.get('refreshToken')?.value || '';

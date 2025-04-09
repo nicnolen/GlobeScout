@@ -1,10 +1,10 @@
-import { Units } from '../../types/weather';
-import { Weather, FiveDayForecast } from '../../types/weather';
+import { Weather, FiveDayForecast, Units } from '../../types/weather';
+import { Context } from '../../types/graphQLContext';
 import { getCurrentWeather, getFiveDayForecast } from '../../library/graphQL/weather';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 interface GetWeatherArgs {
-    location: string;
+    locationSearch: string;
     units: Units;
 }
 
@@ -15,14 +15,16 @@ type GetFiveDayForecastArgs = GetWeatherArgs;
 export const weatherResolvers = {
     Query: {
         getCurrentWeather: async (
-            parent: any,
-            { location, units }: GetCurrentWeatherArgs,
-            context: any,
+            _parent: unknown,
+            { locationSearch, units }: GetCurrentWeatherArgs,
+            context: Context,
         ): Promise<Weather> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;
                 const openWeatherUrl = context.apiBaseUrls.openWeatherUrl;
-                return await getCurrentWeather(location, units, openWeatherApiKey, openWeatherUrl);
+                const user = context.user;
+
+                return await getCurrentWeather(locationSearch, units, openWeatherApiKey, openWeatherUrl, user);
             } catch (err: unknown) {
                 const customMessage = 'Error fetching current weather data from OpenWeatherMap';
                 catchErrorHandler(err, customMessage);
@@ -30,14 +32,16 @@ export const weatherResolvers = {
             }
         },
         getFiveDayForecast: async (
-            parent: any,
-            { location, units }: GetFiveDayForecastArgs,
-            context: any,
+            _parent: unknown,
+            { locationSearch, units }: GetFiveDayForecastArgs,
+            context: Context,
         ): Promise<FiveDayForecast> => {
             try {
                 const openWeatherApiKey = context.apiKeys.openWeatherApiKey;
                 const openWeatherUrl = context.apiBaseUrls.openWeatherUrl;
-                return await getFiveDayForecast({ location, units, openWeatherApiKey, openWeatherUrl });
+                const user = context.user;
+
+                return await getFiveDayForecast({ locationSearch, units, openWeatherApiKey, openWeatherUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching five day forecast data from OpenWeatherMap';
                 catchErrorHandler(err, customMessage);

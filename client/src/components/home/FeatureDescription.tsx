@@ -20,7 +20,7 @@ export default function FeatureDescription({
             <p className="mb-4">{description}</p>
             {buttonLink && (
                 <Link href={buttonLink}>
-                    <button className="button primaryButton">{buttonText}</button>
+                    <button className="button primaryButton py-2 px-4">{buttonText}</button>
                 </Link>
             )}
         </section>
