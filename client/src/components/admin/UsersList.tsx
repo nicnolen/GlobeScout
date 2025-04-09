@@ -101,23 +101,32 @@ export default function UsersList(): JSX.Element {
                                         .filter(
                                             (service) => service !== '__typename' && user.services[service] !== null,
                                         )
-                                        .map((service) => (
-                                            <div
-                                                key={service}
-                                                className="flex items-center justify-between text-sm mb-1"
-                                            >
-                                                <span>
-                                                    {service}: {user.services[service]?.requestsMade} /{' '}
-                                                    {user.services[service]?.maxRequests}
-                                                </span>
-                                                <button
-                                                    onClick={() => handleOpenResetCallsModal(user.email, service)}
-                                                    className="button dangerButton ml-2 px-2 py-1 text-xs"
+                                        .every((service) => user.services[service] === null) ? (
+                                        <span className="text-sm text-gray-500">None</span>
+                                    ) : (
+                                        Object.keys(user.services || {})
+                                            .filter(
+                                                (service) =>
+                                                    service !== '__typename' && user.services[service] !== null,
+                                            )
+                                            .map((service) => (
+                                                <div
+                                                    key={service}
+                                                    className="flex items-center justify-between text-sm mb-1"
                                                 >
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        ))}
+                                                    <span>
+                                                        {service}: {user.services[service]?.requestsMade} /{' '}
+                                                        {user.services[service]?.maxRequests}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => handleOpenResetCallsModal(user.email, service)}
+                                                        className="button dangerButton ml-2 px-2 py-1 text-xs"
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                            ))
+                                    )}
                                 </td>
                                 <td className="px-4 py-3 border">
                                     <div className="flex items-center justify-center space-x-2">
