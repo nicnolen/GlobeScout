@@ -81,9 +81,12 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
         setSelectedUser((prev) => {
             if (!prev) return prev;
 
+            // Ensure that value is not less than 1
+            const updatedValue = Math.max(value, 1);
+
             const updatedServices = { ...prev.services };
             if (updatedServices[service]) {
-                updatedServices[service].maxRequests = value;
+                updatedServices[service].maxRequests = updatedValue;
             }
 
             return {
@@ -239,8 +242,8 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                                                     handleMaxRequestsChange(service, parseInt(e.target.value, 10))
                                                 }
                                                 onBlur={(e) => {
-                                                    if (e.target.value === '' || e.target.value === null) {
-                                                        handleMaxRequestsChange(service, 50);
+                                                    if (e.target.value === '') {
+                                                        handleMaxRequestsChange(service, 1);
                                                     }
                                                 }}
                                                 className="w-24 text-center border border-gray-300 rounded-md p-1 focus:ring-2 focus:ring-blue-500"
