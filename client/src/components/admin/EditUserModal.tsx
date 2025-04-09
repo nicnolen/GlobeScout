@@ -37,9 +37,52 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setSelectedUser((prev) =>
-            prev ? { ...prev, [name]: value === 'true' || value === 'false' ? value === 'true' : value } : prev,
-        );
+        setSelectedUser((prev) => {
+            if (!prev) {
+                return prev;
+            }
+
+            // Convert 'true'/'false' strings to boolean, otherwise keep the original value
+            const updatedValue = value === 'true' ? true : value === 'false' ? false : value;
+
+            return { ...prev, [name]: updatedValue };
+        });
+    };
+
+    const handleAuthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { checked } = e.target;
+        setSelectedUser((prev) => {
+            if (!prev) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                authentication: {
+                    ...prev.authentication,
+                    enabled: checked,
+                },
+            };
+        });
+    };
+
+    const handleAuthMethodChange = (method: string, isChecked: boolean) => {
+        setSelectedUser((prev) => {
+            if (!prev) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                authentication: {
+                    ...prev.authentication,
+                    methods: {
+                        ...prev.authentication.methods,
+                        [method]: isChecked,
+                    },
+                },
+            };
+        });
     };
 
     const handleServiceChange = (service: string) => {
@@ -112,20 +155,16 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <input
                         type="email"
                         name="email"
-                        value={selectedUser?.email || ''}
+                        value={selectedUser.email}
                         onChange={handleChange}
                         className="input w-full"
+                        required
                     />
                 </div>
 
                 <div>
                     <label className="font-bold mb-2">Role:</label>
-                    <select
-                        name="role"
-                        value={selectedUser?.role || 'user'}
-                        onChange={handleChange}
-                        className="input w-full"
-                    >
+                    <select name="role" value={selectedUser.role} onChange={handleChange} className="input w-full">
                         <option value="admin">Admin</option>
                         <option value="user">User</option>
                     </select>
@@ -135,7 +174,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                     <label className="font-bold mb-2">Active:</label>
                     <select
                         name="active"
-                        value={selectedUser?.active ? 'true' : 'false'}
+                        value={selectedUser.active ? 'true' : 'false'}
                         onChange={handleChange}
                         className="input w-full"
                     >
@@ -149,20 +188,8 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                         type="checkbox"
                         id="authenticationEnabled"
                         name="authenticationEnabled"
-                        checked={selectedUser?.authentication?.enabled || false}
-                        onChange={(e) =>
-                            setSelectedUser((prev) =>
-                                prev
-                                    ? {
-                                          ...prev,
-                                          authentication: {
-                                              ...prev.authentication,
-                                              enabled: e.target.checked,
-                                          },
-                                      }
-                                    : prev,
-                            )
-                        }
+                        checked={selectedUser.authentication.enabled}
+                        onChange={handleAuthChange}
                     />
                     <label htmlFor="authenticationEnabled" className="ml-2 block text-sm">
                         Authentication Enabled
@@ -181,22 +208,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                                             type="checkbox"
                                             id={method}
                                             checked={selectedUser.authentication.methods[method] ?? false}
-                                            onChange={(e) =>
-                                                setSelectedUser((prev) =>
-                                                    prev
-                                                        ? {
-                                                              ...prev,
-                                                              authentication: {
-                                                                  ...prev.authentication,
-                                                                  methods: {
-                                                                      ...prev.authentication.methods,
-                                                                      [method]: e.target.checked,
-                                                                  },
-                                                              },
-                                                          }
-                                                        : prev,
-                                                )
-                                            }
+                                            onChange={(e) => handleAuthMethodChange(method, e.target.checked)}
                                         />
                                         <label htmlFor={method} className="cursor-pointer capitalize text-sm">
                                             {method}
