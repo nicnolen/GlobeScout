@@ -72,7 +72,7 @@ export default function UsersList(): JSX.Element {
                 <table className="w-full border border-gray-300">
                     <thead className="bg-black text-white">
                         <tr>
-                            {['Email', 'Role', 'Last Login', 'Status', 'Auth Enabled', 'Services', 'Actions'].map(
+                            {['Email', 'Role', 'Last Login (UTC)', 'Status', 'Auth Enabled', 'Services', 'Actions'].map(
                                 (heading) => (
                                     <th
                                         key={heading}
