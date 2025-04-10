@@ -15,7 +15,7 @@ interface TopTenPlacesParams {
     locationSearch: string;
     googleMapsApiKey: string | null;
     googleMapsTextSearchUrl: string | null;
-    user: UserData | null;
+    user: UserData;
 }
 
 enum BusinessStatus {
@@ -45,10 +45,6 @@ export async function getTopTenPlaces({
     user,
 }: TopTenPlacesParams): Promise<PlaceProps[]> {
     try {
-        if (!user) {
-            throw new GraphQLError('No valid user was found.');
-        }
-
         if (!googleMapsApiKey) {
             throw new GraphQLError('Google Maps Error: Google Maps API key is missing.');
         }

@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { getTopTenPlaces } from '../../library/graphQL/googleMaps';
 import { Context } from '../../types/graphQLContext';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -17,8 +18,8 @@ export const placeResolvers = {
                 return await getTopTenPlaces({ locationSearch, googleMapsApiKey, googleMapsTextSearchUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching top ten locations from Google Maps';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
     },

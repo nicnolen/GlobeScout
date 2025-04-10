@@ -11,15 +11,13 @@ import {
 import UsersModel from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-// Queries
-export async function getCurrentUser(user: User | null): Promise<UserData> {
-    try {
-        if (!user) {
-            throw new GraphQLError('User not authenticated', {
-                extensions: { code: 'UNAUTHENTICATED' },
-            });
-        }
+interface GetCurrentUserProps {
+    user: User;
+}
 
+// Queries
+export async function getCurrentUser({ user }: GetCurrentUserProps): Promise<UserData> {
+    try {
         const { email, role, lastLogin, active, authentication, services } = user;
 
         if (!active) {

@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { getCurrentUser, getAllUsers, editUser, deleteUser, resetSingleApiCalls } from '../../library/graphQL/users';
 import { Context } from '../../types/graphQLContext';
 import { EditUserProps, DeleteUserProps, ResetSingleApiCallsProps } from '../../types/users';
@@ -7,11 +8,13 @@ export const usersResolvers = {
     Query: {
         getCurrentUser: async (_parent: unknown, _args: unknown, context: Context) => {
             try {
-                return await getCurrentUser(context.user);
+                const user = context.user;
+
+                return await getCurrentUser({ user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching current user';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
         getAllUsers: async () => {
@@ -19,8 +22,8 @@ export const usersResolvers = {
                 return await getAllUsers();
             } catch (err: unknown) {
                 const customMessage = 'Error fetching all users';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
     },
@@ -31,8 +34,8 @@ export const usersResolvers = {
                 return await editUser({ email, input });
             } catch (err: unknown) {
                 const customMessage = 'Error editing user';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
         deleteUser: async (_parent: unknown, { email }: DeleteUserProps) => {
@@ -40,8 +43,8 @@ export const usersResolvers = {
                 return await deleteUser({ email });
             } catch (err: unknown) {
                 const customMessage = 'Error deleting user';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
         resetSingleApiCalls: async (_parent: unknown, { email, service }: ResetSingleApiCallsProps) => {
@@ -49,8 +52,8 @@ export const usersResolvers = {
                 return await resetSingleApiCalls({ email, service });
             } catch (err: unknown) {
                 const customMessage = 'Error resetting API calls';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
     },

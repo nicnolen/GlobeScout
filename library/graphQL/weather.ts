@@ -25,7 +25,7 @@ interface GetWeatherProps {
     units: Units;
     openWeatherApiKey: string | null;
     openWeatherUrl: string | null;
-    user: UserData | null;
+    user: UserData;
 }
 
 interface DailyForecastAccumulator {
@@ -40,18 +40,14 @@ interface DailyForecastAccumulator {
     maxTemperature: number;
 }
 
-export async function getCurrentWeather(
-    locationSearch: string,
-    units: string,
-    openWeatherApiKey: string | null,
-    openWeatherUrl: string | null,
-    user: UserData | null,
-): Promise<Weather> {
+export async function getCurrentWeather({
+    locationSearch,
+    units,
+    openWeatherApiKey,
+    openWeatherUrl,
+    user,
+}: GetWeatherProps): Promise<Weather> {
     try {
-        if (!user) {
-            throw new GraphQLError('No valid user was found.');
-        }
-
         // Validate input properties
         validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 
@@ -114,10 +110,6 @@ export async function getFiveDayForecast({
     user,
 }: GetWeatherProps): Promise<FiveDayForecast> {
     try {
-        if (!user) {
-            throw new GraphQLError('No valid user was found.');
-        }
-
         // Validate input properties
         validateWeatherProps({ locationSearch, units, openWeatherApiKey, openWeatherUrl });
 
