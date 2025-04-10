@@ -44,7 +44,7 @@ export function useEscKey(isOpen: boolean, onClose: () => void) {
     }, [isOpen, onClose]);
 }
 
-export function useAutoLogout() {
+export function useAutoLogout(): void {
     const router = useRouter();
 
     async function logoutUser() {

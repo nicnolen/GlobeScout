@@ -1,6 +1,6 @@
 import React, { JSX, useState, useRef } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserData } from '../../../../types/users';
+import { UserData, AuthMethod } from '../../../../types/users';
 import { EDIT_USER } from '../../graphQL/usersMutations';
 import Modal from '../common/Modal';
 import { catchErrorHandler } from '../../utils/errorHandlers';
@@ -130,6 +130,7 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
     };
 
     const availableServices = ['openWeatherApi', 'googleMapsApi'];
+    const authMethods = Object.values(AuthMethod);
 
     const footerButtons = (
         <button
@@ -208,23 +209,20 @@ export default function EditUserModal({ selectedUser, setSelectedUser, handleClo
                 <div>
                     <label className="font-bold mb-2">Authentication Methods:</label>
                     <div className="space-y-2 ml-2">
-                        {selectedUser?.authentication?.methods &&
-                            Object.keys(selectedUser.authentication.methods)
-                                .filter((method) => method !== '__typename')
-                                .map((method) => (
-                                    <div key={method} className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            id={method}
-                                            checked={selectedUser.authentication.methods[method] ?? false}
-                                            onChange={(e) => handleAuthMethodChange(method, e.target.checked)}
-                                            className="cursor-pointer"
-                                        />
-                                        <label htmlFor={method} className="cursor-pointer capitalize text-sm">
-                                            {method}
-                                        </label>
-                                    </div>
-                                ))}
+                        {authMethods.map((method) => (
+                            <div key={method} className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id={method}
+                                    checked={selectedUser?.authentication?.methods?.[method] ?? false}
+                                    onChange={(e) => handleAuthMethodChange(method, e.target.checked)}
+                                    className="cursor-pointer"
+                                />
+                                <label htmlFor={method} className="cursor-pointer capitalize text-sm">
+                                    {method}
+                                </label>
+                            </div>
+                        ))}
                     </div>
                 </div>
 

@@ -5,6 +5,16 @@ export enum UserRole {
     ADMIN = 'admin',
 }
 
+export enum AuthMethod {
+    EMAIL = 'email',
+    AUTHENTICATOR = 'authenticator',
+}
+
+export interface ServiceUsage {
+    requestsMade: number;
+    maxRequests: number;
+}
+
 // User data types to be used in the frontend (password excuded)
 export interface UserData {
     email: string;
@@ -14,16 +24,14 @@ export interface UserData {
     authentication: {
         enabled: boolean;
         methods: {
-            email: boolean;
-            authenticator: boolean;
+            [key in AuthMethod]: boolean;
         };
         authenticatorSecret?: string;
         emailCode?: string;
         emailCodeExpiration?: Date;
     };
     services: {
-        openWeatherApi?: { requestsMade: number; maxRequests: number };
-        googleMapsApi?: { requestsMade: number; maxRequests: number };
+        [key: string]: ServiceUsage; // Allows dynamic service keys
     };
 }
 

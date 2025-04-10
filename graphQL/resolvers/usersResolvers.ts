@@ -27,7 +27,6 @@ export const usersResolvers = {
     Mutation: {
         editUser: async (_parent: unknown, args: { email: string; input: any }) => {
             try {
-                console.log(args.input, 'input');
                 return await editUser(args.email, args.input);
             } catch (err: unknown) {
                 const customMessage = 'Error editing user';

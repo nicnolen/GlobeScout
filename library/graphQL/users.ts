@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { UserData, User } from '../../types/users';
+import { UserData, User, ServiceUsage } from '../../types/users';
 import UsersModel from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -45,11 +45,11 @@ export async function getAllUsers(): Promise<UserData[]> {
             const { authenticatorSecret, ...authenticationWithoutSecret } = user.authentication;
 
             // Filter out services that are empty objects
-            const filteredServices = Object.fromEntries(
+            const filteredServices: Record<string, ServiceUsage> = Object.fromEntries(
                 Object.entries(user.services).filter(([_, value]) => {
                     return value && Object.values(value).some((v) => v != null);
                 }),
-            );
+            ) as Record<string, ServiceUsage>;
 
             return {
                 email: user.email,
