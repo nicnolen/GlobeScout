@@ -1,5 +1,13 @@
 import { GraphQLError } from 'graphql';
-import { UserData, User, ServiceUsage, EditUserInput } from '../../types/users';
+import {
+    UserData,
+    User,
+    ServiceUsage,
+    EditUserInput,
+    EditUserProps,
+    DeleteUserProps,
+    ResetSingleApiCallsProps,
+} from '../../types/users';
 import UsersModel from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -67,7 +75,7 @@ export async function getAllUsers(): Promise<UserData[]> {
 }
 
 // Mutations
-export async function editUser(email: string, input: EditUserInput): Promise<User> {
+export async function editUser({ email, input }: EditUserProps): Promise<User> {
     try {
         // Handle service revocation: remove services that are set to null in input
         const updatedInput: Partial<EditUserInput> = { ...input };
@@ -104,7 +112,7 @@ export async function editUser(email: string, input: EditUserInput): Promise<Use
     }
 }
 
-export async function resetSingleApiCalls(email: string, service: string): Promise<User> {
+export async function resetSingleApiCalls({ email, service }: ResetSingleApiCallsProps): Promise<User> {
     try {
         // Construct the dynamic path to the service's requestsMade field
         const servicePath = `services.${service}.requestsMade`;
@@ -125,7 +133,7 @@ export async function resetSingleApiCalls(email: string, service: string): Promi
     }
 }
 
-export async function deleteUser(email: string): Promise<User> {
+export async function deleteUser({ email }: DeleteUserProps): Promise<User> {
     try {
         const deletedUser = await UsersModel.findOneAndDelete({ email });
 

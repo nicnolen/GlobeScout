@@ -1,6 +1,6 @@
 import { getCurrentUser, getAllUsers, editUser, deleteUser, resetSingleApiCalls } from '../../library/graphQL/users';
 import { Context } from '../../types/graphQLContext';
-import { EditUserInput } from '../../types/users';
+import { EditUserProps, DeleteUserProps, ResetSingleApiCallsProps } from '../../types/users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export const usersResolvers = {
@@ -26,27 +26,27 @@ export const usersResolvers = {
     },
 
     Mutation: {
-        editUser: async (_parent: unknown, args: { email: string; input: EditUserInput }) => {
+        editUser: async (_parent: unknown, { email, input }: EditUserProps) => {
             try {
-                return await editUser(args.email, args.input);
+                return await editUser({ email, input });
             } catch (err: unknown) {
                 const customMessage = 'Error editing user';
                 catchErrorHandler(err, customMessage);
                 throw err;
             }
         },
-        deleteUser: async (_parent: unknown, args: { email: string }) => {
+        deleteUser: async (_parent: unknown, { email }: DeleteUserProps) => {
             try {
-                return await deleteUser(args.email);
+                return await deleteUser({ email });
             } catch (err: unknown) {
                 const customMessage = 'Error deleting user';
                 catchErrorHandler(err, customMessage);
                 throw err;
             }
         },
-        resetSingleApiCalls: async (_parent: unknown, args: { email: string; service: string }) => {
+        resetSingleApiCalls: async (_parent: unknown, { email, service }: ResetSingleApiCallsProps) => {
             try {
-                return await resetSingleApiCalls(args.email, args.service);
+                return await resetSingleApiCalls({ email, service });
             } catch (err: unknown) {
                 const customMessage = 'Error resetting API calls';
                 catchErrorHandler(err, customMessage);

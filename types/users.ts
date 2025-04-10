@@ -51,3 +51,18 @@ export interface User extends UserData {
     resetPasswordExpires?: string;
     __v: number;
 }
+
+// Props
+export interface EditUserProps {
+    email: string;
+    input: EditUserInput;
+}
+
+export interface DeleteUserProps {
+    email: string;
+}
+
+export interface ResetSingleApiCallsProps {
+    email: string;
+    service: string;
+}
