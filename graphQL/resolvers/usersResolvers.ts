@@ -1,5 +1,6 @@
 import { getCurrentUser, getAllUsers, editUser, deleteUser, resetSingleApiCalls } from '../../library/graphQL/users';
 import { Context } from '../../types/graphQLContext';
+import { EditUserInput } from '../../types/users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export const usersResolvers = {
@@ -25,7 +26,7 @@ export const usersResolvers = {
     },
 
     Mutation: {
-        editUser: async (_parent: unknown, args: { email: string; input: any }) => {
+        editUser: async (_parent: unknown, args: { email: string; input: EditUserInput }) => {
             try {
                 return await editUser(args.email, args.input);
             } catch (err: unknown) {

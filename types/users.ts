@@ -15,12 +15,24 @@ export interface ServiceUsage {
     maxRequests: number;
 }
 
-// User data types to be used in the frontend (password excuded)
-export interface UserData {
+// Define the input for editing a user
+export interface EditUserInput {
     email: string;
     role: UserRole;
-    lastLogin?: string;
     active: boolean;
+    authentication: {
+        enabled: boolean;
+        methods: {
+            email: boolean;
+            authenticator: boolean;
+        };
+    };
+    services?: Record<string, ServiceUsage>; // Allow dynamic services
+}
+
+// User data types to be used in the frontend (password excuded)
+export interface UserData extends EditUserInput {
+    lastLogin?: string;
     authentication: {
         enabled: boolean;
         methods: {
@@ -29,9 +41,6 @@ export interface UserData {
         authenticatorSecret?: string;
         emailCode?: string;
         emailCodeExpiration?: Date;
-    };
-    services: {
-        [key: string]: ServiceUsage; // Allows dynamic service keys
     };
 }
 

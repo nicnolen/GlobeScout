@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { UserData, User, ServiceUsage } from '../../types/users';
+import { UserData, User, ServiceUsage, EditUserInput } from '../../types/users';
 import UsersModel from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
@@ -67,10 +67,11 @@ export async function getAllUsers(): Promise<UserData[]> {
 }
 
 // Mutations
-export async function editUser(email: string, input: any): Promise<User> {
+export async function editUser(email: string, input: EditUserInput): Promise<User> {
     try {
         // Handle service revocation: remove services that are set to null in input
-        const updatedInput: any = { ...input };
+        const updatedInput: Partial<EditUserInput> = { ...input };
+
         if (input.services) {
             for (const service in input.services) {
                 if (input.services[service] === null) {
