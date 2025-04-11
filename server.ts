@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, RequestHandler } from 'express';
+import express, { Express, RequestHandler } from 'express';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
