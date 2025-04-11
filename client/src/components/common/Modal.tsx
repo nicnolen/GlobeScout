@@ -1,4 +1,5 @@
-import React, { JSX, ReactNode, useEffect, useRef } from 'react';
+import React, { JSX, ReactNode, useRef } from 'react';
+import { useEscKey } from '../../hooks/eventHooks';
 
 interface ModalProps {
     isOpen: boolean;
@@ -24,27 +25,14 @@ export default function Modal({
     const modalRef = useRef<HTMLDivElement>(null);
 
     // Handle ESC key press to close modal
-    useEffect(() => {
-        const handleEscKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && isOpen) {
-                onClose();
-            }
-        };
-
-        document.addEventListener('keydown', handleEscKey);
-
-        // Prevent scrolling on body when modal is open
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        }
-
-        return () => {
-            document.removeEventListener('keydown', handleEscKey);
-            document.body.style.overflow = 'auto';
-        };
-    }, [isOpen, onClose]);
+    useEscKey(isOpen, onClose);
 
     const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        // Don't close the modal if text is selected
+        if (window.getSelection()?.toString()) {
+            return;
+        }
+
         if (closeOnOutsideClick && modalRef.current && !modalRef.current.contains(e.target as Node)) {
             onClose();
         }
@@ -57,20 +45,19 @@ export default function Modal({
         xl: 'max-w-4xl',
     };
 
+    const isSuccessMessage = message && message.includes('successful') ? 'text-green-500' : 'text-red-500';
+
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs p-4"
             onClick={handleOutsideClick}
             aria-modal="true"
             role="dialog"
         >
-            <div
-                ref={modalRef}
-                className={`${sizeClasses[size]} w-full bg-white rounded-lg shadow-xl overflow-hidden transform transition-all`}
-            >
+            <div ref={modalRef} className={`${sizeClasses[size]} w-full card`}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+                    <h3 className="text-lg font-bold">{title}</h3>
                     <button type="button" onClick={onClose} className="button">
                         <i className="fas fa-x" />
                     </button>
@@ -81,7 +68,7 @@ export default function Modal({
 
                 {/* Footer */}
                 <div className="px-4 py-3 bg-gray-50 border-t flex justify-end items-center">
-                    {message && <span className="text-sm text-gray-600 mr-3">{message}</span>}
+                    {message && <span className={`${isSuccessMessage} text-sm mr-3`}>{message}</span>}
                     <div className="flex space-x-3">{footerButtons}</div>
                 </div>
             </div>
