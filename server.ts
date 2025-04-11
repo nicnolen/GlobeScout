@@ -53,33 +53,50 @@ server.use(express.static(path.join(__dirname, 'client', 'public')));
 
 // ⬇️ 2. Apollo setup will still be async, call it after
 startApolloServer().then((apolloServer) => {
-    const graphqlMiddleware = expressMiddleware(apolloServer, {
-        context: async ({ req }) => {
-            const user = req.user as User | null;
-            return {
-                user,
-                apiKeys: apiKeys || null,
-                apiBaseUrls: apiBaseUrls || null,
+    try {
+        const server: Express = express();
+
+        server.use(passport.initialize());
+
+        // Apply passport to graphql
+        server.use('/graphql', passport.authenticate('jwt', { session: false }));
+
+        // Explicitly cast Apollo's middleware as an Express RequestHandler
+        const graphqlMiddleware = expressMiddleware(apolloServer, {
+            context: async ({ req }): Promise<Context> => {
+                // Type assertion to match your custom User type
+                const user = req.user as User | null;
+                return {
+                    user,
+                    apiKeys: apiKeys || null,
+                    apiBaseUrls: apiBaseUrls || null,
+                };
+            },
+        }) as unknown as RequestHandler;
+        // Apply Apollo Server middleware to the Express app
+        server.use('/graphql', graphqlMiddleware);
+
+        // Cron jobs
+        scheduleClearFiveDayForecastCache();
+        scheduleClearTopTenPlacesCache();
+        scheduleUpdateTopTenPlacesOpenNowStatus();
+
+        if (dev) {
+            // Start HTTPS server if not in Lambda environment
+            const options = {
+                key: fs.readFileSync('./private/private.key'),
+                cert: fs.readFileSync('./private/cert.pem'),
             };
-        },
-    }) as unknown as RequestHandler;
+            https.createServer(options, server).listen(PORT, () => {
+                console.info(`Server is running on https://localhost:${PORT}`);
+            });
+        }
 
-    server.use('/graphql', passport.authenticate('jwt', { session: false }));
-    server.use('/graphql', graphqlMiddleware);
-
-    // Schedule cron jobs
-    scheduleClearFiveDayForecastCache();
-    scheduleClearTopTenPlacesCache();
-    scheduleUpdateTopTenPlacesOpenNowStatus();
-
-    if (dev) {
-        const options = {
-            key: fs.readFileSync('./private/private.key'),
-            cert: fs.readFileSync('./private/cert.pem'),
-        };
-        https.createServer(options, server).listen(PORT, () => {
-            console.info(`Server is running on https://localhost:${PORT}`);
-        });
+        // Export the handler for Lambda
+        module.exports.handler = serverless(server);
+    } catch (err: unknown) {
+        const customMessage = 'Error starting server';
+        catchErrorHandler(err, customMessage);
     }
 });
 
