@@ -1,0 +1,50 @@
+service: globescout
+
+provider:
+    name: aws
+    runtime: nodejs22.x
+    region: us-east-2
+
+functions:
+    api:
+        handler: /server.handler
+        name: express-api-function
+        events:
+            - httpApi: '*'
+
+    # Cron jobs
+    scheduleClearFiveDayForecastCache:
+        handler: handler.scheduleClearFiveDayForecastCache
+        name: scheduleClearFiveDayForecastCache
+        events:
+            - schedule:
+                  rate: cron(0 0 * * ? *) # Runs every day at midnight
+                  enabled: true
+
+    scheduleClearTopTenPlacesCache:
+        handler: handler.scheduleClearTopTenPlacesCache
+        name: scheduleClearTopTenPlacesCache
+        events:
+            - schedule:
+                  rate: cron(0 0 */2 * ? *) # Runs every 2 days at midnight
+                  enabled: true
+
+    scheduleUpdateTopTenPlacesOpenNowStatus:
+        handler: handler.scheduleUpdateTopTenPlacesOpenNowStatus
+        name: scheduleUpdateTopTenPlacesOpenNowStatus
+        events:
+            - schedule:
+                  rate: cron(*/15 * * * ? *) # Runs every 15 minutes
+                  enabled: true
+
+plugins:
+    - serverless-offline
+
+package:
+    exclude:
+        - node_modules/**
+        - .git/**
+        - client/**
+        - README.md
+        - .env
+        - private/**
