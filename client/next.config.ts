@@ -10,15 +10,6 @@ const nextConfig: NextConfig = {
             },
         ],
     },
-    webpack(config, { isServer }) {
-        if (!isServer) {
-            config.module.rules.push({
-                test: /\.map$/,
-                use: 'null-loader', // Discards source map files in the browser
-            });
-        }
-        return config;
-    },
 };
 
 export default nextConfig;

@@ -14,7 +14,7 @@
 /coverage
 
 # production
-.serverless/build
+.serverless
 /build
 
 # misc
