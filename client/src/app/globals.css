@@ -46,7 +46,7 @@ body {
 
 /* Button Styles */
 .button {
-    @apply flex items-center justify-center rounded-md cursor-pointer border-none transition-all transform active:scale-95 disabled:opacity-50;
+    @apply flex items-center justify-center rounded-md cursor-pointer border-none transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* Button Colors */

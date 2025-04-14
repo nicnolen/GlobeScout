@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { Weather, FiveDayForecast, Units } from '../../types/weather';
 import { Context } from '../../types/graphQLContext';
 import { getCurrentWeather, getFiveDayForecast } from '../../library/graphQL/weather';
@@ -24,11 +25,11 @@ export const weatherResolvers = {
                 const openWeatherUrl = context.apiBaseUrls.openWeatherUrl;
                 const user = context.user;
 
-                return await getCurrentWeather(locationSearch, units, openWeatherApiKey, openWeatherUrl, user);
+                return await getCurrentWeather({ locationSearch, units, openWeatherApiKey, openWeatherUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching current weather data from OpenWeatherMap';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
         getFiveDayForecast: async (
@@ -44,8 +45,8 @@ export const weatherResolvers = {
                 return await getFiveDayForecast({ locationSearch, units, openWeatherApiKey, openWeatherUrl, user });
             } catch (err: unknown) {
                 const customMessage = 'Error fetching five day forecast data from OpenWeatherMap';
-                catchErrorHandler(err, customMessage);
-                throw err;
+                const finalMessage = catchErrorHandler(err, customMessage);
+                throw new GraphQLError(finalMessage);
             }
         },
     },

@@ -3,6 +3,11 @@ export enum UserRole {
     ADMIN = 'admin',
 }
 
+export enum AuthMethod {
+    EMAIL = 'email',
+    AUTHENTICATOR = 'authenticator',
+}
+
 // User data types to be used in the frontend (password excuded)
 export interface UserData {
     email: string;

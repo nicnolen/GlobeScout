@@ -4,6 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import https from 'https';
+import { GraphQLError } from 'graphql';
 import { expressMiddleware } from '@apollo/server/express4';
 import { User } from './types/users';
 import { Context } from './types/graphQLContext';
@@ -62,6 +63,13 @@ startApolloServer().then((apolloServer) => {
             context: async ({ req }): Promise<Context> => {
                 // Type assertion to match your custom User type
                 const user = req.user as User | null;
+
+                if (!user) {
+                    throw new GraphQLError('User not authenticated', {
+                        extensions: { code: 'UNAUTHENTICATED' },
+                    });
+                }
+
                 return {
                     user,
                     apiKeys: apiKeys || null,

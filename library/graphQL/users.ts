@@ -1,17 +1,23 @@
 import { GraphQLError } from 'graphql';
-import { UserData, User } from '../../types/users';
+import {
+    UserData,
+    User,
+    ServiceUsage,
+    EditUserInput,
+    EditUserProps,
+    DeleteUserProps,
+    ResetSingleApiCallsProps,
+} from '../../types/users';
 import UsersModel from '../../models/users/Users';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
-// Queries
-export async function getCurrentUser(user: User | null): Promise<UserData> {
-    try {
-        if (!user) {
-            throw new GraphQLError('User not authenticated', {
-                extensions: { code: 'UNAUTHENTICATED' },
-            });
-        }
+interface GetCurrentUserProps {
+    user: User;
+}
 
+// Queries
+export async function getCurrentUser({ user }: GetCurrentUserProps): Promise<UserData> {
+    try {
         const { email, role, lastLogin, active, authentication, services } = user;
 
         if (!active) {
@@ -45,11 +51,11 @@ export async function getAllUsers(): Promise<UserData[]> {
             const { authenticatorSecret, ...authenticationWithoutSecret } = user.authentication;
 
             // Filter out services that are empty objects
-            const filteredServices = Object.fromEntries(
+            const filteredServices: Record<string, ServiceUsage> = Object.fromEntries(
                 Object.entries(user.services).filter(([_, value]) => {
                     return value && Object.values(value).some((v) => v != null);
                 }),
-            );
+            ) as Record<string, ServiceUsage>;
 
             return {
                 email: user.email,
@@ -67,10 +73,11 @@ export async function getAllUsers(): Promise<UserData[]> {
 }
 
 // Mutations
-export async function editUser(email: string, input: any): Promise<User> {
+export async function editUser({ email, input }: EditUserProps): Promise<User> {
     try {
         // Handle service revocation: remove services that are set to null in input
-        const updatedInput: any = { ...input };
+        const updatedInput: Partial<EditUserInput> = { ...input };
+
         if (input.services) {
             for (const service in input.services) {
                 if (input.services[service] === null) {
@@ -103,7 +110,7 @@ export async function editUser(email: string, input: any): Promise<User> {
     }
 }
 
-export async function resetSingleApiCalls(email: string, service: string): Promise<User> {
+export async function resetSingleApiCalls({ email, service }: ResetSingleApiCallsProps): Promise<User> {
     try {
         // Construct the dynamic path to the service's requestsMade field
         const servicePath = `services.${service}.requestsMade`;
@@ -124,7 +131,7 @@ export async function resetSingleApiCalls(email: string, service: string): Promi
     }
 }
 
-export async function deleteUser(email: string): Promise<User> {
+export async function deleteUser({ email }: DeleteUserProps): Promise<User> {
     try {
         const deletedUser = await UsersModel.findOneAndDelete({ email });
 

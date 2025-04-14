@@ -1,7 +1,7 @@
 import { User } from './users';
 
 export interface Context {
-    user: User | null;
+    user: User;
     apiKeys: {
         googleMapsApiKey: string | null;
         openWeatherApiKey: string | null;
