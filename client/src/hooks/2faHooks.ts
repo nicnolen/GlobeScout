@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserData } from '../../../types/users';
+import { UserData } from '../types/users';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 export function useFetch2faStatus(user: UserData) {
