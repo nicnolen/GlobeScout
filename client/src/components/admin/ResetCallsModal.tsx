@@ -6,7 +6,7 @@ import { catchErrorHandler } from '../../utils/errorHandlers';
 import Modal from '../common/Modal';
 
 interface ResetCallsModalProps {
-    selectedUser: UserData | null;
+    selectedUser: UserData;
     serviceToReset: string;
     handleClose: () => void;
     message: string;
