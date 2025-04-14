@@ -12,7 +12,7 @@ export default function UsersList(): JSX.Element {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
     const [isResetCallsModalOpen, setIsResetCallsModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-    const [serviceToReset, setServiceToReset] = useState(null);
+    const [serviceToReset, setServiceToReset] = useState<string>('');
     const [message, setMessage] = useState<string>('');
 
     const {
@@ -144,7 +144,7 @@ export default function UsersList(): JSX.Element {
                 </table>
             </div>
 
-            {isEditModalOpen && (
+            {isEditModalOpen && selectedUser && (
                 <EditUserModal
                     selectedUser={selectedUser}
                     setSelectedUser={setSelectedUser}

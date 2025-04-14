@@ -21,6 +21,9 @@ const eslintConfig = [
             ],
         },
     },
+    {
+        ignores: ['.serverless/**'],
+    },
 ];
 
 export default eslintConfig;

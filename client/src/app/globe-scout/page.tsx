@@ -32,12 +32,12 @@ export default function GlobeScout(): JSX.Element {
     useCurrentWeatherData({
         currentWeatherLoading,
         currentWeatherError,
-        currentWeatherData: currentWeatherData ? currentWeatherData.getCurrentWeather : null,
+        currentWeatherData: currentWeatherData && currentWeatherData.getCurrentWeather,
         setMessage,
     });
 
     const isLoading = currentWeatherLoading;
-    const isError = currentWeatherError;
+    const isError = currentWeatherError || null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

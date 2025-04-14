@@ -6,7 +6,7 @@ import Modal from '../common/Modal';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 interface UserDeleteModalProps {
-    selectedUser: UserData | null;
+    selectedUser: UserData;
     handleClose: () => void;
     message: string;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
