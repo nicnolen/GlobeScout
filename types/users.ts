@@ -29,8 +29,26 @@ export interface UserData {
 
 export interface User extends UserData {
     _id: ObjectId;
+    email: string;
     password: string;
     resetPasswordToken?: string;
     resetPasswordExpires?: string;
+    role: UserRole;
+    lastLogin?: string;
+    active: boolean;
+    authentication: {
+        enabled: boolean;
+        methods: {
+            email: boolean;
+            authenticator: boolean;
+        };
+        authenticatorSecret?: string;
+        emailCode?: string;
+        emailCodeExpiration?: Date;
+    };
+    services: {
+        openWeatherApi?: { requestsMade: number; maxRequests: number };
+        googleMapsApi?: { requestsMade: number; maxRequests: number };
+    };
     __v: number;
 }

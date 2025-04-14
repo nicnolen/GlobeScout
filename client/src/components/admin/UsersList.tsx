@@ -1,6 +1,6 @@
 import React, { JSX, useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { UserData } from '../../../../types/users';
+import { UserData } from '../../types/users';
 import { GET_ALL_USERS } from '../../graphQL/usersQueries';
 import { removeFields } from '../../utils/helpers/graphQLHelpers';
 import EditUserModal from './EditUserModal';
