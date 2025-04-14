@@ -1,6 +1,6 @@
 import React, { JSX } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserData } from '../../../../types/users';
+import { UserData } from '../../types/users';
 import { RESET_SINGLE_API_CALLS } from '../../graphQL/usersMutations';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 import Modal from '../common/Modal';

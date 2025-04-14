@@ -4,6 +4,21 @@ provider:
     name: aws
     runtime: nodejs22.x
     region: us-east-2
+    environment:
+        NODE_ENV: production
+        OPENWEATHER_API_KEY: ${env:OPENWEATHER_API_KEY}
+        GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}
+        BASE_URL: ${env:BASE_URL}
+        OPENWEATHER_BASE_URL: ${env:OPENWEATHER_BASE_URL}
+        GOOGLE_MAPS_TEXT_SEARCH_URL: ${env.GOOGLE_MAPS_TEXT_SEARCH_URL}
+        JWT_SECRET: ${env:JWT_SECRET}
+        MONGODB_URI: ${env:MONGODB_URI}
+        USER_EMAIL: ${env:USER_EMAIL}
+        GMAIL_PASSWORD: ${env:GMAIL_PASSWORD}
+        CURRENT_WEATHER_CACHE_MODEL_NAME: ${env:CURRENT_WEATHER_CACHE_MODEL_NAME}
+        FIVE_DAY_FORECAST_CACHE_MODEL_NAME: ${env:FIVE_DAY_FORECAST_CACHE_MODEL_NAME}
+        TOP_TEN_PLACES_CACHE_MODEL_NAME: ${env:TOP_TEN_PLACES_CACHE_MODEL_NAME}
+        USERS_MODEL_NAME: ${env:USERS_MODEL_NAME}
 
 functions:
     api:

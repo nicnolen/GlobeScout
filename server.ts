@@ -36,8 +36,6 @@ const apiBaseUrls = {
 
 // Connect to MongoDB
 connectToMongoDB();
-
-// ⬇️ 1. Define and configure your Express app immediately
 const server: Express = express();
 
 server.use(express.json());
@@ -51,8 +49,6 @@ server.use('/', twoFactorRoutes);
 
 // Static files
 server.use(express.static(path.join(__dirname, 'client', 'public')));
-
-// ⬇️ 2. Apollo setup will still be async, call it after
 startApolloServer().then((apolloServer) => {
     try {
         const server: Express = express();
@@ -108,5 +104,5 @@ startApolloServer().then((apolloServer) => {
     }
 });
 
-// ⬇️ 3. Export the Lambda handler synchronously
+// Export the Lambda handler synchronously
 module.exports.handler = serverless(server);
