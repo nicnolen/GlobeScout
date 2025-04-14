@@ -17,6 +17,7 @@ import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
 import serverless from 'serverless-http';
+import cors from 'cors';
 
 // Load environmental variables
 dotenv.config();
@@ -38,6 +39,16 @@ const apiBaseUrls = {
 connectToMongoDB();
 const server: Express = express();
 
+// CORS Configuration to allow requests from your Vercel frontend
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+
+server.use(
+    cors({
+        origin: allowedOrigins, // Only allow requests from your frontend
+        credentials: true, // If you're sending cookies or sessions, this is needed
+    }),
+);
+
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
@@ -51,10 +62,6 @@ server.use('/', twoFactorRoutes);
 server.use(express.static(path.join(__dirname, 'client', 'public')));
 startApolloServer().then((apolloServer) => {
     try {
-        const server: Express = express();
-
-        server.use(passport.initialize());
-
         // Apply passport to graphql
         server.use('/graphql', passport.authenticate('jwt', { session: false }));
 
@@ -95,9 +102,6 @@ startApolloServer().then((apolloServer) => {
                 console.info(`Server is running on https://localhost:${PORT}`);
             });
         }
-
-        // Export the handler for Lambda
-        module.exports.handler = serverless(server);
     } catch (err: unknown) {
         const customMessage = 'Error starting server';
         catchErrorHandler(err, customMessage);
