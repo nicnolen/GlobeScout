@@ -15,7 +15,7 @@ export default function TwoFactorSetup(): JSX.Element {
         try {
             setLoading(true);
             const response = await axios.post<{ message: string }>(
-                '/validate-2fa',
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/validate-2fa`,
                 { code },
                 {
                     withCredentials: true,
@@ -39,7 +39,11 @@ export default function TwoFactorSetup(): JSX.Element {
         try {
             setLoading(true);
             setMessage('');
-            const response = await axios.post<{ message: string }>('/email-2fa-code', {}, { withCredentials: true });
+            const response = await axios.post<{ message: string }>(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/email-2fa-code`,
+                {},
+                { withCredentials: true },
+            );
 
             setMessage(response.data.message);
             setLoading(false);

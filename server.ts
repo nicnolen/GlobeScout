@@ -55,6 +55,10 @@ server.use(cookieParser());
 server.use(passport.initialize());
 
 // Routes before GraphQL
+server.get('/', (req, res) => {
+    res.send('Welcome to the API');
+});
+
 server.use('/', authRoutes);
 server.use('/', twoFactorRoutes);
 
@@ -87,12 +91,12 @@ startApolloServer().then((apolloServer) => {
         // Apply Apollo Server middleware to the Express app
         server.use('/graphql', graphqlMiddleware);
 
-        // Cron jobs
-        scheduleClearFiveDayForecastCache();
-        scheduleClearTopTenPlacesCache();
-        scheduleUpdateTopTenPlacesOpenNowStatus();
-
         if (dev) {
+            // Cron jobs
+            scheduleClearFiveDayForecastCache();
+            scheduleClearTopTenPlacesCache();
+            scheduleUpdateTopTenPlacesOpenNowStatus();
+
             // Start HTTPS server if not in Lambda environment
             const options = {
                 key: fs.readFileSync('./private/private.key'),

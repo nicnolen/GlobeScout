@@ -17,7 +17,7 @@ export default function ResetPasswordPage(): JSX.Element {
     const handleResetPassword = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/forgot', { email });
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/forgot`, { email });
 
             if (response.status === 200) {
                 setMessage('Password reset link sent. Check your email.');

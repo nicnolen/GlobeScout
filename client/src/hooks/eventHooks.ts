@@ -49,7 +49,7 @@ export function useAutoLogout(): void {
 
     async function logoutUser() {
         try {
-            await axios.post('/logout', {}, { withCredentials: true });
+            await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/logout`, {}, { withCredentials: true });
             router.push('/login');
         } catch (err) {
             const customMessage = 'Error logging out';
@@ -60,7 +60,9 @@ export function useAutoLogout(): void {
 
     async function verifyToken() {
         try {
-            const response = await axios.get('/verify', { withCredentials: true });
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/verify`, {
+                withCredentials: true,
+            });
 
             if (response.status !== 200) {
                 console.error(response.data.message);

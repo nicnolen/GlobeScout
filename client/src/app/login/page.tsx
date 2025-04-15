@@ -25,7 +25,11 @@ export default function LoginPage(): JSX.Element {
     const fetchUserLoginData = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/login', { email, password }, { withCredentials: true });
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,
+                { email, password },
+                { withCredentials: true },
+            );
 
             setMessage(response.data.message);
 

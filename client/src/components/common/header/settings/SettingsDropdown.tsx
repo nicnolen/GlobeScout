@@ -15,7 +15,11 @@ export default function SettingsDropdown(): JSX.Element {
 
     const handleLogout = async () => {
         try {
-            const response = await axios.post('/logout', {}, { withCredentials: true });
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/logout`,
+                {},
+                { withCredentials: true },
+            );
 
             if (response.status === 200) {
                 router.push('/login');

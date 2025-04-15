@@ -25,7 +25,11 @@ export default function TwoFactorSettings(): JSX.Element {
         try {
             setMessage('');
             setIsUpdating(true);
-            const response = await axios.patch('/toggle-2fa', { is2faEnabled }, { withCredentials: true });
+            const response = await axios.patch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/toggle-2fa`,
+                { is2faEnabled },
+                { withCredentials: true },
+            );
 
             if (!response.data.message.includes('enabled')) {
                 setMessage(response.data.message);
@@ -53,7 +57,7 @@ export default function TwoFactorSettings(): JSX.Element {
         try {
             setIsUpdating(true);
             const response = await axios.patch(
-                '/toggle-2fa-method',
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/toggle-2fa-method`,
                 { isGoogleAuthEnabled },
                 { withCredentials: true },
             );

@@ -27,7 +27,7 @@ export default function RegisterPage(): JSX.Element {
 
         try {
             const response = await axios.post(
-                '/register',
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/register`,
                 { email, password },
                 {
                     headers: {

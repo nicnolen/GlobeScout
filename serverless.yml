@@ -19,13 +19,15 @@ provider:
         FIVE_DAY_FORECAST_CACHE_MODEL_NAME: ${env:FIVE_DAY_FORECAST_CACHE_MODEL_NAME}
         TOP_TEN_PLACES_CACHE_MODEL_NAME: ${env:TOP_TEN_PLACES_CACHE_MODEL_NAME}
         USERS_MODEL_NAME: ${env:USERS_MODEL_NAME}
+    stage: dev
 
 functions:
     api:
-        handler: /server.handler
+        handler: server.handler
         name: express-api-function
         events:
-            - httpApi: '*'
+            - http: ANY /
+            - http: 'ANY {proxy+}'
 
     # Cron jobs
     scheduleClearFiveDayForecastCache:
@@ -63,3 +65,6 @@ package:
         - README.md
         - .env
         - private/**
+custom:
+    serverless-offline:
+        noPrependStageInUrl: true

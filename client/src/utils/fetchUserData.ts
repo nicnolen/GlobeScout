@@ -7,7 +7,7 @@ import { catchErrorHandler } from '../utils/errorHandlers';
 
 export async function verifyUser(): Promise<boolean> {
     try {
-        const response = await axios.get('/verify', { withCredentials: true });
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/verify`, { withCredentials: true });
         return response.status === 200;
     } catch (err: unknown) {
         const customMessage = 'Error verifying user';

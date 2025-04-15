@@ -14,7 +14,11 @@ export default function ResetPassword(): JSX.Element {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.patch('/reset-password', { password }, { withCredentials: true });
+            const response = await axios.patch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/reset-password`,
+                { password },
+                { withCredentials: true },
+            );
             setMessage('Password successfully reset.');
             if (response.status === 200) {
                 setTimeout(() => router.push('/'), 1500);
