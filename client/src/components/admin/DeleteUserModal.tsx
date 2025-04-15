@@ -1,6 +1,6 @@
 import React, { JSX } from 'react';
 import { useMutation } from '@apollo/client';
-import { UserData } from '../../../../types/users';
+import { UserData } from '../../types/users';
 import { DELETE_USER } from '../../graphQL/usersMutations';
 import Modal from '../common/Modal';
 import { catchErrorHandler } from '../../utils/errorHandlers';
