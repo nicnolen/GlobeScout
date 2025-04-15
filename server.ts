@@ -1,6 +1,5 @@
 import express, { Express, Request, Response, RequestHandler } from 'express';
 import fs from 'fs';
-import next from 'next';
 import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -23,9 +22,6 @@ dotenv.config();
 
 const PORT: string | number = process.env.PORT || 3000;
 const dev: boolean = process.env.NODE_ENV !== 'production';
-const app = next({ dev, dir: './client' });
-// Tell Express how to handle incoming requests to server Next.js pages
-const handle = app.getRequestHandler();
 
 const apiKeys = {
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? null,
@@ -42,9 +38,6 @@ connectToMongoDB();
 
 async function startServer(): Promise<void> {
     try {
-        // Wait for Next.js to be ready;
-        await app.prepare();
-
         const server: Express = express();
 
         const apolloServer = await startApolloServer();
@@ -87,11 +80,6 @@ async function startServer(): Promise<void> {
         // Routes
         server.use('/', authRoutes);
         server.use('/', twoFactorRoutes);
-
-        // Catch all route to handle Next.js pages
-        server.get(/(.*)/, (req: Request, res: Response) => {
-            return handle(req, res);
-        });
 
         // Cron jobs
         scheduleClearFiveDayForecastCache();
