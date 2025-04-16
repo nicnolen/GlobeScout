@@ -1,9 +1,8 @@
-import express, { Express, Request, Response, RequestHandler } from 'express';
-import fs from 'fs';
+import express, { Express, RequestHandler } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import https from 'https';
+import serverless from 'serverless-http';
 import { GraphQLError } from 'graphql';
 import { expressMiddleware } from '@apollo/server/express4';
 import { User } from './types/users';
@@ -16,11 +15,12 @@ import twoFactorRoutes from './routes/2fa';
 import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
 import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 // Load environmental variables
 dotenv.config();
 
-const PORT: string | number = process.env.PORT || 3000;
 const dev: boolean = process.env.NODE_ENV !== 'production';
 
 const apiKeys = {
@@ -33,19 +33,45 @@ const apiBaseUrls = {
     googleMapsTextSearchUrl: process.env.GOOGLE_MAPS_TEXT_SEARCH_URL ?? null,
 };
 
+const server: Express = express();
+
 // Connect to MongoDB
 connectToMongoDB();
 
 async function startServer(): Promise<void> {
     try {
-        const server: Express = express();
-
         const apolloServer = await startApolloServer();
+
+        // Raw parser for AWS Lambda payloads
+        server.use(bodyParser.raw({ type: 'application/json' }));
+
+        // Middleware to convert raw buffer into JSON (for Lambda/API Gateway compatibility)
+        const bufferParserMiddleware: RequestHandler = (req, res, next) => {
+            if (req.is('application/json') && Buffer.isBuffer(req.body)) {
+                try {
+                    req.body = JSON.parse(req.body.toString());
+                } catch (err: unknown) {
+                    const customMessage = 'Invalid JSON body';
+                    catchErrorHandler(err, customMessage);
+                    res.status(400).send('Invalid JSON body');
+                    return; // Just return here to stop further processing
+                }
+            }
+            next();
+        };
+
+        server.use(bufferParserMiddleware);
 
         // Middleware to parse JSON requests before Apollo Server
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
         server.use(cookieParser()); // Enable cookies for authentication
+        server.use(
+            cors({
+                origin: ['https://globe-scout.vercel.app', 'http://localhost:3000'],
+                credentials: true,
+            }),
+        );
 
         server.use(passport.initialize());
 
@@ -81,20 +107,13 @@ async function startServer(): Promise<void> {
         server.use('/', authRoutes);
         server.use('/', twoFactorRoutes);
 
-        // Cron jobs
-        scheduleClearFiveDayForecastCache();
-        scheduleClearTopTenPlacesCache();
-        scheduleUpdateTopTenPlacesOpenNowStatus();
-
-        // Start HTTPS server
-        const options = {
-            key: fs.readFileSync('./private/private.key'),
-            cert: fs.readFileSync('./private/cert.pem'),
-        };
-
-        https.createServer(options, server).listen(PORT, () => {
-            console.info(`Server is running on https://localhost:${PORT}`);
-        });
+        // Only run cron jobs if we're in development (In lambda they will be ran on AWS Cloudwatch)
+        if (dev) {
+            // Cron jobs (These will run on AWS CloudWatch, no need for manual scheduling in Lambda)
+            scheduleClearFiveDayForecastCache();
+            scheduleClearTopTenPlacesCache();
+            scheduleUpdateTopTenPlacesOpenNowStatus();
+        }
     } catch (err: unknown) {
         const customMessage = 'Error starting server';
         catchErrorHandler(err, customMessage);
@@ -102,3 +121,5 @@ async function startServer(): Promise<void> {
 }
 
 startServer();
+
+module.exports.handler = serverless(server);
