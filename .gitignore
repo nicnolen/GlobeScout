@@ -32,5 +32,8 @@ yarn-error.log*
 # private folder
 /private
 
+# serverless file
+.serverless*
+
 # typescript
 *.tsbuildinfo

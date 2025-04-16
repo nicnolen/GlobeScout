@@ -1,0 +1,87 @@
+service: globescout
+
+provider:
+    name: aws
+    runtime: nodejs22.x
+    region: us-east-2
+    stage: dev
+    environment:
+        NODE_ENV: production
+        OPENWEATHER_API_KEY: ${env:OPENWEATHER_API_KEY}
+        GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}
+        BASE_URL: ${env:BASE_URL}
+        ALLOWED_URLS: ${env:ALLOWED_URLS}
+        OPENWEATHER_BASE_URL: ${env:OPENWEATHER_BASE_URL}
+        GOOGLE_MAPS_TEXT_SEARCH_URL: ${env.GOOGLE_MAPS_TEXT_SEARCH_URL}
+        JWT_SECRET: ${env:JWT_SECRET}
+        MONGODB_URI: ${env:MONGODB_URI}
+        USER_EMAIL: ${env:USER_EMAIL}
+        GMAIL_PASSWORD: ${env:GMAIL_PASSWORD}
+        CURRENT_WEATHER_CACHE_MODEL_NAME: ${env:CURRENT_WEATHER_CACHE_MODEL_NAME}
+        FIVE_DAY_FORECAST_CACHE_MODEL_NAME: ${env:FIVE_DAY_FORECAST_CACHE_MODEL_NAME}
+        TOP_TEN_PLACES_CACHE_MODEL_NAME: ${env:TOP_TEN_PLACES_CACHE_MODEL_NAME}
+        USERS_MODEL_NAME: ${env:USERS_MODEL_NAME}
+    httpApi:
+        cors:
+            allowedOrigins:
+                - https://globe-scout.vercel.app # Frontend Next.js app
+            allowedMethods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+                - OPTIONS
+            allowedHeaders:
+                - Content-Type
+                - Authorization
+            maxAge: 86400 # Cache CORS preflight response for 24 hours (86400 seconds) to improve performance
+            allowCredentials: true
+
+functions:
+    api:
+        handler: server.handler
+        name: express-api-function
+        events:
+            - httpApi:
+                  path: /{proxy+}
+                  method: ANY
+
+    # Cron jobs
+    scheduleClearFiveDayForecastCache:
+        handler: aws/cronHandlers.clearFiveDayForecastCacheHandler
+        name: clearFiveDayForecastCacheHandler
+        events:
+            - schedule:
+                  rate: cron(0 0 * * ? *) # Runs every day at midnight
+                  enabled: true
+
+    scheduleClearTopTenPlacesCache:
+        handler: aws/cronHandlers.clearTopTenPlacesCacheHandler
+        name: clearTopTenPlacesCacheHandler
+        events:
+            - schedule:
+                  rate: cron(0 0 */2 * ? *) # Runs every 2 days at midnight
+                  enabled: true
+
+    scheduleUpdateTopTenPlacesOpenNowStatus:
+        handler: aws/cronHandlers.updateTopTenPlacesOpenNowStatusHandler
+        name: updateTopTenPlacesOpenNowStatusHandler
+        events:
+            - schedule:
+                  rate: cron(*/15 * * * ? *) # Runs every 15 minutes
+                  enabled: true
+
+plugins:
+    - serverless-offline
+
+package:
+    exclude:
+        - node_modules/**
+        - .git/**
+        - client/**
+        - README.md
+        - .env
+        - private/**
+custom:
+    serverless-offline:
+        noPrependStageInUrl: true
