@@ -1,11 +1,11 @@
 import React, { JSX } from 'react';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { Units } from '../../../../../../types/weather';
 import { selectUnits } from '../../../../redux/selectors/weatherSelectors';
 import { setUnits } from '../../../../redux/slices/weatherSlice';
 import TwoFactorAuthSettings from './TwoFactorAuthSettings';
+import api from '../../../../utils/apiHandler';
 import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
 export default function SettingsDropdown(): JSX.Element {
@@ -15,7 +15,7 @@ export default function SettingsDropdown(): JSX.Element {
 
     const handleLogout = async () => {
         try {
-            const response = await axios.post('/logout', {}, { withCredentials: true });
+            const response = await api.post('/logout', {}, { withCredentials: true });
 
             if (response.status === 200) {
                 router.push('/login');

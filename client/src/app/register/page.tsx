@@ -1,9 +1,9 @@
 'use client';
 
 import React, { JSX, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import api from '../../utils/apiHandler';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function RegisterPage(): JSX.Element {
@@ -26,7 +26,7 @@ export default function RegisterPage(): JSX.Element {
         e.preventDefault();
 
         try {
-            const response = await axios.post(
+            const response = await api.post(
                 '/register',
                 { email, password },
                 {

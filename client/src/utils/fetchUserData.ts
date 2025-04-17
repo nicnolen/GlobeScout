@@ -1,13 +1,13 @@
-import axios from 'axios';
 import client from '../config/graphQL/apolloClient';
 import { GET_CURRENT_USER } from '../graphQL/usersQueries';
 import { AppDispatch } from '../redux/store';
 import { setUser } from '../redux/slices/usersSlice';
+import api from '../utils/apiHandler';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 export async function verifyUser(): Promise<boolean> {
     try {
-        const response = await axios.get('/verify', { withCredentials: true });
+        const response = await api.get('/verify', { withCredentials: true });
         return response.status === 200;
     } catch (err: unknown) {
         const customMessage = 'Error verifying user';

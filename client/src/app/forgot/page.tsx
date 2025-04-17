@@ -1,8 +1,8 @@
 'use client';
 
 import React, { JSX, useState } from 'react';
-import axios from 'axios';
 import Link from 'next/link';
+import api from '../../utils/apiHandler';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function ResetPasswordPage(): JSX.Element {
@@ -17,7 +17,7 @@ export default function ResetPasswordPage(): JSX.Element {
     const handleResetPassword = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/forgot', { email });
+            const response = await api.post('/forgot', { email });
 
             if (response.status === 200) {
                 setMessage('Password reset link sent. Check your email.');
