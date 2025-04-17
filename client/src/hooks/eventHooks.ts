@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import api from '../utils/apiHandler';
 import { catchErrorHandler } from '../utils/errorHandlers';
 
 export function useOutsideClick(callback: () => void) {
@@ -49,7 +49,7 @@ export function useAutoLogout(): void {
 
     async function logoutUser() {
         try {
-            await axios.post('/logout', {}, { withCredentials: true });
+            await api.post('/logout', {}, { withCredentials: true });
             router.push('/login');
         } catch (err) {
             const customMessage = 'Error logging out';
@@ -60,7 +60,7 @@ export function useAutoLogout(): void {
 
     async function verifyToken() {
         try {
-            const response = await axios.get('/verify', { withCredentials: true });
+            const response = await api.get('/verify', { withCredentials: true });
 
             if (response.status !== 200) {
                 console.error(response.data.message);

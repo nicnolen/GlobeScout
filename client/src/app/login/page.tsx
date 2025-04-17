@@ -1,9 +1,9 @@
 'use client';
 
 import React, { JSX, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import api from '../../utils/apiHandler';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function LoginPage(): JSX.Element {
@@ -25,7 +25,7 @@ export default function LoginPage(): JSX.Element {
     const fetchUserLoginData = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/login', { email, password }, { withCredentials: true });
+            const response = await api.post('/login', { email, password }, { withCredentials: true });
 
             setMessage(response.data.message);
 

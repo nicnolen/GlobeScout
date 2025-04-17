@@ -1,8 +1,8 @@
 'use client';
 
 import React, { JSX, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import api from '../../utils/apiHandler';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function TwoFactorSetup(): JSX.Element {
@@ -14,7 +14,7 @@ export default function TwoFactorSetup(): JSX.Element {
     async function handleValidateCode(): Promise<void> {
         try {
             setLoading(true);
-            const response = await axios.post<{ message: string }>(
+            const response = await api.post<{ message: string }>(
                 '/validate-2fa',
                 { code },
                 {
@@ -39,7 +39,7 @@ export default function TwoFactorSetup(): JSX.Element {
         try {
             setLoading(true);
             setMessage('');
-            const response = await axios.post<{ message: string }>('/email-2fa-code', {}, { withCredentials: true });
+            const response = await api.post<{ message: string }>('/email-2fa-code', {}, { withCredentials: true });
 
             setMessage(response.data.message);
             setLoading(false);

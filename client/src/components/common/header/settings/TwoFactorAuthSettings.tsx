@@ -1,9 +1,9 @@
 import { JSX } from 'react';
-import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../../../redux/selectors/usersSelectors';
 import { setUser } from '../../../../redux/slices/usersSlice';
 import { useFetch2faStatus } from '../../../../hooks/2faHooks';
+import api from '../../../../utils/apiHandler';
 import { catchErrorHandler } from '../../../../utils/errorHandlers';
 
 export default function TwoFactorSettings(): JSX.Element {
@@ -25,7 +25,7 @@ export default function TwoFactorSettings(): JSX.Element {
         try {
             setMessage('');
             setIsUpdating(true);
-            const response = await axios.patch('/toggle-2fa', { is2faEnabled }, { withCredentials: true });
+            const response = await api.patch('/toggle-2fa', { is2faEnabled }, { withCredentials: true });
 
             if (!response.data.message.includes('enabled')) {
                 setMessage(response.data.message);
@@ -52,11 +52,7 @@ export default function TwoFactorSettings(): JSX.Element {
     const toggle2faMethod = async (isGoogleAuthEnabled: boolean) => {
         try {
             setIsUpdating(true);
-            const response = await axios.patch(
-                '/toggle-2fa-method',
-                { isGoogleAuthEnabled },
-                { withCredentials: true },
-            );
+            const response = await api.patch('/toggle-2fa-method', { isGoogleAuthEnabled }, { withCredentials: true });
 
             setMessage(response.data.message);
             setIsGoogleAuthEnabled(isGoogleAuthEnabled);

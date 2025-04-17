@@ -1,9 +1,9 @@
 'use client';
 
 import { JSX, useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import api from '../../utils/apiHandler';
 import { catchErrorHandler } from '../../utils/errorHandlers';
 
 export default function ResetPassword(): JSX.Element {
@@ -14,7 +14,7 @@ export default function ResetPassword(): JSX.Element {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.patch('/reset-password', { password }, { withCredentials: true });
+            const response = await api.patch('/reset-password', { password }, { withCredentials: true });
             setMessage('Password successfully reset.');
             if (response.status === 200) {
                 setTimeout(() => router.push('/'), 1500);
