@@ -12,16 +12,11 @@ import connectToMongoDB from './config/mongoDB/db';
 import { startApolloServer } from './config/graphQL/apolloServer';
 import authRoutes from './routes/auth';
 import twoFactorRoutes from './routes/2fa';
-import { scheduleClearFiveDayForecastCache } from './utils/cron/weatherCrons';
-import { scheduleClearTopTenPlacesCache, scheduleUpdateTopTenPlacesOpenNowStatus } from './utils/cron/googleMapsCrons';
 import { catchErrorHandler } from './utils/errorHandlers';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 
 // Load environmental variables
 dotenv.config();
-
-const dev: boolean = process.env.NODE_ENV !== 'production';
 
 const apiKeys = {
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? null,
@@ -42,8 +37,12 @@ async function startServer(): Promise<void> {
     try {
         const apolloServer = await startApolloServer();
 
-        // Raw parser for AWS Lambda payloads
-        server.use(bodyParser.raw({ type: 'application/json' }));
+        server.use(
+            cors({
+                origin: ['https://globe-scout.vercel.app', 'http://localhost:3000'],
+                credentials: true,
+            }),
+        );
 
         // Middleware to convert raw buffer into JSON (for Lambda/API Gateway compatibility)
         const bufferParserMiddleware: RequestHandler = (req, res, next) => {
@@ -66,13 +65,6 @@ async function startServer(): Promise<void> {
         server.use(express.json());
         server.use(express.urlencoded({ extended: true })); // Handles form data
         server.use(cookieParser()); // Enable cookies for authentication
-        server.use(
-            cors({
-                origin: ['https://globe-scout.vercel.app', 'http://localhost:3000'],
-                credentials: true,
-            }),
-        );
-
         server.use(passport.initialize());
 
         // Apply passport to graphql
@@ -97,6 +89,7 @@ async function startServer(): Promise<void> {
                 };
             },
         }) as unknown as RequestHandler;
+
         // Apply Apollo Server middleware to the Express app
         server.use('/graphql', graphqlMiddleware);
 
@@ -106,14 +99,6 @@ async function startServer(): Promise<void> {
         // Routes
         server.use('/', authRoutes);
         server.use('/', twoFactorRoutes);
-
-        // Only run cron jobs if we're in development (In lambda they will be ran on AWS Cloudwatch)
-        if (dev) {
-            // Cron jobs (These will run on AWS CloudWatch, no need for manual scheduling in Lambda)
-            scheduleClearFiveDayForecastCache();
-            scheduleClearTopTenPlacesCache();
-            scheduleUpdateTopTenPlacesOpenNowStatus();
-        }
     } catch (err: unknown) {
         const customMessage = 'Error starting server';
         catchErrorHandler(err, customMessage);
