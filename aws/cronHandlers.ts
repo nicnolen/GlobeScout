@@ -4,11 +4,13 @@ import { checkOpenNowStatus } from '../utils/checkOpenNowStatus';
 import { catchErrorHandler } from '../utils/errorHandlers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import connectToMongoDB from '../config/mongoDB/db';
 
 dayjs.extend(utc);
 
 export const clearFiveDayForecastCacheHandler = async () => {
     try {
+        await connectToMongoDB();
         console.info('Starting cache clearing job for 5-day forecast...');
         await FiveDayForecastCache.deleteMany({});
         console.info('Successfully cleared the 5-day forecast cache.');
@@ -20,6 +22,7 @@ export const clearFiveDayForecastCacheHandler = async () => {
 
 export const clearTopTenPlacesCacheHandler = async () => {
     try {
+        await connectToMongoDB();
         // Calculate 48 hours ago from the current date
         const dateThreshold = new Date();
         dateThreshold.setHours(dateThreshold.getHours() - 48);
@@ -37,6 +40,7 @@ export const clearTopTenPlacesCacheHandler = async () => {
 
 export const updateTopTenPlacesOpenNowStatusHandler = async () => {
     try {
+        await connectToMongoDB();
         // Get the current time and subtract 15 minutes to filter documents
         const fifteenMinutesAgo = dayjs().subtract(15, 'minutes').toISOString();
 

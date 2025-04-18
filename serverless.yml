@@ -9,10 +9,10 @@ provider:
         NODE_ENV: production
         OPENWEATHER_API_KEY: ${env:OPENWEATHER_API_KEY}
         GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}
-        BASE_URL: ${env:BASE_URL}
+        BASE_URL: ${self:custom.baseUrl.${opt:stage, 'dev'}} # dynamic BASE_URL based on stage
         ALLOWED_URLS: ${env:ALLOWED_URLS}
         OPENWEATHER_BASE_URL: ${env:OPENWEATHER_BASE_URL}
-        GOOGLE_MAPS_TEXT_SEARCH_URL: ${env.GOOGLE_MAPS_TEXT_SEARCH_URL}
+        GOOGLE_MAPS_TEXT_SEARCH_URL: ${env:GOOGLE_MAPS_TEXT_SEARCH_URL}
         JWT_SECRET: ${env:JWT_SECRET}
         MONGODB_URI: ${env:MONGODB_URI}
         USER_EMAIL: ${env:USER_EMAIL}
@@ -25,6 +25,7 @@ provider:
         cors:
             allowedOrigins:
                 - https://globe-scout.vercel.app # Frontend Next.js app
+                - http://localhost:3000
             allowedMethods:
                 - GET
                 - POST
@@ -83,5 +84,9 @@ package:
         - .env
         - private/**
 custom:
-    serverless-offline:
-        noPrependStageInUrl: true
+    baseUrl:
+        dev: 'http://localhost:3000' # Local development URL
+        prod: 'https://globe-scout.vercel.app' # Production URL
+
+        serverless-offline:
+            noPrependStageInUrl: true
