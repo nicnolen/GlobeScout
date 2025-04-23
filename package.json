@@ -13,7 +13,8 @@
         "prettier": "echo 'Server Prettier' && prettier --config .prettierrc --write . && echo 'Client Prettier' && cd client && npm run prettier",
         "prepare": "husky",
         "update-deps": "echo 'Server' && ncu -i --format group && echo 'Client' && ncu -i --format group && echo 'Global' && ncu -g",
-        "unused-deps": "depcheck"
+        "unused-deps": "depcheck",
+        "deploy-prod": "serverless deploy --stage prod"
     },
     "repository": {
         "type": "git",
