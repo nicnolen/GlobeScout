@@ -30,6 +30,7 @@ provider:
                 - GET
                 - POST
                 - PUT
+                - PATCH
                 - DELETE
                 - OPTIONS
             allowedHeaders:
@@ -88,5 +89,6 @@ custom:
         dev: 'http://localhost:3000' # Local development URL
         prod: 'https://globe-scout.vercel.app' # Production URL
 
-        serverless-offline:
-            noPrependStageInUrl: true
+    serverless-offline:
+        httpPort: 3001
+        noPrependStageInUrl: true
