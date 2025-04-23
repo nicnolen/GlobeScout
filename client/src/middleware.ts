@@ -43,7 +43,9 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
+         * - images (images folder)
+         * - login, register, forgot, reset-password, 2fa (public routes)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|images|login|register|forgot|reset-password|2fa).*)',
     ],
 };
