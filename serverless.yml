@@ -6,7 +6,7 @@ provider:
     region: us-east-2
     stage: dev
     environment:
-        NODE_ENV: production
+        NODE_ENV: ${env:NODE_ENV}
         OPENWEATHER_API_KEY: ${env:OPENWEATHER_API_KEY}
         GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}
         BASE_URL: ${self:custom.baseUrl.${opt:stage, 'dev'}} # dynamic BASE_URL based on stage
