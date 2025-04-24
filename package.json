@@ -18,14 +18,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/nicnolen/CityZen.git"
+        "url": "git+https://github.com/nicnolen/GlobeScout.git"
     },
     "author": "Nicholas Nolen",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/nicnolen/CityZen/issues"
+        "url": "https://github.com/nicnolen/GlobeScout/issues"
     },
-    "homepage": "https://github.com/nicnolen/CityZen#readme",
+    "homepage": "https://github.com/nicnolen/GlobeScout#readme",
     "dependencies": {
         "@apollo/server": "^4.11.3",
         "axios": "^1.8.4",
