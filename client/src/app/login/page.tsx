@@ -32,11 +32,11 @@ export default function LoginPage(): JSX.Element {
             if (response.status === 200) {
                 const is2FA = response.data.message.includes('2FA');
                 if (is2FA) {
-                    router.push('/2fa');
+                    setTimeout(() => router.push('/2fa'), 200);
                     return;
                 }
 
-                router.push('/');
+                setTimeout(() => router.push('/'), 200);
             }
         } catch (err: unknown) {
             const customMessage = 'User login failed';

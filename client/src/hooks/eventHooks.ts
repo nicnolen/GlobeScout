@@ -50,11 +50,11 @@ export function useAutoLogout(): void {
     async function logoutUser() {
         try {
             await api.post('/logout', {}, { withCredentials: true });
-            router.push('/login');
+            setTimeout(() => router.push('/login'), 200);
         } catch (err) {
             const customMessage = 'Error logging out';
             catchErrorHandler(err, customMessage);
-            router.push('/login');
+            setTimeout(() => router.push('/login'), 200);
         }
     }
 
@@ -71,7 +71,7 @@ export function useAutoLogout(): void {
             catchErrorHandler(err, customMessage);
 
             logoutUser();
-            router.push('/login');
+            setTimeout(() => router.push('/login'), 200);
         }
     }
 

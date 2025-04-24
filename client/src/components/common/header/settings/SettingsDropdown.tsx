@@ -18,7 +18,7 @@ export default function SettingsDropdown(): JSX.Element {
             const response = await api.post('/logout', {}, { withCredentials: true });
 
             if (response.status === 200) {
-                router.push('/login');
+                setTimeout(() => router.push('/login'), 200);
             }
         } catch (err: unknown) {
             const customMessage = 'Error during logout';

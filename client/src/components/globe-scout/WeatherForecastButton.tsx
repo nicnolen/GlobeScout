@@ -22,7 +22,7 @@ export default function WeatherForecastButton({
 
     const handleWeatherButtonClick = () => {
         if (currentWeatherData) {
-            router.push('/weather-forecast');
+            setTimeout(() => router.push('/weather-forecast'), 200);
         }
     };
 
