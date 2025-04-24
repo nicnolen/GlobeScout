@@ -104,8 +104,8 @@ async function startServer(): Promise<void> {
         server.use(express.static(path.join(__dirname, 'client', 'public')));
 
         // Routes
-        server.use('/', authRoutes);
-        server.use('/', twoFactorRoutes);
+        server.use('/api', authRoutes);
+        server.use('/api', twoFactorRoutes);
 
         // Only run cron jobs if we're in development (In lambda they will be ran on AWS Cloudwatch)
         if (dev) {
